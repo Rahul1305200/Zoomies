@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<![CDATA[<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400;1,9..144,500;1,9..144,600;1,9..144,700;1,9..144,800&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #F6F1E4; color: #23281C; font-family: 'Work Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  a { color: inherit; text-decoration: none; }
+  a.link { transition: color 0.2s ease; }
+  a.link:hover { color: #C4632F; }
+  a[href]:not(.link) { transition: transform 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s cubic-bezier(.22,1,.36,1), background-color 0.2s ease, color 0.2s ease; }
+
+  @keyframes fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-in { animation: fade-up 0.7s cubic-bezier(.22,1,.36,1) both; }
+  .d1 { animation-delay: .05s; } .d2 { animation-delay: .12s; } .d3 { animation-delay: .19s; }
+
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s cubic-bezier(.22,1,.36,1), transform 0.7s cubic-bezier(.22,1,.36,1); }
+  .reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+  .nav-dropdown-wrap {
+    position: relative;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+  .nav-dropdown-wrap .nav-dropdown-caret { transition: transform 0.45s cubic-bezier(.34,1.3,.64,1); display: inline-block; }
+  .nav-dropdown-wrap:hover .nav-dropdown-caret,
+  .nav-dropdown-wrap:focus-within .nav-dropdown-caret { transform: rotate(180deg); }
+  .nav-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(14px) scale(0.96);
+    background: #FFFEFA;
+    border: 2px solid #F5C21A;
+    border-radius: 18px;
+    padding: 10px;
+    min-width: 224px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.42s ease,
+      transform 0.5s cubic-bezier(.22,1,.36,1),
+      visibility 0.42s,
+      box-shadow 0.4s ease;
+    transform-origin: top center;
+    z-index: 300;
+    box-shadow: 4px 4px 0 rgba(35,40,28,0.12), 0 16px 32px -16px rgba(35,40,28,0.35);
+  }
+  /* invisible bridge so mouse can travel from link to menu without closing */
+  .nav-dropdown::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0;
+    bottom: 100%;
+    height: 16px;
+  }
+  .nav-dropdown-wrap:hover .nav-dropdown,
+  .nav-dropdown-wrap:focus-within .nav-dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  .nav-dropdown-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 12px; border-radius: 11px;
+    font-family: 'Work Sans', sans-serif; font-size: 15.5px; font-weight: 500;
+    color: #23281C; white-space: nowrap;
+    transition:
+      background 0.4s ease,
+      transform 0.4s cubic-bezier(.22,1,.36,1),
+      padding-left 0.4s cubic-bezier(.22,1,.36,1),
+      box-shadow 0.35s ease;
+    pointer-events: auto;
+    position: relative; z-index: 1;
+  }
+  .nav-dropdown-item:hover {
+    background: #FBF3D9;
+    padding-left: 16px;
+    transform: translateX(2px);
+  }
+  .nav-dropdown-icon {
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    width: 32px; height: 32px; border-radius: 9px; background: #F6F1E4;
+    transition: background 0.4s ease, transform 0.45s cubic-bezier(.34,1.56,.64,1);
+  }
+  .nav-dropdown-item:hover .nav-dropdown-icon {
+    background: #F5C21A;
+    transform: rotate(-8deg) scale(1.08);
+  }
+
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 15px clamp(16px, 1.9vw, 28px); border-radius: 10px; font-family: 'Lora', serif; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; transition: transform 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s cubic-bezier(.22,1,.36,1), background-color 0.2s ease, color 0.2s ease; }
+  .btn-yellow { background: #F5C21A; color: #23281C; box-shadow: 3px 3px 0 #23281C; }
+  .btn-yellow:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 #23281C; }
+  .btn-ink { background: #23281C; color: #F6F1E4; }
+  .btn-ink:hover { background: #F5C21A; color: #23281C; transform: translateY(-3px); }
+  .btn-whatsapp { background: #25D366; color: #FFFFFF; }
+  .btn-whatsapp:hover { background: #1ebe57; color: #FFFFFF; transform: translateY(-2px); }
+
+  .kicker { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #C4632F; }
+
+  .launching-card { position: relative; overflow: hidden; isolation: isolate; }
+  .launching-card > * { position: relative; z-index: 2; }
+
+  .hl-year { position: relative; display: inline-block; padding: 0 6px; z-index: 2; }
+  /* a steady highlighter bar behind the year, not a morphing blob */
+  .hl-year::before {
+    content: ""; position: absolute; inset: 18% -8% 12% -8%; z-index: -1;
+    background: #F5C21A;
+    border-radius: 8px;
+  }
+
+  .paw-trail {
+    position: absolute; left: 24px; right: 24px; bottom: 16px;
+    height: 32px; display: flex; align-items: center; justify-content: space-between;
+    pointer-events: none; z-index: 1;
+  }
+  .paw-trail svg {
+    width: 26px; height: 26px; flex-shrink: 0;
+    opacity: 0;
+    transform: translateY(var(--ty, 0)) rotate(var(--r, 0deg)) scale(0.4);
+    transform-origin: 50% 50%;
+    animation: paw-stamp 5.2s cubic-bezier(.22,1,.36,1) infinite;
+  }
+  .paw-trail svg:nth-child(odd)  { --ty: -7px; }
+  .paw-trail svg:nth-child(even) { --ty:  7px; }
+  .paw-trail svg:nth-child(1) { animation-delay: 0s;    --r: -22deg; }
+  .paw-trail svg:nth-child(2) { animation-delay: 0.42s; --r:  18deg; }
+  .paw-trail svg:nth-child(3) { animation-delay: 0.84s; --r: -14deg; }
+  .paw-trail svg:nth-child(4) { animation-delay: 1.26s; --r:  16deg; }
+  .paw-trail svg:nth-child(5) { animation-delay: 1.68s; --r: -18deg; }
+  .paw-trail svg:nth-child(6) { animation-delay: 2.10s; --r:  12deg; }
+  .paw-trail svg:nth-child(7) { animation-delay: 2.52s; --r: -16deg; }
+  @keyframes paw-stamp {
+    0%   { opacity: 0;    transform: translateY(var(--ty)) rotate(var(--r)) scale(0.4); }
+    10%  { opacity: 0.9;  transform: translateY(var(--ty)) rotate(var(--r)) scale(1.15); }
+    18%  { opacity: 0.85; transform: translateY(var(--ty)) rotate(var(--r)) scale(1); }
+    65%  { opacity: 0.85; transform: translateY(var(--ty)) rotate(var(--r)) scale(1); }
+    85%, 100% { opacity: 0; transform: translateY(var(--ty)) rotate(var(--r)) scale(1); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .paw-trail svg { animation: none; opacity: 0.5; }
+  }
+  .heading { font-family: 'Fraunces', serif; font-weight: 700; letter-spacing: -0.02em; color: #23281C; }
+
+  .icon-orb {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: #F5C21A; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+
+  .fact-card, .audience-card, .include-card, .pillar {
+    background: #FFFFFF; border-radius: 20px;
+    transition: transform 0.3s cubic-bezier(.22,1,.36,1), box-shadow 0.3s cubic-bezier(.22,1,.36,1);
+  }
+  .fact-card:hover, .audience-card:hover, .include-card:hover, .pillar:hover {
+    transform: translateY(-4px); box-shadow: 0 18px 34px -24px rgba(35,40,28,0.3);
+  }
+
+  .wavy-photo {
+    aspect-ratio: 4/5; overflow: hidden;
+    border-radius: 24px;
+    background: #EFE2C8;
+  }
+
+  .topic-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 14.5px; line-height: 1.5; color: #4B4A3E;
+  }
+  .topic-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: #F5C21A;
+    margin-top: 7px; flex-shrink: 0;
+  }
+
+  .week-day {
+    flex: 1; text-align: center; padding: 10px 4px; border-radius: 12px;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .week-day.on { background: #F5C21A; color: #23281C; }
+  .week-day.off { background: rgba(35,40,28,0.06); color: #4B4A3E; }
+
+  .stat-num { font-family: 'Fraunces', serif; font-optical-sizing: auto; font-weight: 800; font-size: clamp(33px, 5vw, 72px); line-height: 0.9; letter-spacing: -0.03em; color: #23281C; }
+
+  .topic-list {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; width: 100%;
+  }
+  .topic-item {
+    display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: center;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: rgba(246,241,228,0.07);
+    font-size: 14.5px; line-height: 1.4; font-weight: 400;
+    color: rgba(246,241,228,0.88);
+  }
+  .topic-icon {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(245,194,26,0.16);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .include-stack { display: flex; flex-direction: column; gap: 10px; }
+  .include-row {
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba(35,40,28,0.05);
+  }
+  .include-row-dark { background: rgba(246,241,228,0.07); }
+
+  .page-width {
+    max-width: 1440px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: clamp(21px, 3.3vw, 48px);
+    padding-right: clamp(21px, 3.3vw, 48px);
+    box-sizing: border-box;
+  }
+  .site-logo { height: 88px; width: auto; object-fit: contain; display: block; }
+  .site-header { background: #23281C; color: #F6F1E4; position: relative; z-index: 100; overflow: visible; }
+  .site-header .promo {
+    text-align: center;
+    padding: 11px 20px;
+    font-size: 13.5px;
+    font-weight: 500;
+    background: #F5C21A;
+    color: #23281C;
+  }
+  .site-header .promo strong { color: #23281C; font-weight: 700; }
+  .site-header .nav-bar {
+    max-width: 1440px; margin: 0 auto; padding: 10px clamp(21px, 3.3vw, 48px);
+    display: flex; align-items: center; justify-content: space-between; gap: clamp(16px, 1.9vw, 28px);
+    position: relative; z-index: 101; overflow: visible; transition: padding 0.3s ease;
+  }
+  .site-header .nav-links {
+    display: flex;
+    align-items: center;
+    gap: clamp(18px, 2.2vw, 30px);
+  }
+  .site-header .nav-links > a,
+  .site-header .nav-dropdown-wrap > a {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 15.5px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: rgba(246,241,228,0.9);
+    padding: 6px 2px;
+    border-radius: 0;
+    background: transparent;
+    transition: color 0.25s ease;
+    position: relative;
+  }
+  .site-header .nav-links > a:hover,
+  .site-header .nav-dropdown-wrap > a:hover {
+    color: #F5C21A;
+    background: transparent;
+    transform: none;
+  }
+  .site-header .nav-links > a.is-active {
+    color: #F5C21A;
+    background: transparent;
+    box-shadow: none;
+  }
+  .site-header .nav-links > a.is-active::after,
+  .site-header .nav-dropdown-wrap > a.is-active::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -4px;
+    height: 2px;
+    background: #F5C21A;
+    border-radius: 2px;
+  }
+  .site-logo { transition: height 0.3s ease; }
+  .nav-checkbox, .nav-burger { display: none; }
+  .hero-grid {
+    display: grid; grid-template-columns: 1.1fr 0.9fr; gap: clamp(28px, 4.4vw, 64px); align-items: center;
+    padding-top: clamp(21px, 3.3vw, 48px); padding-bottom: clamp(30px, 5.6vw, 80px);
+  }
+  .hero-title { font-size: clamp(27px, 3.6vw, 52px); line-height: 1.12; margin: 0 0 20px; }
+  .section-title { font-size: clamp(22px, 2.9vw, 42px); }
+  .glance-top { display: grid; grid-template-columns: 1.15fr 0.85fr 0.85fr; gap: 16px; margin-bottom: 16px; }
+  .glance-bottom { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; }
+  .who-split { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-radius: 24px; overflow: hidden; border: 1px solid rgba(35,40,28,0.08); }
+  .who-split-left { border-right: 1px solid rgba(35,40,28,0.08); }
+  .topic-card { display: grid; grid-template-columns: 180px 1fr; gap: clamp(14px, 1.7vw, 24px); align-items: start; background: rgba(246,241,228,0.06); border-radius: 20px; padding: 22px clamp(14px, 1.7vw, 24px); }
+  /* what students will learn: 3 cards over 2 */
+  .learn-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: clamp(12px, 1.6vw, 20px); }
+  .learn-card { grid-column: span 2; background: rgba(246,241,228,0.07); border: 1px solid rgba(246,241,228,0.12); border-radius: 24px; padding: clamp(20px, 2.2vw, 30px); display: flex; flex-direction: column; }
+  .learn-card:nth-child(n+4) { grid-column: span 3; }
+  .learn-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: clamp(16px, 2vw, 26px); }
+  .learn-top .icon-orb { margin: 0 !important; }
+  .learn-num { font-family: 'Fraunces', serif; font-weight: 800; font-size: clamp(34px, 3.8vw, 54px); line-height: 1; letter-spacing: -0.03em; color: #F5C21A; opacity: 0.9; }
+  .learn-title { font-family: 'Fraunces', serif; font-weight: 700; font-size: clamp(19px, 1.8vw, 25px); line-height: 1.15; letter-spacing: -0.02em; color: #F6F1E4; margin: 0 0 10px; }
+  .learn-copy { font-size: 15px; line-height: 1.65; color: rgba(246,241,228,0.78); margin: 0; }
+  @media (max-width: 900px) { .learn-grid { grid-template-columns: 1fr 1fr; } .learn-card, .learn-card:nth-child(n+4) { grid-column: span 1; } .learn-card:last-child { grid-column: span 2; } }
+  @media (max-width: 560px) { .learn-grid { grid-template-columns: 1fr; } .learn-card, .learn-card:nth-child(n+4), .learn-card:last-child { grid-column: span 1; } }
+  .covers-section { background: #23281C; color: #F6F1E4; padding-top: clamp(34px, 6.3vw, 90px); padding-bottom: clamp(34px, 6.3vw, 90px); }
+  .included-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .how-split { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-radius: 24px; overflow: hidden; margin-bottom: 16px; }
+  .location-bar { background: #FFFFFF; border-radius: 20px; padding: 22px clamp(15px, 1.8vw, 26px); display: grid; grid-template-columns: 1.3fr 1fr auto; gap: clamp(14px, 1.7vw, 24px); align-items: center; }
+  .cta-box { background: #EFE2C8; border-radius: 24px; padding: clamp(28px, 4.4vw, 64px) clamp(26px, 4.2vw, 60px); text-align: center; }
+  .cta-title { font-size: clamp(25px, 3.3vw, 48px); margin: 0 0 14px; line-height: 1.12; }
+  .footer-grid { display: grid; grid-template-columns: 1.2fr 0.7fr 1fr 1.1fr; gap: clamp(24px, 3.5vw, 48px); }
+  .wa-float { bottom: 28px; right: 28px; }
+
+  @media (max-width: 1024px) {
+    .page-width { padding-left: 28px; padding-right: 28px; }
+    .hero-title { font-size: 42px; }
+    .section-title { font-size: 34px; }
+    .cta-title { font-size: 38px; }
+    .topic-card { grid-template-columns: 140px 1fr; }
+  }
+
+  @media (max-width: 900px) {
+    .site-header .nav-bar {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      padding-top: 14px; padding-bottom: 14px;
+      gap: 10px;
+    }
+    .site-logo { height: 68px; }
+    .nav-burger {
+      display: flex; align-items: center; justify-content: center;
+      width: 42px; height: 42px; border-radius: 10px;
+      background: #F5C21A; color: #23281C; cursor: pointer;
+    }
+    .nav-checkbox { position: absolute; opacity: 0; pointer-events: none; }
+    .nav-links {
+      display: none;
+      grid-column: 1 / -1;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 2px;
+      padding: 8px 0 4px;
+    }
+    .nav-checkbox:checked ~ .nav-links { display: flex; }
+    .nav-links > a, .nav-dropdown-wrap > a {
+      padding: 12px 4px;
+      font-size: 16px;
+    }
+    .nav-dropdown {
+      position: static; transform: none; opacity: 1; visibility: visible;
+      pointer-events: auto; min-width: 0; width: 100%;
+      border: none; background: transparent; padding: 0 0 8px 8px;
+    }
+    .nav-dropdown-wrap { padding-bottom: 0; margin-bottom: 0; }
+    .nav-dropdown-wrap:hover .nav-dropdown,
+    .nav-dropdown-wrap:focus-within .nav-dropdown {
+      transform: none;
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+    .nav-cta { padding: 10px 14px !important; font-size: 13px !important; }
+    .hero-grid {
+      grid-template-columns: 1fr;
+      gap: 36px;
+      padding-top: 28px;
+      padding-bottom: 56px;
+    }
+    .hero-title { font-size: 32px; }
+    .hero-visual .wavy-photo { width: min(320px, 100%); margin: 0 auto; }
+    .page-width { padding-left: 20px; padding-right: 20px; }
+    .covers-section { padding-top: 64px; padding-bottom: 64px; }
+    .glance-top, .glance-bottom, .who-split, .included-grid, .how-split, .location-bar, .footer-grid, .topic-card, .topic-list {
+      grid-template-columns: 1fr;
+    }
+    .hero-grid > *,
+    .glance-top > *, .glance-bottom > *,
+    .who-split > *,
+    .included-grid > *,
+    .how-split > *,
+    .location-bar > *,
+    .footer-grid > *,
+    .topic-card > *,
+    .topic-list > *,
+    .topic-item > * {
+      min-width: 0;
+    }
+    .hero-visual .wavy-photo img { max-width: 100%; }
+    .who-split-left { border-right: 0; border-bottom: 1px solid rgba(35,40,28,0.08); }
+    .location-bar { justify-items: start; }
+    .location-bar .btn { width: 100%; justify-content: center; }
+    .cta-box { padding: 40px 24px; }
+    .glance-top > div { min-height: 0 !important; }
+    .who-split-left, .who-split > div, .how-split > div { padding: 28px 22px !important; }
+    .cta-title { font-size: 32px; }
+    .stat-num { font-size: 56px; }
+    .week-day { font-size: 10px; padding: 8px 2px; }
+    .wa-float { bottom: 16px; right: 16px; }
+  }
+
+  @media (min-width: 700px) and (max-width: 900px) {
+    .hero-grid {
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 36px;
+      padding-top: 36px;
+      padding-bottom: 64px;
+      align-items: center;
+    }
+    .hero-title { font-size: 38px; }
+    .hero-visual { justify-content: flex-end; }
+    .hero-visual .wavy-photo { width: 100%; max-width: 320px; margin: 0; }
+  }
+
+  @media (max-width: 480px) {
+    .hero-title { font-size: 28px; }
+    .section-title { font-size: 28px; }
+    .site-header .promo { font-size: 12.5px; padding: 10px 16px; }
+  }
+  .hand { font-family: 'Fraunces', serif; font-optical-sizing: auto; font-style: italic; font-weight: 500; font-size: inherit; letter-spacing: -0.01em; color: #C4632F; }
+
+    /* Header is NOT sticky — keeps page scroll free */
+  .site-header { position: relative; top: auto; z-index: 100; }
+  .site-header.is-stuck { box-shadow: none; }
+
+
+  /* ---- Footer typography + newsletter ---- */
+  .site-footer a.link,
+  .site-footer .fc-row,
+  .site-footer .footer-copy,
+  .site-footer .footer-legal,
+  .site-footer .footer-bottom {
+    font-family: 'Work Sans', sans-serif;
+  }
+  .footer-kicker {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #F5C21A;
+    margin-bottom: 14px;
+  }
+  .footer-heading {
+    font-family: inherit;
+    padding-bottom: 0;
+  }
+  .footer-brand p, .site-footer .footer-tagline {
+    font-family: 'Work Sans', sans-serif;
+  }
+  .footer-news-copy {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 14.5px; line-height: 1.55;
+    color: rgba(246,241,228,0.75); margin: 0 0 14px; max-width: 260px;
+  }
+  .footer-news-form {
+    display: flex; flex-direction: column; gap: 10px; max-width: 280px;
+  }
+  .footer-news-input {
+    width: 100%; box-sizing: border-box;
+    background: rgba(246,241,228,0.08);
+    border: 1px solid rgba(246,241,228,0.18);
+    border-radius: 999px;
+    padding: 12px 16px;
+    color: #F6F1E4;
+    font-family: 'Work Sans', sans-serif; font-size: 14.5px;
+    outline: none;
+  }
+  .footer-news-input::placeholder { color: rgba(246,241,228,0.45); }
+  .footer-news-input:focus { border-color: #F5C21A; background: rgba(246,241,228,0.12); }
+  .footer-news-btn {
+    align-self: flex-start;
+    background: #F5C21A; color: #23281C; border: 0;
+    border-radius: 999px;
+    padding: 11px 20px;
+    font-family: 'Work Sans', sans-serif; font-weight: 600; font-size: 14.5px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 3px 3px 0 #F6F1E4;
+  }
+  .footer-news-btn:hover {
+    background: #F6F1E4;
+    transform: translate(-2px,-2px);
+    box-shadow: 5px 5px 0 #F6F1E4;
+  }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+
+  .footer-social {
+    display: flex; gap: 10px; margin-top: 18px; align-items: center;
+  }
+  .footer-social-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(246,241,228,0.08);
+    color: #F5C21A;
+    border: 1.5px solid rgba(245,194,26,0.35);
+    transition: transform 0.35s cubic-bezier(.34,1.56,.64,1), background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  }
+  .footer-social-btn:hover {
+    background: #F5C21A; color: #23281C; border-color: #F5C21A;
+    transform: translateY(-4px) rotate(-6deg) scale(1.06);
+  }
+
+  @keyframes to-top-float-live {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .to-top {
+    width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+    background: #F5C21A; color: #23281C; border: 0; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    animation: to-top-float-live 2.2s ease-in-out infinite;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 6px 16px -8px rgba(245,194,26,0.7);
+  }
+  .to-top:hover {
+    animation-play-state: paused;
+    background: #F6F1E4;
+    transform: translateY(-3px);
+  }
+
+</style>
+<link rel="stylesheet" href="./responsive.css">
+<script src="./reveal.js" defer></script>
+<script src="./gallery.js" defer></script>
+</helmet>
+
+<div style="background: #F6F1E4; color: #23281C; font-family: 'Work Sans', sans-serif;">
+
+  <header class="site-header fade-in">
+    <nav class="nav-bar">
+      <a href="Homepage.dc.html" style="display: flex; align-items: center; flex-shrink: 0;">
+        <img src="assets/logo-official.png" alt="Zoomies" class="site-logo">
+      </a>
+    <input type="checkbox" id="nav-toggle" class="nav-checkbox">
+    <label for="nav-toggle" class="nav-burger" aria-label="Toggle menu">
+        <svg class="nav-burger-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <svg class="nav-burger-close" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </label>
+    <div class="nav-links">
+        <a class="link" href="Grooming.dc.html">Dog Grooming</a>
+        <a class="link" href="Daycare.dc.html">Dog Daycare</a>
+        <a class="link" href="TeethCleaning.dc.html">Teeth Cleaning</a>
+        <a class="link is-active" href="Training.dc.html">Grooming Courses</a>
+        <a class="link" href="Pricing.dc.html">Pricing</a>
+        <a class="link" href="Contact.dc.html">Contact</a>
+      </div>
+      <a href="https://wa.me/353868099535" target="_blank" rel="noopener" class="btn btn-whatsapp nav-cta" style="padding: 13px 22px; font-size: 14px; background: #25D366; color: #FFFFFF;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      WhatsApp Us
+    </a>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero-grid page-width">
+    <div class="fade-in d2" style="max-width: 560px;">
+      <div style="display: inline-flex; align-items: center; gap: 8px; background: #F5C21A; color: #23281C; padding: 7px 14px; border-radius: 999px; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 22px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg>
+        Now Enrolling - Limited to 2 Students Per Course
+      </div>
+      <h1 class="heading hero-title">Start Your Career Working With Dogs</h1>
+      <p style="font-family: 'Fraunces', serif; font-style: italic; font-weight: 500; font-size: clamp(16px, 1.5vw, 21px); letter-spacing: -0.01em; line-height: 1.5; color: #23281C; margin: 0 0 16px; max-width: 500px;"><span style="color: #C4632F;">Zoomies Academy</span> &middot; 5-Day Practical Dog Grooming &amp; Care Course</p>
+      <p style="font-size: 16.5px; line-height: 1.65; color: #4B4A3E; margin: 0 0 22px; max-width: 500px;">
+        Get real, hands-on experience inside a working professional grooming salon and daycare in Dublin.
+      </p>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 30px;"><span style="display: inline-flex; align-items: center; background: #fff; border: 1.5px solid rgba(35,40,28,0.14); border-radius: 999px; padding: 8px 16px; font-size: 13.5px; font-weight: 600; color: #23281C;">5 practical days</span><span style="display: inline-flex; align-items: center; background: #fff; border: 1.5px solid rgba(35,40,28,0.14); border-radius: 999px; padding: 8px 16px; font-size: 13.5px; font-weight: 600; color: #23281C;">Max 2 students</span><span style="display: inline-flex; align-items: center; background: #fff; border: 1.5px solid rgba(35,40,28,0.14); border-radius: 999px; padding: 8px 16px; font-size: 13.5px; font-weight: 600; color: #23281C;">No experience required</span></div>
+      <div style="display: flex; align-items: center; gap: 22px; flex-wrap: wrap;">
+        <a href="https://wa.me/message/W2OAWUQCD5WCJ1" class="btn btn-yellow">
+          Enquire About Academy
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <div>
+          <div class="heading" style="font-size: clamp(17px, 1.9vw, 28px); font-weight: 600; line-height: 1;">€975 <span style="font-size: 0.5em; font-weight: 500; text-decoration: line-through; color: #4B4A3E;">€1,400</span></div>
+          <div style="font-size: 13px; color: #4B4A3E;">limited-time offer</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fade-in d3 hero-visual" style="position: relative; display: flex; justify-content: center;">
+      <div style="position: absolute; top: 10px; left: 8px; z-index: 5; background: #23281C; color: #F5C21A; padding: 8px 14px; border-radius: 999px; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;">Max 2 students</div>
+      <div class="wavy-photo" style="width: 380px; max-width: 100%;">
+        <img src="assets/dog2.png" alt="A freshly groomed dog at the Zoomies salon" style="width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block;">
+      </div>
+    </div>
+  </section>
+
+  <!-- COURSE AT A GLANCE -->
+  <section class="reveal page-width" style="padding-top: 0; padding-bottom: clamp(38px, 6.9vw, 100px);">
+    <div style="text-align: center; margin-bottom: 40px;">
+      <div class="eyebrow">the basics</div>
+      <h2 class="heading section-title" style="margin: 0; line-height: 1.15;">Course at a glance</h2>
+    </div>
+
+    <div class="glance-top">
+      <div class="launching-card" style="background: #EFE2C8; border-radius: 24px; padding: clamp(19px, 2.2vw, 32px) clamp(20px, 2.4vw, 34px) clamp(23px, 2.8vw, 40px); display: flex; flex-direction: column; justify-content: space-between; min-height: 210px;">
+        <div class="kicker">Now Enrolling</div>
+        <div>
+          <div class="heading" style="font-size: clamp(25px, 3.3vw, 48px); line-height: 1; margin: 8px 0 10px;">Limited to <span class="hl-year">2</span> students</div>
+          <div style="font-size: 15px; line-height: 1.55; color: #4B4A3E;">Per course &middot; Kilmacud, South Dublin.</div>
+        </div>
+        <div class="paw-trail" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="#C4632F"><ellipse cx="7" cy="6" rx="2" ry="2.6"/><ellipse cx="17" cy="6" rx="2" ry="2.6"/><ellipse cx="3.6" cy="11" rx="1.6" ry="2.1"/><ellipse cx="20.4" cy="11" rx="1.6" ry="2.1"/><path d="M12 22c-3.6 0-6.4-2.2-6.4-4.9 0-2.2 1.8-4.9 6.4-4.9s6.4 2.7 6.4 4.9c0 2.7-2.8 4.9-6.4 4.9z"/></svg>
+          <svg viewBox="0 0 24 24" fill="#C4632F"><ellipse cx="7" cy="6" rx="2" ry="2.6"/><ellipse cx="17" cy="6" rx="2" ry="2.6"/><ellipse cx="3.6" cy="11" rx="1.6" ry="2.1"/><ellipse cx="20.4" cy="11" rx="1.6" ry="2.1"/><path d="M12 22c-3.6 0-6.4-2.2-6.4-4.9 0-2.2 1.8-4.9 6.4-4.9s6.4 2.7 6.4 4.9c0 2.7-2.8 4.9-6.4 4.9z"/></svg>
+          <svg viewBox="0 0 24 24" fill="#C4632F"><ellipse cx="7" cy="6" rx="2" ry="2.6"/><ellipse cx="17" cy="6" rx="2" ry="2.6"/><ellipse cx="3.6" cy="11" rx="1.6" ry="2.1"/><ellipse cx="20.4" cy="11" rx="1.6" ry="2.1"/><path d="M12 22c-3.6 0-6.4-2.2-6.4-4.9 0-2.2 1.8-4.9 6.4-4.9s6.4 2.7 6.4 4.9c0 2.7-2.8 4.9-6.4 4.9z"/></svg>
+          <svg viewBox="0 0 24 24" fill="#C4632F"><ellipse cx="7" cy="6" rx="2" ry="2.6"/><ellipse cx="17" cy="6" rx="2" ry="2.6"/><ellipse cx="3.6" cy="11" rx="1.6" ry="2.1"/><ellipse cx="20.4" cy="11" rx="1.6" ry="2.1"/><path d="M12 22c-3.6 0-6.4-2.2-6.4-4.9 0-2.2 1.8-4.9 6.4-4.9s6.4 2.7 6.4 4.9c0 2.7-2.8 4.9-6.4 4.9z"/></svg>
+          <svg viewBox="0 0 24 24" fill="#C4632F"><ellipse cx="7" cy="6" rx="2" ry="2.6"/><ellipse cx="17" cy="6" rx="2" ry="2.6"/><ellipse cx="3.6" cy="11" rx="1.6" ry="2.1"/><ellipse cx="20.4" cy="11" rx="1.6" ry="2.1"/><path d="M12 22c-3.6 0-6.4-2.2-6.4-4.9 0-2.2 1.8-4.9 6.4-4.9s6.4 2.7 6.4 4.9c0 2.7-2.8 4.9-6.4 4.9z"/></svg>
+          <svg viewBox="0 0 24 24" fill="#C4632F"><ellipse cx="7" cy="6" rx="2" ry="2.6"/><ellipse cx="17" cy="6" rx="2" ry="2.6"/><ellipse cx="3.6" cy="11" rx="1.6" ry="2.1"/><ellipse cx="20.4" cy="11" rx="1.6" ry="2.1"/><path d="M12 22c-3.6 0-6.4-2.2-6.4-4.9 0-2.2 1.8-4.9 6.4-4.9s6.4 2.7 6.4 4.9c0 2.7-2.8 4.9-6.4 4.9z"/></svg>
+          <svg viewBox="0 0 24 24" fill="#C4632F"><ellipse cx="7" cy="6" rx="2" ry="2.6"/><ellipse cx="17" cy="6" rx="2" ry="2.6"/><ellipse cx="3.6" cy="11" rx="1.6" ry="2.1"/><ellipse cx="20.4" cy="11" rx="1.6" ry="2.1"/><path d="M12 22c-3.6 0-6.4-2.2-6.4-4.9 0-2.2 1.8-4.9 6.4-4.9s6.4 2.7 6.4 4.9c0 2.7-2.8 4.9-6.4 4.9z"/></svg>
+        </div>
+      </div>
+      <div style="background: #F5C21A; border-radius: 24px; padding: clamp(16px, 1.9vw, 28px) clamp(14px, 1.7vw, 24px); min-height: 210px; display: flex; flex-direction: column; justify-content: space-between;">
+        <div class="stat-num">5</div>
+        <div>
+          <div class="heading" style="font-size: clamp(16px, 1.5vw, 22px); margin-bottom: 4px;">full days</div>
+          <div style="font-size: 14px; line-height: 1.5; color: #23281C;">Five days inside a working salon.</div>
+        </div>
+      </div>
+      <div style="background: #23281C; color: #F6F1E4; border-radius: 24px; padding: clamp(16px, 1.9vw, 28px) clamp(14px, 1.7vw, 24px); min-height: 210px; display: flex; flex-direction: column; justify-content: space-between;">
+        <div class="stat-num" style="color: #F5C21A;">2</div>
+        <div>
+          <div class="heading" style="font-size: clamp(16px, 1.5vw, 22px); margin-bottom: 4px; color: #F6F1E4;">students max</div>
+          <div style="font-size: 14px; line-height: 1.5; color: rgba(246,241,228,0.7);">Maximum two students.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="glance-bottom">
+      <div style="background: #FFFFFF; border-radius: 24px; padding: clamp(16px, 1.9vw, 28px) clamp(17px, 2.1vw, 30px);">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 18px; flex-wrap: wrap;">
+          <div class="heading" style="font-size: clamp(18px, 1.7vw, 24px);">Complete in one week or spread over two weeks</div>
+        </div>
+        <div style="margin-bottom: 10px; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #C4632F;">One week</div>
+        <div style="display: flex; gap: 6px; margin-bottom: 16px;">
+          <div class="week-day on">Mon</div>
+          <div class="week-day on">Tue</div>
+          <div class="week-day on">Wed</div>
+          <div class="week-day on">Thu</div>
+          <div class="week-day on">Fri</div>
+          <div class="week-day off">Sat</div>
+          <div class="week-day off">Sun</div>
+        </div>
+        <div style="margin-bottom: 10px; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #C4632F;">Spread over two weeks</div>
+        <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+          <div class="week-day on">Mon</div>
+          <div class="week-day on">Tue</div>
+          <div class="week-day on">Wed</div>
+          <div class="week-day off">Thu</div>
+          <div class="week-day off">Fri</div>
+          <div class="week-day off">Sat</div>
+          <div class="week-day off">Sun</div>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <div class="week-day on">Mon</div>
+          <div class="week-day on">Tue</div>
+          <div class="week-day off">Wed</div>
+          <div class="week-day off">Thu</div>
+          <div class="week-day off">Fri</div>
+          <div class="week-day off">Sat</div>
+          <div class="week-day off">Sun</div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div style="background: #FFFFFF; border-radius: 24px; padding: clamp(14px, 1.7vw, 24px) clamp(15px, 1.8vw, 26px); flex: 1;">
+          <div class="heading" style="font-size: clamp(16px, 1.5vw, 22px); margin-bottom: 8px;">A real working salon</div>
+          <p style="font-size: 14.5px; line-height: 1.6; color: #4B4A3E; margin: 0;">Shadow the team in a real working salon and daycare.</p>
+        </div>
+        <div style="background: #FFFFFF; border-radius: 24px; padding: clamp(14px, 1.7vw, 24px) clamp(15px, 1.8vw, 26px); flex: 1;">
+          <div class="heading" style="font-size: clamp(16px, 1.5vw, 22px); margin-bottom: 8px;">No experience needed</div>
+          <p style="font-size: 14.5px; line-height: 1.6; color: #4B4A3E; margin: 0;">No previous experience required.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO IT IS FOR -->
+  <section class="reveal page-width" style="padding-top: 0; padding-bottom: clamp(38px, 6.9vw, 100px);">
+    <div style="text-align: center; margin-bottom: 40px;">
+      <div class="eyebrow">is this you?</div>
+      <h2 class="heading section-title" style="margin: 0 0 14px; line-height: 1.15;">Who the course is for</h2>
+      <p style="font-size: 16px; line-height: 1.65; color: #4B4A3E; margin: 0 auto; max-width: 620px;"><strong>Not sure if a career with dogs is right for you?</strong> Spend five days working alongside the Zoomies team learning the fundamentals of professional grooming, dog handling, daycare and salon operations.</p>
+    </div>
+    <div class="who-split">
+      <div class="who-split-left" style="background: #EFE2C8; padding: clamp(21px, 2.5vw, 36px) clamp(20px, 2.4vw, 34px) clamp(19px, 2.2vw, 32px);">
+        <div class="kicker" style="margin-bottom: 8px;">Considering this work</div>
+        <div class="heading" style="font-size: clamp(17px, 1.9vw, 28px); margin-bottom: 28px;">No previous experience is required</div>
+        <div style="display: flex; gap: 18px; margin-bottom: 28px;">
+          <div style="font-family: 'Fraunces', serif; font-optical-sizing: auto; font-size: clamp(22px, 2.9vw, 42px); font-weight: 800; letter-spacing: -0.03em; line-height: 1; color: #C4632F; min-width: 52px; flex-shrink: 0; white-space: nowrap;">01</div>
+          <div>
+            <p style="font-size: 15px; line-height: 1.6; color: #4B4A3E; margin: 0;">Complete beginners considering a career in dog grooming.</p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 18px;">
+          <div style="font-family: 'Fraunces', serif; font-optical-sizing: auto; font-size: clamp(22px, 2.9vw, 42px); font-weight: 800; letter-spacing: -0.03em; line-height: 1; color: #C4632F; min-width: 52px; flex-shrink: 0; white-space: nowrap;">02</div>
+          <div>
+            <p style="font-size: 15px; line-height: 1.6; color: #4B4A3E; margin: 0;">People who want to understand what working in a grooming salon is really like before committing to longer training.</p>
+          </div>
+        </div>
+      </div>
+      <div style="background: #23281C; color: #F6F1E4; padding: clamp(21px, 2.5vw, 36px) clamp(20px, 2.4vw, 34px) clamp(19px, 2.2vw, 32px);">
+        <div class="kicker" style="color: #F5C21A; margin-bottom: 8px;">Also a great fit for</div>
+        <div class="heading" style="font-size: clamp(17px, 1.9vw, 28px); margin-bottom: 28px; color: #F6F1E4;">Learning by doing</div>
+        <div style="display: flex; gap: 18px; margin-bottom: 28px;">
+          <div style="font-family: 'Fraunces', serif; font-optical-sizing: auto; font-size: clamp(22px, 2.9vw, 42px); font-weight: 800; letter-spacing: -0.03em; line-height: 1; color: #F5C21A; min-width: 52px; flex-shrink: 0; white-space: nowrap;">03</div>
+          <div>
+            <p style="font-size: 15px; line-height: 1.6; color: rgba(246,241,228,0.78); margin: 0;">Dog lovers who want practical, hands-on experience rather than an online-only course.</p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 18px;">
+          <div style="font-family: 'Fraunces', serif; font-optical-sizing: auto; font-size: clamp(22px, 2.9vw, 42px); font-weight: 800; letter-spacing: -0.03em; line-height: 1; color: #F5C21A; min-width: 52px; flex-shrink: 0; white-space: nowrap;">04</div>
+          <div>
+            <p style="font-size: 15px; line-height: 1.6; color: rgba(246,241,228,0.78); margin: 0;">Anyone interested in building a foundation in professional dog grooming and care.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT YOU'LL LEARN -->
+  <section class="reveal covers-section">
+    <div class="page-width">
+      <div style="text-align: center; margin-bottom: 48px;">
+        <div class="eyebrow eyebrow--light">five main areas</div>
+        <h2 class="heading section-title" style="margin: 0; line-height: 1.15; color: #F6F1E4;">What students will learn</h2>
+      </div>
+      <div class="learn-grid">
+        <div class="learn-card">
+          <div class="learn-top">
+            <div class="icon-orb" style="margin-bottom: 12px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4L8.12 15.88M14.47 14.48L20 20M8.12 8.12L12 12"/></svg></div>
+            <span class="learn-num">01</span>
+          </div>
+          <h3 class="learn-title">Dog Handling &amp; Salon Fundamentals</h3>
+          <p class="learn-copy">Safe handling, understanding behaviour, salon routines, equipment, hygiene and how a professional grooming salon operates.</p>
+        </div>
+        <div class="learn-card">
+          <div class="learn-top">
+            <div class="icon-orb" style="margin-bottom: 12px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color:#23281C"><ellipse cx="7" cy="5.5" rx="2.5" ry="3"/><ellipse cx="17" cy="5.5" rx="2.5" ry="3"/><ellipse cx="3.5" cy="11" rx="2" ry="2.5"/><ellipse cx="20.5" cy="11" rx="2" ry="2.5"/><path d="M12 22c-4 0-7-2.5-7-5.5 0-2.5 2-5.5 7-5.5s7 3 7 5.5c0 3-3 5.5-7 5.5z"/></svg></div>
+            <span class="learn-num">02</span>
+          </div>
+          <h3 class="learn-title">Bathing, Drying &amp; Coat Preparation</h3>
+          <p class="learn-copy">How dogs are prepared properly for a groom, including bathing, product selection, drying, brushing and coat preparation.</p>
+        </div>
+        <div class="learn-card">
+          <div class="learn-top">
+            <div class="icon-orb" style="margin-bottom: 12px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V10l9-6 9 6v11"/><path d="M9 21v-6h6v6"/></svg></div>
+            <span class="learn-num">03</span>
+          </div>
+          <h3 class="learn-title">Clippers &amp; Grooming Techniques</h3>
+          <p class="learn-copy">An introduction to clippers, blades, comb attachments, hygiene areas, paws, nails, ears and the practical techniques used during a groom.</p>
+        </div>
+        <div class="learn-card">
+          <div class="learn-top">
+            <div class="icon-orb" style="margin-bottom: 12px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4L8.12 15.88M14.47 14.48L20 20M8.12 8.12L12 12"/></svg></div>
+            <span class="learn-num">04</span>
+          </div>
+          <h3 class="learn-title">Scissoring, Styling &amp; Finishing</h3>
+          <p class="learn-copy">Shadowing the team through shaping, scissoring and finishing, and understanding what creates a balanced, professional-looking groom.</p>
+        </div>
+        <div class="learn-card">
+          <div class="learn-top">
+            <div class="icon-orb" style="margin-bottom: 12px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="color:#23281C"><ellipse cx="7" cy="5.5" rx="2.5" ry="3"/><ellipse cx="17" cy="5.5" rx="2.5" ry="3"/><ellipse cx="3.5" cy="11" rx="2" ry="2.5"/><ellipse cx="20.5" cy="11" rx="2" ry="2.5"/><path d="M12 22c-4 0-7-2.5-7-5.5 0-2.5 2-5.5 7-5.5s7 3 7 5.5c0 3-3 5.5-7 5.5z"/></svg></div>
+            <span class="learn-num">05</span>
+          </div>
+          <h3 class="learn-title">The Complete Grooming Journey</h3>
+          <p class="learn-copy">Seeing how it all comes together &ndash; from a dog arriving at reception through consultation, preparation, grooming, finishing and collection.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INCLUDED -->
+  <section class="reveal page-width" style="padding-top: clamp(34px, 6.3vw, 90px); padding-bottom: clamp(34px, 6.3vw, 90px);">
+    <div style="text-align: center; margin-bottom: 40px;">
+      <div class="eyebrow">in the box</div>
+      <h2 class="heading section-title" style="margin: 0; line-height: 1.15;">What’s included</h2>
+    </div>
+    <div class="included-grid">
+      <div style="background: #EFE2C8; border-radius: 24px; padding: clamp(21px, 2.5vw, 36px) clamp(20px, 2.4vw, 34px);">
+        <div class="heading" style="font-size: clamp(17px, 1.9vw, 28px); margin-bottom: 22px;">During the course</div>
+        <div class="include-stack">
+        <div class="include-row">
+          <div class="icon-orb" style="width: 42px; height: 42px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div>
+            <div class="heading" style="font-size: clamp(15px, 1.3vw, 18px); margin-bottom: 2px;">All equipment and PPE required for the course</div>
+          </div>
+        </div>
+        <div class="include-row">
+          <div class="icon-orb" style="width: 42px; height: 42px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M4 20c0-4 3-6 8-6s8 2 8 6"/></svg></div>
+          <div>
+            <div class="heading" style="font-size: clamp(15px, 1.3vw, 18px); margin-bottom: 2px;">Supervised practical experience with suitable dogs</div>
+          </div>
+        </div>
+        <div class="include-row">
+          <div class="icon-orb" style="width: 42px; height: 42px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><path d="M6 1v3M10 1v3M14 1v3"/></svg></div>
+          <div>
+            <div class="heading" style="font-size: clamp(15px, 1.3vw, 18px); margin-bottom: 2px;">Tea, coffee and refreshments</div>
+          </div>
+        </div>
+        </div>
+      </div>
+      <div style="background: #23281C; color: #F6F1E4; border-radius: 24px; padding: clamp(21px, 2.5vw, 36px) clamp(20px, 2.4vw, 34px);">
+        <div class="heading" style="font-size: clamp(17px, 1.9vw, 28px); margin-bottom: 22px; color: #F6F1E4;">On completion</div>
+        <div class="include-stack">
+        <div class="include-row include-row-dark">
+          <div class="icon-orb" style="width: 42px; height: 42px; flex-shrink: 0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20V4H6.5A2.5 2.5 0 004 6.5v13z"/></svg></div>
+          <div>
+            <div class="heading" style="font-size: clamp(15px, 1.3vw, 18px); margin-bottom: 2px; color: #F6F1E4;">Printed student workbook</div>
+          </div>
+        </div>
+        <div class="include-row include-row-dark">
+          <div class="icon-orb" style="width: 42px; height: 42px; flex-shrink: 0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M8.5 12.5L7 22l5-3 5 3-1.5-9.5"/></svg></div>
+          <div>
+            <div class="heading" style="font-size: clamp(15px, 1.3vw, 18px); margin-bottom: 2px; color: #F6F1E4;">Zoomies Academy Certificate of Completion</div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="reveal page-width" style="padding-top: 0; padding-bottom: clamp(34px, 6.3vw, 90px);">
+    <div style="text-align: center; margin-bottom: 40px;">
+      <div class="eyebrow">how it runs</div>
+      <h2 class="heading section-title" style="margin: 0; line-height: 1.15;">How the course works</h2>
+    </div>
+    <div class="how-split">
+      <div style="background: #EFE2C8; padding: clamp(23px, 2.8vw, 40px) clamp(21px, 2.5vw, 36px);">
+        <div class="heading" style="font-size: clamp(17px, 1.9vw, 28px); margin-bottom: 18px;">How the course works</div>
+        <p style="font-size: 15px; line-height: 1.7; color: #4B4A3E; margin: 0 0 16px;">This is not just a course about grooming &ndash; it is an opportunity to experience what working in a professional grooming salon is actually like.</p>
+        <p style="font-size: 15px; line-height: 1.7; color: #4B4A3E; margin: 0;">Students pitch in, observe real grooms, ask questions and learn from experienced people at every stage. With a maximum of two students, it stays personal and hands-on.</p>
+      </div>
+      <div style="background: #23281C; color: #F6F1E4; padding: clamp(23px, 2.8vw, 40px) clamp(21px, 2.5vw, 36px);">
+        <div class="heading" style="font-size: clamp(17px, 1.9vw, 28px); margin-bottom: 18px; color: #F6F1E4;">Certificate of completion</div>
+        <p style="font-size: 15px; line-height: 1.7; color: rgba(246,241,228,0.78); margin: 0 0 16px;">This is an introductory practical course with an in-house certificate. It does not qualify anyone as a professional dog groomer or represent an externally accredited qualification.</p>
+        <p style="font-size: 15px; line-height: 1.7; color: rgba(246,241,228,0.78); margin: 0;">Students who complete the five-day course receive an in-house Zoomies Academy Certificate of Completion.</p>
+      </div>
+    </div>
+    <div class="location-bar">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div class="icon-orb" style="width: 48px; height: 48px; flex-shrink: 0;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+        </div>
+        <div>
+          <div class="kicker" style="margin-bottom: 4px;">Location</div>
+          <div class="heading" style="font-size: clamp(15px, 1.3vw, 18px); margin-bottom: 2px;">Kilmacud, South Dublin</div>
+          <div style="font-size: 14px; color: #4B4A3E;">116A Lower Kilmacud Road, Stillorgan, Co. Dublin, A94 R2C9</div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div class="icon-orb" style="width: 48px; height: 48px; flex-shrink: 0;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V10l9-6 9 6v11"/><path d="M9 21v-6h6v6"/></svg>
+        </div>
+        <div>
+          <div class="kicker" style="margin-bottom: 4px;">Venue</div>
+          <div class="heading" style="font-size: clamp(15px, 1.3vw, 18px); margin-bottom: 2px;">Zoomies salon &amp; daycare</div>
+          <div style="font-size: 14px; color: #4B4A3E;">Real working grooming salon and daycare</div>
+        </div>
+      </div>
+      <a href="https://www.google.com/maps/search/?api=1&amp;query=116A+Lower+Kilmacud+Road+Stillorgan+Dublin" target="_blank" rel="noopener" class="btn btn-ink" style="padding: 12px 20px; font-size: 14px; white-space: nowrap;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+        Get directions
+      </a>
+    </div>
+  </section>
+
+  <!-- GALLERY — recent grooms -->
+  <section class="reveal page-width" style="padding-top: 0; padding-bottom: clamp(38px, 6.9vw, 100px);">
+    <div style="text-align: center; max-width: 760px; margin: 0 auto clamp(22px, 3vw, 38px);">
+      <div class="eyebrow">gallery</div>
+      <h2 class="heading" style="font-size: clamp(28px, 3.9vw, 54px); margin: 0; line-height: 1.04;">Dogs you could <span style="font-weight: 500; font-style: italic; color: #C4632F;">groom</span></h2>
+    </div>
+    <div class="gal-car ">
+      <div class="gal-track">
+        <figure class="gal-slide"><img src="assets/client/team-trainer-with-dog.jpg" alt="A Zoomies trainer with a dog at the Kilmacud salon" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/team-handler-with-dog.jpg" alt="A Zoomies team member with a dog at the Kilmacud salon" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/grooming-aussie-table.jpg" alt="An Australian shepherd freshly groomed on the Zoomies table" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/grooming-bichon-orange.jpg" alt="A bichon in a Zoomies bandana after a full groom" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/grooming-cockapoo-orange.jpg" alt="A cockapoo after a full groom at Zoomies" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/grooming-maltese-purple.jpg" alt="A maltese in a purple bandana after grooming" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/daycare-handler-bichon.jpg" alt="A Zoomies handler with a small dog in the daycare room" style="object-position: center 25%;" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/grooming-samoyed-bandana.jpg" alt="A samoyed in a Zoomies bandana" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/grooming-cocker-panelling.jpg" alt="A cocker spaniel finished at the Zoomies salon" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/grooming-retriever-puppy.jpg" alt="A retriever puppy after a groom at Zoomies" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/grooming-shepherd-table.jpg" alt="A shepherd freshly groomed on the table" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/grooming-cockapoo-blue.jpg" alt="A cockapoo in a blue bandana after grooming" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/grooming-cockapoo-table.jpg" alt="A cockapoo freshly groomed at Zoomies" loading="lazy"></figure>
+      </div>
+      <div class="gal-nav">
+        <button type="button" class="gal-btn" data-gal="prev" aria-label="Previous photos"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <button type="button" class="gal-btn" data-gal="next" aria-label="Next photos"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="reveal page-width" style="padding-top: 0; padding-bottom: clamp(38px, 6.9vw, 100px);">
+    <div class="cta-box">
+      <div class="eyebrow" style="margin-bottom: 8px;">Now Enrolling - Limited to 2 Students Per Course</div>
+      <h2 class="heading cta-title">Thinking About a Career Working With Dogs?</h2>
+      <p style="font-size: 16px; line-height: 1.65; color: #4B4A3E; margin: 0 auto 28px; max-width: 480px;">Spend five days inside Zoomies and experience professional grooming from the inside. Course value €1,400 &ndash; limited-time offer €975. Maximum 2 students per course.</p>
+      <a href="https://wa.me/message/W2OAWUQCD5WCJ1" class="btn btn-yellow">
+        Enquire About the Next Course
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </section>
+
+
+  <!-- FLOATING WHATSAPP -->
+  <a href="https://wa.me/message/W2OAWUQCD5WCJ1" target="_blank" rel="noopener" aria-label="Chat on WhatsApp" class="wa-float" style="position: fixed; z-index: 999; width: 58px; height: 58px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(37,211,102,0.45), 0 0 24px rgba(37,211,102,0.25); transition: transform 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s ease;" onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 6px 22px rgba(37,211,102,0.55), 0 0 32px rgba(37,211,102,0.35)'" onmouseout="this.style.transform='none';this.style.boxShadow='0 4px 16px rgba(37,211,102,0.45), 0 0 24px rgba(37,211,102,0.25)'">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </a>
+
+  <!-- FOOTER -->
+  <footer class="reveal site-footer">
+    <div class="footer-dog" aria-hidden="true">
+      <img src="assets/client/grooming-cockapoo-blue.jpg" alt="">
+    </div>
+    <div class="footer-glow" aria-hidden="true"></div>
+
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="assets/logo-footer-transparent.png" alt="Zoomies" class="site-logo" style="height: 120px; width: auto; margin-bottom: 14px;">
+        <p style="font-family: 'Work Sans', sans-serif; font-size: 14px; line-height: 1.6; color: #4B4A3E; margin: 0; max-width: 320px; font-style: italic;">Happier Dogs. Brighter Days.</p>
+        <div class="footer-social" aria-label="Social media">
+          <a class="footer-social-btn" href="https://www.instagram.com/zoomies_ireland/" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          </a>
+          <a class="footer-social-btn" href="https://www.facebook.com/zoomiesireland" target="_blank" rel="noopener" aria-label="Facebook">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M14 9h3V6h-3c-1.7 0-3 1.3-3 3v2H9v3h2v7h3v-7h3l1-3h-4V9c0-.6.4-1 1-1z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <div class="footer-kicker"><span class="footer-heading">Quick Link</span></div>
+        <nav style="display: flex; flex-direction: column; gap: 11px; font-size: 14.5px;">
+          <a class="link" href="Homepage.dc.html">Home</a>
+          <a class="link" href="Services.dc.html">Services</a>
+          <a class="link" href="Pricing.dc.html">Pricing</a>
+          <a class="link" href="Contact.dc.html">Contact Us</a>
+        </nav>
+      </div>
+
+      <div class="footer-col">
+        <div class="footer-kicker"><span class="footer-heading">Contact Info</span></div>
+        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 14.5px;">
+          <a class="fc-row" href="https://wa.me/353868099535" target="_blank" rel="noopener"><span class="fc-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0122 16.92z"/></svg></span><span>+353868099535</span></a>
+          <a class="fc-row" href="mailto:hello@zoomies.ie"><span class="fc-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></span><span>hello@zoomies.ie</span></a>
+          <div class="fc-row is-static"><span class="fc-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span>116A Lower Kilmacud Road, Stillorgan, Co. Dublin, A94 R2C9</span></div>
+        </div>
+      </div>
+
+      <div class="footer-col footer-news">
+        <div class="footer-kicker"><span class="footer-heading">Newsletter</span></div>
+        <p class="footer-news-copy">Paw-some updates, grooming tips &amp; academy news — straight to your inbox.</p>
+        <form class="footer-news-form" action="#" method="post" onsubmit="return false;">
+          <label class="sr-only" for="footer-email-training">Email</label>
+          <input id="footer-email-training" class="footer-news-input" type="email" name="email" placeholder="Your email" required autocomplete="email">
+          <button class="footer-news-btn" type="submit">Subscribe<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </form>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="footer-copy">
+        <button class="to-top" type="button" id="to-top" aria-label="Back to top">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        </button>
+        <span>© 2026 Zoomies Grooming. All Rights Reserved.</span>
+      </div>
+      <div class="footer-legal">
+        <a class="link" href="#">Privacy Policy</a>
+        <span class="footer-dot" aria-hidden="true">·</span>
+        <a class="link" href="#">Terms &amp; Conditions</a>
+      </div>
+    </div>
+  </footer>
+
+</div>
+]]>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+class Component extends StreamableLogic {
+  componentDidMount() {
+    for (const n of Array.from(document.body.childNodes)) {
+      if (n.nodeType === 3 && n.nodeValue && n.nodeValue.includes("]]>")) n.remove();
+    }
+    if (typeof window === "undefined") return;
+
+    if ("IntersectionObserver" in window) {
+      const els = document.querySelectorAll(".reveal");
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) { entry.target.classList.add("is-visible"); io.unobserve(entry.target); }
+        });
+      }, { threshold: 0.15, rootMargin: "0px 0px -60px 0px" });
+      els.forEach((el) => io.observe(el));
+      this._io = io;
+    } else {
+      document.querySelectorAll(".reveal").forEach((el) => el.classList.add("is-visible"));
+    }
+
+    /* ---------- sticky header ---------- */
+    const header = document.querySelector(".site-header");
+    if (header) {
+      const onScrollStuck = () => {
+        const y = window.scrollY || document.documentElement.scrollTop || 0;
+        header.classList.toggle("is-stuck", y > 8);
+      };
+      window.addEventListener("scroll", onScrollStuck, { passive: true });
+      onScrollStuck();
+    }
+
+
+    const scrollToTopRobust = (el) => {
+      const roots = [window, document.documentElement, document.body];
+      let p = el && el.parentElement;
+      while (p && p !== document.body) {
+        const s = getComputedStyle(p);
+        if ((s.overflowY === "auto" || s.overflowY === "scroll") && p.scrollHeight > p.clientHeight) roots.push(p);
+        p = p.parentElement;
+      }
+      roots.forEach((r) => {
+        try {
+          if (r === window) window.scrollTo({ top: 0, behavior: "smooth" });
+          else if (r.scrollTo) r.scrollTo({ top: 0, behavior: "smooth" });
+          else r.scrollTop = 0;
+        } catch (_) {}
+      });
+    };
+
+    /* ---------- back to top (footer) ---------- */
+    const wireToTop = (el) => {
+      if (!el) return;
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        scrollToTopRobust(el);
+      });
+    };
+    wireToTop(document.getElementById("to-top"));
+
+  }
+  componentWillUnmount() { if (this._io) this._io.disconnect(); }
+}
+</script>
+</body>
+</html>

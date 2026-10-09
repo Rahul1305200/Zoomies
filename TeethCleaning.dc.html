@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<![CDATA[<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400;1,9..144,500;1,9..144,600;1,9..144,700;1,9..144,800&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #F6F1E4; color: #23281C; font-family: 'Work Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  a { color: inherit; text-decoration: none; }
+  a.link { transition: color 0.2s ease; }
+  a.link:hover { color: #A67C0A; }
+  a[href]:not(.link) { transition: transform 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s cubic-bezier(.22,1,.36,1), background-color 0.2s ease, color 0.2s ease; }
+
+  @keyframes fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-in { animation: fade-up 0.7s cubic-bezier(.22,1,.36,1) both; }
+  .d1 { animation-delay: .05s; } .d2 { animation-delay: .12s; } .d3 { animation-delay: .19s; }
+
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s cubic-bezier(.22,1,.36,1), transform 0.7s cubic-bezier(.22,1,.36,1); }
+  .reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+  .nav-dropdown-wrap {
+    position: relative;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+  .nav-dropdown-wrap .nav-dropdown-caret { transition: transform 0.45s cubic-bezier(.34,1.3,.64,1); display: inline-block; }
+  .nav-dropdown-wrap:hover .nav-dropdown-caret,
+  .nav-dropdown-wrap:focus-within .nav-dropdown-caret { transform: rotate(180deg); }
+  .nav-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(14px) scale(0.96);
+    background: #FFFEFA;
+    border: 2px solid #F5C21A;
+    border-radius: 18px;
+    padding: 10px;
+    min-width: 224px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.42s ease,
+      transform 0.5s cubic-bezier(.22,1,.36,1),
+      visibility 0.42s,
+      box-shadow 0.4s ease;
+    transform-origin: top center;
+    z-index: 300;
+    box-shadow: 4px 4px 0 rgba(35,40,28,0.12), 0 16px 32px -16px rgba(35,40,28,0.35);
+  }
+  /* invisible bridge so mouse can travel from link to menu without closing */
+  .nav-dropdown::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0;
+    bottom: 100%;
+    height: 16px;
+  }
+  .nav-dropdown-wrap:hover .nav-dropdown,
+  .nav-dropdown-wrap:focus-within .nav-dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  .nav-dropdown-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 12px; border-radius: 11px;
+    font-family: 'Work Sans', sans-serif; font-size: 15.5px; font-weight: 500;
+    color: #23281C; white-space: nowrap;
+    transition:
+      background 0.4s ease,
+      transform 0.4s cubic-bezier(.22,1,.36,1),
+      padding-left 0.4s cubic-bezier(.22,1,.36,1),
+      box-shadow 0.35s ease;
+    pointer-events: auto;
+    position: relative; z-index: 1;
+  }
+  .nav-dropdown-item:hover {
+    background: #FBF3D9;
+    padding-left: 16px;
+    transform: translateX(2px);
+  }
+  .nav-dropdown-icon {
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    width: 32px; height: 32px; border-radius: 9px; background: #F6F1E4;
+    transition: background 0.4s ease, transform 0.45s cubic-bezier(.34,1.56,.64,1);
+  }
+  .nav-dropdown-item:hover .nav-dropdown-icon {
+    background: #F5C21A;
+    transform: rotate(-8deg) scale(1.08);
+  }
+  /* the page you are on, marked inside the Services menu */
+  .nav-dropdown-item.is-current { background: #FBF3D9; font-weight: 600; }
+  .nav-dropdown-item.is-current .nav-dropdown-icon { background: #F5C21A; }
+
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 15px clamp(16px, 1.9vw, 28px); border-radius: 10px; font-family: 'Lora', serif; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; transition: transform 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s cubic-bezier(.22,1,.36,1), background-color 0.2s ease, color 0.2s ease; }
+  .btn-yellow { background: #F5C21A; color: #23281C; box-shadow: 3px 3px 0 #23281C; }
+  .btn-yellow:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 #23281C; }
+  .btn-ink { background: #23281C; color: #F6F1E4; }
+  .btn-ink:hover { background: #F5C21A; color: #23281C; transform: translateY(-3px); }
+  .btn-outline { background: transparent; color: #23281C; border: 1.5px solid #23281C; }
+  .btn-outline:hover { background: #23281C; color: #F6F1E4; }
+  .btn-outline-light { background: transparent; color: #F6F1E4; border: 1.5px solid rgba(246,241,228,0.55); }
+  .btn-outline-light:hover { background: #F6F1E4; color: #23281C; border-color: #F6F1E4; }
+  .btn-whatsapp { background: #25D366; color: #FFFFFF; }
+  .btn-whatsapp:hover { background: #1ebe57; color: #FFFFFF; transform: translateY(-2px); }
+  .site-logo { height: 88px; width: auto; object-fit: contain; display: block; }
+  .site-header { background: #23281C; color: #F6F1E4; position: relative; z-index: 100; overflow: visible; }
+  .site-header .promo {
+    text-align: center;
+    padding: 11px 20px;
+    font-size: 13.5px;
+    font-weight: 500;
+    background: #F5C21A;
+    color: #23281C;
+  }
+  .site-header .promo strong { color: #23281C; font-weight: 700; }
+  .site-header .nav-bar {
+    max-width: 1440px; margin: 0 auto; padding: 10px clamp(21px, 3.3vw, 48px);
+    display: flex; align-items: center; justify-content: space-between; gap: clamp(16px, 1.9vw, 28px); z-index: 101; overflow: visible; position: relative; }
+  .site-header .nav-links {
+    display: flex;
+    align-items: center;
+    gap: clamp(18px, 2.2vw, 30px);
+  }
+  .site-header .nav-links > a,
+  .site-header .nav-dropdown-wrap > a {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 15.5px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: rgba(246,241,228,0.9);
+    padding: 6px 2px;
+    border-radius: 0;
+    background: transparent;
+    transition: color 0.25s ease;
+    position: relative;
+  }
+  .site-header .nav-links > a:hover,
+  .site-header .nav-dropdown-wrap > a:hover {
+    color: #F5C21A;
+    background: transparent;
+    transform: none;
+  }
+  .site-header .nav-links > a.is-active,
+  .site-header .nav-dropdown-wrap > a.is-active {
+    color: #F5C21A;
+    background: transparent;
+    box-shadow: none;
+  }
+  .site-header .nav-links > a.is-active::after,
+  .site-header .nav-dropdown-wrap > a.is-active::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -4px;
+    height: 2px;
+    background: #F5C21A;
+    border-radius: 2px;
+  }
+
+  .wavy-photo {
+    aspect-ratio: 6/5; overflow: hidden;
+    border-radius: 24px;
+    background: #EFE2C8;
+  }
+  .wavy-photo-alt { aspect-ratio: 1; border-radius: 50%; }
+  /* photos hold still on hover — no blob-morph, no zoom */
+  .care-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .sticker-note {
+    display: inline-block; background: #F5C21A; color: #23281C;
+    padding: 7px 14px; border-radius: 999px; font-size: 12px;
+    font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  }
+
+  /* =====================================================================
+     Teeth Cleaning — hero media
+     Same blob language as the Grooming / Pricing / Services heroes.
+     ===================================================================== */
+  .hero-media-wrap {
+    position: relative;
+    min-height: clamp(360px, 44vw, 520px);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hero-media-wrap::before {
+    content: "";
+    position: absolute;
+    width: 88%; height: 86%;
+    right: 2%; top: 7%;
+    background: #F5C21A;
+    border-radius: 50%;
+    transform: rotate(8deg);
+    z-index: 0;
+  }
+  .hero-media-wrap::after {
+    content: "";
+    position: absolute;
+    width: 38%; height: 32%;
+    left: 0; bottom: 6%;
+    background: #C4632F;
+    opacity: 0.2;
+    border-radius: 50%;
+    z-index: 0;
+  }
+  .hero-media {
+    position: relative; z-index: 1;
+    width: min(90%, 500px); aspect-ratio: 1; height: auto;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 3.5px solid #23281C;
+    box-shadow: 10px 12px 0 #23281C;
+    background: #EFE2C8;
+  }
+  .hero-media img {
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center 22%;
+    display: block;
+  }
+  .hero-sticker {
+    position: absolute; z-index: 2;
+    left: 2%; bottom: 8%;
+    background: #F5C21A; color: #23281C;
+    font-family: 'Lora', serif; font-weight: 600; font-size: clamp(13px, 1.2vw, 15px); letter-spacing: -0.01em;
+    padding: 8px 20px; border-radius: 999px;
+    border: 2.5px solid #23281C;
+    box-shadow: 3px 4px 0 #23281C;
+    transform: rotate(-6deg);
+  }
+
+  /* ---- hero layout ---- */
+  .tc-hero {
+    max-width: 1440px; margin: 0 auto;
+    padding: clamp(21px, 3.3vw, 48px) clamp(21px, 3.3vw, 48px) clamp(26px, 4vw, 56px);
+    display: grid; grid-template-columns: 1.05fr 0.95fr;
+    gap: clamp(28px, 4.4vw, 64px); align-items: center;
+  }
+
+  /* ---- the price pair -------------------------------------------------
+     The commercial heart of the page, so it appears three times: compact
+     in the hero, full size in the pricing section, and as a plain list in
+     the closing panel. One class set, two sizes, no duplicated markup
+     language between them.
+     ------------------------------------------------------------------- */
+  .tc-price-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 0 0 26px; }
+  .tc-price {
+    position: relative;
+    background: #FFFFFF; border: 1.5px solid rgba(35,40,28,0.14);
+    border-radius: 18px; padding: 18px 20px;
+    transition: transform 0.3s cubic-bezier(.22,1,.36,1), box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+  .tc-price:hover { transform: translateY(-4px); box-shadow: 0 22px 40px -28px rgba(35,40,28,0.5); }
+  /* the add-on is the conversion target, so it carries the ink fill */
+  .tc-price--feature { background: #23281C; border-color: #23281C; color: #F6F1E4; }
+  .tc-price-label {
+    font-family: 'Work Sans', sans-serif; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.14em; color: #8A8677; margin: 0 0 8px;
+  }
+  .tc-price--feature .tc-price-label { color: rgba(246,241,228,0.6); }
+  .tc-price-fig {
+    font-family: 'Fraunces', serif; font-weight: 800; font-size: clamp(30px, 3.4vw, 44px);
+    line-height: 1; letter-spacing: -0.03em; color: #23281C; display: block;
+  }
+  .tc-price--feature .tc-price-fig { color: #F5C21A; }
+  .tc-price-note { font-size: 13px; line-height: 1.5; color: #4B4A3E; margin: 8px 0 0; }
+  .tc-price--feature .tc-price-note { color: rgba(246,241,228,0.78); }
+  .tc-save {
+    position: absolute; top: -11px; right: 14px;
+    background: #F5C21A; color: #23281C;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 5px 12px; border-radius: 999px;
+    border: 2px solid #23281C;
+    transform: rotate(-3deg);
+  }
+  /* full-size variant for the pricing section */
+  .tc-price--lg { padding: clamp(26px, 3vw, 40px) clamp(24px, 2.6vw, 36px); border-radius: 22px; }
+  .tc-price--lg .tc-price-fig { font-size: clamp(46px, 6vw, 82px); }
+  .tc-price--lg .tc-price-label { font-size: 12px; margin-bottom: 12px; }
+  .tc-price--lg .tc-price-note { font-size: 14.5px; margin-top: 12px; }
+
+  .tc-hero-cue {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 13.5px; line-height: 1.6; color: #4B4A3E;
+    margin: 22px 0 0; max-width: 460px;
+  }
+  .tc-hero-cue svg { flex-shrink: 0; margin-top: 2px; color: #C4632F; }
+
+  /* ---- trust strip (shared language with Grooming) ---- */
+  .tc-trust {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: clamp(14px, 1.8vw, 24px);
+    background: #23281C; color: #F6F1E4;
+    border-radius: 22px;
+    padding: clamp(22px, 2.6vw, 34px) clamp(20px, 2.4vw, 32px);
+  }
+  .tc-trust-cell { display: flex; align-items: center; gap: 14px; }
+  .tc-trust-cell p {
+    margin: 0; font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: clamp(14px, 1.3vw, 17px); letter-spacing: -0.01em;
+  }
+  .trust-orb {
+    width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+    background: #F5C21A;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+
+  /* ---- two-column text + photo ---- */
+  .tc-split { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: clamp(28px, 4vw, 60px); align-items: center; }
+  .tc-split--flip { grid-template-columns: 0.9fr 1.1fr; }
+  .tc-photo-wrap { position: relative; }
+  .tc-photo-wrap .wavy-photo { aspect-ratio: 4/5; width: 100%; }
+
+  /* ---- benefit list ---- */
+  .tc-bene { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+  .tc-bene li {
+    display: grid; grid-template-columns: 58px 1fr; gap: 18px; align-items: start;
+    font-size: 15px; line-height: 1.6; color: #4B4A3E;
+  }
+  .tc-bene li b { display: block; font-family: 'Fraunces', serif; font-weight: 700; font-size: 16px; color: #23281C; letter-spacing: -0.01em; margin-bottom: 2px; }
+  /* white orb, not the usual yellow one: these icons carry a yellow accent
+     that would disappear against a yellow ground */
+  .tc-bene-ico {
+    width: 58px; height: 58px; border-radius: 50%; margin-top: -4px;
+    background: #FFFFFF;
+    display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+    box-shadow: 0 10px 20px -14px rgba(35,40,28,0.6);
+  }
+  /* ~59% of the orb, not 50%: at 22px in a 44px orb these read as specks */
+  .tc-bene-ico svg { width: 34px; height: 34px; display: block; }
+
+  /* The page is set in heavy Fraunces with 3.5px borders and hard offset
+     shadows. A 1.8 hairline disappears against it, so the icons carry a
+     heavier line than the stock 24px grid assumes. Declared here rather than
+     on each path so the whole set stays locked to one weight. */
+  .tc-bene-ico svg [stroke]:not([stroke="none"]),
+  .tc-step-ico svg [stroke]:not([stroke="none"]) { stroke-width: 2.3; }
+
+  /* ---- the manufacturer figure ----------------------------------------
+     Attributed on the face of the card, not in a footnote — the brief's
+     claims list forbids presenting maker numbers as Zoomies' own.
+     ------------------------------------------------------------------- */
+  .tc-stat {
+    background: #F5C21A; color: #23281C;
+    border: 3px solid #23281C; border-radius: 22px;
+    box-shadow: 7px 8px 0 #23281C;
+    padding: clamp(24px, 2.8vw, 36px);
+    transform: rotate(-1.5deg);
+  }
+  .tc-stat-fig {
+    font-family: 'Fraunces', serif; font-weight: 800;
+    font-size: clamp(42px, 5.4vw, 72px); line-height: 0.95; letter-spacing: -0.04em;
+    display: block; margin-bottom: 10px;
+  }
+  .tc-stat-copy { font-family: 'Work Sans', sans-serif; font-size: 16px; line-height: 1.6; margin: 0 0 14px; font-weight: 600; }
+  .tc-stat-src { font-size: 12.5px; line-height: 1.5; margin: 0; color: rgba(35,40,28,0.7); }
+
+  /* ---- the four-step journey ---- */
+  .tc-journey { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(16px, 2vw, 26px); }
+  .tc-step {
+    position: relative;
+    background: #FFFFFF; border: 1px solid rgba(35,40,28,0.1);
+    border-radius: 18px; padding: clamp(22px, 2.5vw, 32px);
+    transition: transform 0.3s cubic-bezier(.22,1,.36,1), box-shadow 0.3s ease;
+  }
+  .tc-step:hover { transform: translateY(-5px); box-shadow: 0 24px 46px -30px rgba(35,40,28,0.55); }
+  /* the icon now carries the weight; the number is demoted to a caption,
+     because an icon alone cannot tell the reader this is an ordered sequence.
+     Sand orb here — the step cards are white, so a white orb would vanish. */
+  .tc-step-ico {
+    width: 64px; height: 64px; border-radius: 19px;
+    background: #EFE2C8;
+    /* block-level flex, not inline-flex: an atomic inline sits on the text
+       baseline and leaves unpredictable descender space under the orb */
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 18px;
+  }
+  .tc-step-ico svg { width: 38px; height: 38px; display: block; }
+  /* the caption belongs to the title, so it sits tight against it */
+  .tc-step-num {
+    display: block;
+    font-family: 'Work Sans', sans-serif; font-weight: 600;
+    font-size: 11px; line-height: 1; letter-spacing: 0.15em; text-transform: uppercase;
+    color: #8A8677;
+    margin-bottom: 4px;
+  }
+  .tc-step-title {
+    font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: clamp(17px, 1.7vw, 21px); letter-spacing: -0.02em;
+    margin: 0 0 8px; color: #23281C;
+  }
+  .tc-step-copy { font-size: 14.5px; line-height: 1.6; color: #4B4A3E; margin: 0; }
+
+  /* ---- the safety panel -----------------------------------------------
+     Must be unmissable without reading as a warning notice — so it takes
+     the cream card + terracotta rule rather than an alert colour.
+     ------------------------------------------------------------------- */
+  .tc-safety {
+    background: #FFFFFF;
+    border: 1px solid rgba(35,40,28,0.1);
+    border-left: 6px solid #C4632F;
+    border-radius: 18px;
+    padding: clamp(26px, 3vw, 44px);
+    display: grid; grid-template-columns: 56px 1fr; gap: clamp(20px, 2.4vw, 32px);
+    align-items: start;
+  }
+  .tc-safety-ico {
+    width: 56px; height: 56px; border-radius: 16px;
+    background: #EFE2C8; color: #C4632F;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  /* the panel spans the full section width like every other section, but
+     the prose inside keeps a readable measure */
+  .tc-safety p { font-size: 15.5px; line-height: 1.75; color: #4B4A3E; margin: 0 0 14px; max-width: 88ch; }
+  .tc-safety p:last-child { margin-bottom: 0; }
+
+  /* ---- FAQ ---- */
+  .faq-list { max-width: none; display: flex; flex-direction: column; gap: 12px; }
+  .faq-item {
+    background: #FFFFFF; border: 1px solid rgba(35,40,28,0.1);
+    border-radius: 16px; padding: 4px 22px;
+  }
+  .faq-item summary {
+    cursor: pointer; list-style: none;
+    padding: 18px 0;
+    font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: clamp(15.5px, 1.5vw, 18px); letter-spacing: -0.01em; color: #23281C;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after {
+    content: "+";
+    font-family: 'Work Sans', sans-serif; font-weight: 400;
+    font-size: 24px; line-height: 1; color: #C4632F;
+    transition: transform 0.25s ease;
+    flex-shrink: 0;
+  }
+  .faq-item[open] summary::after { transform: rotate(45deg); }
+  .faq-body { padding: 0 0 18px; }
+  .faq-body p { margin: 0 0 10px; font-size: 15px; line-height: 1.7; color: #4B4A3E; max-width: 88ch; }
+  .faq-body p:last-child { margin-bottom: 0; }
+
+  /* ---- local area chips ---- */
+  .tc-areas { display: flex; flex-wrap: wrap; gap: 10px; margin: 24px 0 0; padding: 0; list-style: none; }
+  .tc-areas li {
+    background: #EFE2C8; color: #23281C;
+    font-family: 'Work Sans', sans-serif; font-size: 14.5px; font-weight: 500;
+    padding: 9px 18px; border-radius: 999px;
+    border: 1px solid rgba(35,40,28,0.1);
+    transition: background 0.25s ease, transform 0.25s cubic-bezier(.22,1,.36,1);
+  }
+  .tc-areas li:hover { background: #F5C21A; transform: translateY(-2px); }
+
+  /* ---- closing booking panel ---- */
+  .tc-book { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: clamp(28px, 4vw, 60px); align-items: center; }
+  .tc-book-lines { list-style: none; margin: 0 0 26px; padding: 0; display: grid; gap: 12px; }
+  .tc-book-lines li {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+    padding-bottom: 12px; border-bottom: 1px solid rgba(246,241,228,0.16);
+    font-family: 'Work Sans', sans-serif; font-size: 16px; color: rgba(246,241,228,0.85);
+  }
+  .tc-book-lines li:last-child { border-bottom: 0; padding-bottom: 0; }
+  .tc-book-lines b { font-family: 'Fraunces', serif; font-weight: 800; font-size: 22px; letter-spacing: -0.02em; color: #F5C21A; }
+
+  /* ---- sticky mobile booking bar --------------------------------------
+     The brief asks for a persistent WhatsApp CTA on small screens. It
+     replaces the floating bubble rather than stacking with it, and carries
+     the price so the offer travels down the page with the button.
+     ------------------------------------------------------------------- */
+  .tc-sticky { display: none; }
+
+  @media (max-width: 1024px) {
+    .tc-journey { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 900px) {
+    .tc-hero { grid-template-columns: 1fr; }
+    /* headline, price and CTA lead on small screens — the photo follows,
+       so the offer is above the fold */
+    .tc-hero .hero-media-wrap { min-height: 0; }
+    .hero-media { height: auto; aspect-ratio: 4/3; }
+    .tc-split, .tc-split--flip, .tc-book { grid-template-columns: 1fr; }
+    .tc-trust { grid-template-columns: 1fr; gap: 16px; }
+    .tc-stat { transform: none; }
+    .wavy-photo { aspect-ratio: 5/4; }
+    .tc-photo-wrap .wavy-photo { aspect-ratio: 5/4; }
+  }
+  @media (max-width: 700px) {
+    .tc-safety { grid-template-columns: 1fr; gap: 18px; }
+    .tc-price-duo { gap: 12px; }
+  }
+  @media (max-width: 560px) {
+    .tc-journey { grid-template-columns: 1fr; }
+    .tc-price-duo { grid-template-columns: 1fr; gap: 16px; }
+    .tc-book-lines li { flex-direction: column; gap: 2px; }
+    /* the inline style on the bubble, and responsive.css loading after this
+       block, both outrank a plain rule here */
+    .tc-float { display: none !important; }
+    .tc-sticky {
+      display: flex; align-items: center; gap: 12px;
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 999;
+      background: #23281C;
+      padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -8px 24px -14px rgba(35,40,28,0.9);
+    }
+    .tc-sticky-price { flex: 1; min-width: 0; }
+    .tc-sticky-price span {
+      display: block; font-size: 10.5px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      color: rgba(246,241,228,0.55);
+    }
+    .tc-sticky-price b {
+      font-family: 'Fraunces', serif; font-weight: 800; font-size: 19px;
+      letter-spacing: -0.02em; color: #F5C21A;
+    }
+    /* responsive.css sends every .btn full-width below 480px and only
+       exempts the header/float ones — the bar needs its own exemption or
+       the button eats the row and crushes the price to zero width */
+    .tc-sticky .btn { padding: 13px 18px; font-size: 14px; flex-shrink: 0; width: auto !important; }
+    /* keep the footer clear of the fixed bar */
+    .site-footer { padding-bottom: 86px !important; }
+    /* this page alone has a sticky booking bar pinned to the bottom, so the
+       back-to-top button has to sit above it rather than behind it */
+    .site-footer .to-top { bottom: 88px !important; }
+  }
+
+  .hand { font-family: 'Fraunces', serif; font-optical-sizing: auto; font-style: italic; font-weight: 500; font-size: inherit; letter-spacing: -0.01em; color: #C4632F; }
+  .heading { font-family: 'Fraunces', serif; font-weight: 700; letter-spacing: -0.02em; color: #23281C; }
+  .page-width { max-width: 1440px; margin: 0 auto; padding-left: clamp(21px, 3.3vw, 48px); padding-right: clamp(21px, 3.3vw, 48px); }
+
+  /* Header is NOT sticky — keeps page scroll free */
+  .site-header { position: relative; top: auto; z-index: 100; }
+  .site-header.is-stuck { box-shadow: none; }
+
+  /* ---- Footer typography + newsletter ---- */
+  .site-footer a.link,
+  .site-footer .fc-row,
+  .site-footer .footer-copy,
+  .site-footer .footer-legal,
+  .site-footer .footer-bottom {
+    font-family: 'Work Sans', sans-serif;
+  }
+  .footer-kicker {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #F5C21A;
+    margin-bottom: 14px;
+  }
+  .footer-heading {
+    font-family: inherit;
+    padding-bottom: 0;
+  }
+  .footer-brand p, .site-footer .footer-tagline {
+    font-family: 'Work Sans', sans-serif;
+  }
+  .footer-news-copy {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 14.5px; line-height: 1.55;
+    color: rgba(246,241,228,0.75); margin: 0 0 14px; max-width: 260px;
+  }
+  .footer-news-form {
+    display: flex; flex-direction: column; gap: 10px; max-width: 280px;
+  }
+  .footer-news-input {
+    width: 100%; box-sizing: border-box;
+    background: rgba(246,241,228,0.08);
+    border: 1px solid rgba(246,241,228,0.18);
+    border-radius: 999px;
+    padding: 12px 16px;
+    color: #F6F1E4;
+    font-family: 'Work Sans', sans-serif; font-size: 14.5px;
+    outline: none;
+  }
+  .footer-news-input::placeholder { color: rgba(246,241,228,0.45); }
+  .footer-news-input:focus { border-color: #F5C21A; background: rgba(246,241,228,0.12); }
+  .footer-news-btn {
+    align-self: flex-start;
+    background: #F5C21A; color: #23281C; border: 0;
+    border-radius: 999px;
+    padding: 11px 20px;
+    font-family: 'Work Sans', sans-serif; font-weight: 600; font-size: 14.5px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 3px 3px 0 #F6F1E4;
+  }
+  .footer-news-btn:hover {
+    background: #F6F1E4;
+    transform: translate(-2px,-2px);
+    box-shadow: 5px 5px 0 #F6F1E4;
+  }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+  .footer-social {
+    display: flex; gap: 10px; margin-top: 18px; align-items: center;
+  }
+  .footer-social-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(246,241,228,0.08);
+    color: #F5C21A;
+    border: 1.5px solid rgba(245,194,26,0.35);
+    transition: transform 0.35s cubic-bezier(.34,1.56,.64,1), background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  }
+  .footer-social-btn:hover {
+    background: #F5C21A; color: #23281C; border-color: #F5C21A;
+    transform: translateY(-4px) rotate(-6deg) scale(1.06);
+  }
+
+  @keyframes to-top-float-live {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .to-top {
+    width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+    background: #F5C21A; color: #23281C; border: 0; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    animation: to-top-float-live 2.2s ease-in-out infinite;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 6px 16px -8px rgba(245,194,26,0.7);
+  }
+  .to-top:hover {
+    animation-play-state: paused;
+    background: #F6F1E4;
+    transform: translateY(-3px);
+  }
+  @media (max-width: 900px) {
+    .footer-inner { grid-template-columns: 1fr !important; }
+  }
+
+</style>
+<link rel="stylesheet" href="./responsive.css">
+<script src="./reveal.js" defer></script>
+<script src="./gallery.js" defer></script>
+</helmet>
+
+<div style="background: #F6F1E4; color: #23281C; font-family: 'Work Sans', sans-serif;">
+
+  <!-- HEADER -->
+  <header class="site-header fade-in">
+    <nav class="nav-bar">
+      <a href="Homepage.dc.html" style="display: flex; align-items: center; flex-shrink: 0;">
+        <img src="assets/logo-official.png" alt="Zoomies" class="site-logo">
+      </a>
+      <input type="checkbox" id="nav-toggle" class="nav-checkbox">
+      <label for="nav-toggle" class="nav-burger" aria-label="Toggle menu">
+        <svg class="nav-burger-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <svg class="nav-burger-close" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </label>
+      <div class="nav-links">
+        <a class="link" href="Grooming.dc.html">Dog Grooming</a>
+        <a class="link" href="Daycare.dc.html">Dog Daycare</a>
+        <a class="link is-active" href="TeethCleaning.dc.html">Teeth Cleaning</a>
+        <a class="link" href="Training.dc.html">Grooming Courses</a>
+        <a class="link" href="Pricing.dc.html">Pricing</a>
+        <a class="link" href="Contact.dc.html">Contact</a>
+      </div>
+      <a href="https://wa.me/353868099535" target="_blank" rel="noopener" class="btn btn-whatsapp" style="padding: 13px 22px; font-size: 14px; flex-shrink: 0;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp Us
+      </a>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="tc-hero">
+    <div class="fade-in d2" style="max-width: 580px;">
+      <div class="eyebrow" style="margin-bottom: 8px;">No scrubbing. No noise. No sedation.</div>
+      <h1 style="font-family: 'Fraunces'; font-optical-sizing: auto; font-size: clamp(36px, 5.2vw, 74px); line-height: 0.97; letter-spacing: -0.03em; margin: 0 0 22px; color: #23281C;">
+        <span style="font-weight: 800;">Ultrasonic Dog<br>Teeth Cleaning</span><br>
+        <span style="font-weight: 500; font-style: italic; color: #C4632F;">in Dublin</span>
+      </h1>
+      <p style="font-size: 16px; line-height: 1.75; color: #4B4A3E; margin: 0 0 26px;">Gentle Emmi-pet dental hygiene to help keep teeth cleaner and breath fresher &ndash; without mechanical brushing, noise or sedation.</p>
+      <div class="tc-price-duo">
+        <div class="tc-price">
+          <p class="tc-price-label">Standalone</p>
+          <span class="tc-price-fig">&euro;35</span>
+          <p class="tc-price-note">Per session</p>
+        </div>
+        <div class="tc-price tc-price--feature">
+          <span class="tc-save">Save 29%</span>
+          <p class="tc-price-label">Added to a groom</p>
+          <span class="tc-price-fig">&euro;25</span>
+          <p class="tc-price-note">Our most popular way to book</p>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <a href="https://wa.me/message/W2OAWUQCD5WCJ1" target="_blank" rel="noopener" class="btn btn-yellow"><svg width="17" height="17" viewBox="0 0 24 24" fill="#25D366" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>Book Teeth Cleaning</a>
+        <a href="Grooming.dc.html" class="btn btn-outline"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M12 5v14M5 12h14"/></svg>Add to My Next Groom</a>
+      </div>
+
+      <p class="tc-hero-cue">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Dental hygiene, not veterinary dentistry.</span>
+      </p>
+    </div>
+
+    <div class="fade-in d3 hero-media-wrap">
+      <div class="hero-media">
+        <img src="assets/dog2.png" alt="A freshly groomed dog at the Zoomies salon">
+      </div>
+      <div class="hero-sticker">calm &amp; unsedated</div>
+    </div>
+  </section>
+
+  <!-- WHY OWNERS CHOOSE EMMI-PET -->
+  <section class="reveal" style="background: #EFE2C8;">
+    <div style="max-width: 1440px; margin: 0 auto; padding: clamp(42px, 7vw, 100px) clamp(21px, 3.3vw, 48px);">
+      <div class="tc-split tc-split--flip" style="align-items: center;">
+        <div>
+          <div class="eyebrow">the benefits</div>
+          <h2 class="heading" style="font-size: clamp(26px, 3.4vw, 46px); margin: 0 0 18px; line-height: 1.06;">Gentle <span style="font-weight: 500; font-style: italic; color: #C4632F;">by design</span></h2>
+          
+          <a href="https://wa.me/message/W2OAWUQCD5WCJ1" target="_blank" rel="noopener" class="btn btn-yellow"><svg width="17" height="17" viewBox="0 0 24 24" fill="#25D366" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>Book Teeth Cleaning</a>
+        </div>
+        <ul class="tc-bene">
+          <li>
+            <span class="tc-bene-ico"><svg viewBox="0 0 24 24"><path d="M4.26 9.43A4 4 0 0 1 4.26 14.57M6.56 7.5A7 7 0 0 1 6.56 16.5" stroke="#F5C21A" stroke-width="1.8" stroke-linecap="round" fill="none"/><g transform="translate(7.36 3.5) scale(.72)"><path d="M12 4.2C10.8 3.45 9.25 3.35 8.1 4.05C6.75 4.85 6.4 6.55 6.75 8.15C7.05 9.5 7.75 10.35 7.9 12.25C8.05 14.1 7.95 18.2 9.35 19.4C10.35 20.25 10.65 17.05 12 16.15C13.35 17.05 13.65 20.25 14.65 19.4C16.05 18.2 15.95 14.1 16.1 12.25C16.25 10.35 16.95 9.5 17.25 8.15C17.6 6.55 17.25 4.85 15.9 4.05C14.75 3.35 13.2 3.45 12 4.2Z" stroke="#23281C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none" vector-effect="non-scaling-stroke"/></g></svg></span>
+            <span><b>No mechanical scrubbing</b></span>
+          </li>
+          <li>
+            <span class="tc-bene-ico"><svg viewBox="0 0 24 24"><g stroke="#23281C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M4 10h3l4-3.2v10.4L7 14H4Z"/><path d="M14 9.6c.8.7 1.2 1.5 1.2 2.4S14.8 13.7 14 14.4M16.7 7.4c1.5 1.3 2.2 2.8 2.2 4.6s-.7 3.3-2.2 4.6"/></g><path fill="#F5C21A" stroke="none" d="M5.52 3.33a.82.82 0 0 1 1.16 0l12 12a.82.82 0 0 1-1.16 1.16l-12-12a.82.82 0 0 1 0-1.16Z"/></svg></span>
+            <span><b>Silent and vibration-free</b></span>
+          </li>
+          <li>
+            <span class="tc-bene-ico"><svg viewBox="0 0 24 24"><path fill="#F5C21A" fill-rule="evenodd" stroke="none" d="M12 2.1c2.2 1.3 4.6 1.8 7.3 2.1v5.7c0 5-2.7 8.8-7.3 11.5C7.4 18.7 4.7 14.9 4.7 9.9V4.2C7.4 3.9 9.8 3.4 12 2.1Zm0 2.08C10.27 5 8.45 5.47 6.5 5.76V9.9c0 4.08 2.02 7.2 5.5 9.4 3.48-2.2 5.5-5.32 5.5-9.4V5.76C15.55 5.47 13.73 5 12 4.18Z"/><g transform="translate(5.04 4.9) scale(.58)"><path d="M12 4.2C10.8 3.45 9.25 3.35 8.1 4.05C6.75 4.85 6.4 6.55 6.75 8.15C7.05 9.5 7.75 10.35 7.9 12.25C8.05 14.1 7.95 18.2 9.35 19.4C10.35 20.25 10.65 17.05 12 16.15C13.35 17.05 13.65 20.25 14.65 19.4C16.05 18.2 15.95 14.1 16.1 12.25C16.25 10.35 16.95 9.5 17.25 8.15C17.6 6.55 17.25 4.85 15.9 4.05C14.75 3.35 13.2 3.45 12 4.2Z" stroke="#23281C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none" vector-effect="non-scaling-stroke"/></g></svg></span>
+            <span><b>No sedation or anaesthetic</b></span>
+          </li>
+          <li>
+            <span class="tc-bene-ico"><svg viewBox="0 0 24 24"><path fill="#F5C21A" stroke="none" d="M21 4.2c.2 5.4-2 8.2-6.1 7.4-.9-4 1.6-6.9 6.1-7.4Z"/><g transform="translate(0.1 3.74) scale(.7)"><path d="M12 4.2C10.8 3.45 9.25 3.35 8.1 4.05C6.75 4.85 6.4 6.55 6.75 8.15C7.05 9.5 7.75 10.35 7.9 12.25C8.05 14.1 7.95 18.2 9.35 19.4C10.35 20.25 10.65 17.05 12 16.15C13.35 17.05 13.65 20.25 14.65 19.4C16.05 18.2 15.95 14.1 16.1 12.25C16.25 10.35 16.95 9.5 17.25 8.15C17.6 6.55 17.25 4.85 15.9 4.05C14.75 3.35 13.2 3.45 12 4.2Z" stroke="#23281C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none" vector-effect="non-scaling-stroke"/></g></svg></span>
+            <span><b>Helps control plaque</b></span>
+          </li>
+          <li>
+            <span class="tc-bene-ico"><svg viewBox="0 0 24 24"><g stroke="#23281C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(1.004 5.752) scale(.72)"><path d="M15.8 4.2a8 8 0 1 0 3.9 11.9A7 7 0 0 1 15.8 4.2Z" vector-effect="non-scaling-stroke"/></g><path d="M15.5 3h5l-5 5.5h5"/></g><path d="M4.5 20 20 4.5" stroke="#F5C21A" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg></span>
+            <span><b>Supports fresher breath</b></span>
+          </li>
+          <li>
+            <span class="tc-bene-ico"><svg viewBox="0 0 24 24"><g stroke="#23281C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"><g transform="translate(1.004 5.752) scale(.72)"><path d="M15.8 4.2a8 8 0 1 0 3.9 11.9A7 7 0 0 1 15.8 4.2Z" vector-effect="non-scaling-stroke"/></g><path d="M15.5 3h5l-5 5.5h5"/></g><path d="M4.5 20 20 4.5" stroke="#F5C21A" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg></span>
+            <span><b>Introduced gradually at your dog&rsquo;s pace</b></span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- BEFORE &amp; AFTER — the client's October photos -->
+  <section class="reveal" style="padding: clamp(42px, 7vw, 100px) 0 clamp(34px, 6.3vw, 90px);">
+    <div style="max-width: 1440px; margin: 0 auto; padding: 0 clamp(21px, 3.3vw, 48px);">
+      <div style="max-width: 720px; margin-bottom: clamp(20px, 2.6vw, 34px);">
+        <div class="eyebrow">real results</div>
+        <h2 class="heading" style="font-size: clamp(28px, 3.9vw, 54px); margin: 0 0 16px; line-height: 1.04;">Before &amp; <span style="font-weight: 500; font-style: italic; color: #C4632F;">after</span></h2>
+        <p style="font-size: 15.5px; line-height: 1.75; color: #4B4A3E; margin: 0;">Real dogs, photographed before and straight after their session.</p>
+      </div>
+      <div class="gal-car is-wide">
+      <div class="gal-track">
+        <figure class="gal-slide"><img src="assets/client/teeth-before-after-merle.jpg" alt="A dog&rsquo;s teeth before and after Emmi-pet ultrasonic cleaning at Zoomies" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/teeth-before-after-tan.jpg" alt="A second dog&rsquo;s teeth before and after Emmi-pet ultrasonic cleaning at Zoomies" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/teeth-ultrasonic-brushing.jpg" alt="Ultrasonic teeth cleaning at Zoomies" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/teeth-brush-doodle.jpg" alt="Brushing a doodle&rsquo;s teeth at Zoomies" loading="lazy"></figure>
+      </div>
+      <div class="gal-nav">
+        <button type="button" class="gal-btn" data-gal="prev" aria-label="Previous photos"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <button type="button" class="gal-btn" data-gal="next" aria-label="Next photos"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing" class="reveal" style="background: #EFE2C8;">
+    <div style="max-width: 1440px; margin: 0 auto; padding: clamp(42px, 7vw, 100px) clamp(21px, 3.3vw, 48px);">
+      <div style="max-width: 720px; margin-bottom: clamp(26px, 3.4vw, 44px);">
+        <div class="eyebrow">simple, honest pricing</div>
+        <h2 class="heading" style="font-size: clamp(28px, 3.9vw, 54px); margin: 0 0 16px; line-height: 1.04;">Dog Teeth Cleaning <span style="font-weight: 500; font-style: italic; color: #C4632F;">Prices</span></h2>
+        <p style="font-size: 15.5px; line-height: 1.75; color: #4B4A3E; margin: 0;">From &euro;25 when added to your dog&rsquo;s groom.</p>
+      </div>
+
+      <div class="tc-price-duo" style="margin-bottom: 28px;">
+        <div class="tc-price tc-price--lg">
+          <p class="tc-price-label">Standalone teeth cleaning</p>
+          <span class="tc-price-fig">&euro;35</span>
+          <p class="tc-price-note">Per session, booked on its own.</p>
+        </div>
+        <div class="tc-price tc-price--lg tc-price--feature">
+          <span class="tc-save">Save 29%</span>
+          <p class="tc-price-label">Add to your groom</p>
+          <span class="tc-price-fig">&euro;25</span>
+          <p class="tc-price-note">Added to any grooming appointment &mdash; a 29% saving versus standalone.</p>
+        </div>
+      </div>
+
+      
+
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+        <a href="https://wa.me/message/W2OAWUQCD5WCJ1" target="_blank" rel="noopener" class="btn btn-yellow"><svg width="17" height="17" viewBox="0 0 24 24" fill="#25D366" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>Book Teeth Cleaning on WhatsApp</a>
+        <a href="Grooming.dc.html" class="btn btn-outline">See Dog Grooming<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SAFETY -->
+  <section id="safety" class="reveal" style="max-width: 1440px; margin: 0 auto; padding: clamp(42px, 7vw, 100px) clamp(21px, 3.3vw, 48px) clamp(38px, 6vw, 84px);">
+    <div class="tc-safety">
+      <span class="tc-safety-ico">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+      </span>
+      <div>
+        <h2 class="heading" style="font-size: clamp(22px, 2.6vw, 34px); margin: 0 0 16px; line-height: 1.15;">Important: dental hygiene, <span style="font-weight: 500; font-style: italic; color: #C4632F;">not veterinary dentistry</span></h2>
+        <p>This is a non-invasive hygiene service, not a replacement for veterinary dentistry. If we see signs of dental disease, we&rsquo;ll recommend you speak to your vet.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="FAQs" class="reveal" style="max-width: 1440px; margin: 0 auto; padding: 0 clamp(21px, 3.3vw, 48px) clamp(38px, 6vw, 84px);">
+    <div style="text-align: center; margin-bottom: clamp(24px, 3.2vw, 40px);">
+      <div class="eyebrow">the questions owners ask us</div>
+      <h2 class="heading" style="font-size: clamp(28px, 3.9vw, 54px); margin: 0; line-height: 1.04;">Frequently Asked <span style="font-weight: 500; font-style: italic; color: #C4632F;">Questions</span></h2>
+    </div>
+
+    <div class="faq-list">
+      <details class="faq-item" open>
+        <summary>How does Emmi-pet dog teeth cleaning work?</summary>
+        <div class="faq-body">
+          <p>The Emmi-pet toothbrush uses ultrasonic technology together with specialist toothpaste. The brush head is held gently against the teeth rather than being scrubbed backwards and forwards. This allows dental hygiene to be carried out without a rotating brush head or vigorous mechanical brushing.</p>
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>How many sessions will my dog need?</summary>
+        <div class="faq-body">
+          <p>There is no fixed number because every dog is different. A dog with relatively clean teeth and light plaque may need fewer sessions, while a dog with more visible surface build-up may benefit from an initial course of weekly Zoomies appointments. We review progress as the sessions continue and keep expectations realistic.</p>
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>Does my dog need sedation or anaesthetic?</summary>
+        <div class="faq-body">
+          <p>No. The Zoomies Emmi-pet hygiene service is carried out while your dog is awake and does not involve sedation or anaesthetic.</p>
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>Is this the same as a veterinary dental cleaning?</summary>
+        <div class="faq-body">
+          <p>No. Zoomies provides a non-invasive dental hygiene and maintenance service. We do not diagnose or treat dental disease, and our service does not replace veterinary dentistry where treatment is clinically required.</p>
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>Can I add teeth cleaning to my dog&rsquo;s groom?</summary>
+        <div class="faq-body">
+          <p>Yes. A standalone session is &euro;35, while grooming customers can add Emmi-pet teeth cleaning for &euro;25 &mdash; a 29% saving. This is the easiest way to make dental hygiene part of your dog&rsquo;s regular grooming routine.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- LOCAL SEO -->
+  <section id="local" class="reveal" style="max-width: 1440px; margin: 0 auto; padding: 0 clamp(21px, 3.3vw, 48px) clamp(42px, 7vw, 100px);">
+    <div class="tc-split">
+      <div>
+        <div class="eyebrow">find us in south dublin</div>
+        <h2 class="heading" style="font-size: clamp(26px, 3.4vw, 46px); margin: 0 0 18px; line-height: 1.06;">Dog Teeth Cleaning in <span style="font-weight: 500; font-style: italic; color: #C4632F;">Kilmacud, South Dublin</span></h2>
+        <p style="font-size: 15.5px; line-height: 1.75; color: #4B4A3E; margin: 0 0 16px;">Zoomies provides Emmi-pet ultrasonic dog teeth cleaning in Kilmacud, conveniently located for dog owners in Stillorgan, Dundrum, Sandyford, Blackrock, Mount Merrion, Leopardstown and surrounding South Dublin areas.</p>
+        <p style="font-size: 15.5px; line-height: 1.75; color: #4B4A3E; margin: 0;">Whether you want to book a standalone teeth-cleaning appointment or add dental hygiene to your dog&rsquo;s next groom, our team can explain the process and help you decide on a sensible starting plan.</p>
+        <ul class="tc-areas">
+          <li>Kilmacud</li>
+          <li>Stillorgan</li>
+          <li>Dundrum</li>
+          <li>Sandyford</li>
+          <li>Blackrock</li>
+          <li>Mount Merrion</li>
+          <li>Leopardstown</li>
+        </ul>
+      </div>
+      <div class="tc-photo-wrap care-card">
+        <div class="sticker-note" style="position: absolute; top: -12px; right: 10px; z-index: 2; transform: rotate(4deg);">the zoomies team</div>
+        <div class="wavy-photo">
+          <img src="assets/client/facility-wall-sign.jpg" class="care-photo" alt="The Zoomies sign at the Kilmacud salon" style="object-position: center 30%;">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOOK YOUR DOG'S TEETH CLEANING -->
+  <section class="reveal" style="background: #23281C; color: #F6F1E4; padding: clamp(34px, 6.3vw, 90px) clamp(21px, 3.3vw, 48px); margin-bottom: clamp(34px, 6.3vw, 90px);">
+    <div style="max-width: 1440px; margin: 0 auto;">
+      <div class="tc-book">
+        <div>
+          <div class="eyebrow eyebrow--light">ready when you are</div>
+          <h2 style="font-family: 'Fraunces', serif; font-weight: 800; letter-spacing: -0.03em; font-size: clamp(28px, 3.9vw, 54px); margin: 0 0 18px; line-height: 1.04; color: #F6F1E4;">Book Your Dog&rsquo;s <span style="font-weight: 500; font-style: italic; color: #F5C21A;">Teeth Cleaning</span></h2>
+          <p style="font-family: 'Work Sans', sans-serif; font-size: 16px; line-height: 1.7; color: rgba(246,241,228,0.8); margin: 0 0 28px; max-width: 520px;">Message us on WhatsApp and we&rsquo;ll talk you through the process, answer any questions and help you pick a sensible starting plan for your dog.</p>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="https://wa.me/message/W2OAWUQCD5WCJ1" target="_blank" rel="noopener" class="btn btn-yellow"><svg width="17" height="17" viewBox="0 0 24 24" fill="#25D366" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>Book Teeth Cleaning on WhatsApp</a>
+            <a href="Grooming.dc.html" class="btn btn-outline-light"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M12 5v14M5 12h14"/></svg>Add Teeth Cleaning to My Next Groom</a>
+          </div>
+          <p style="font-family: 'Work Sans', sans-serif; font-size: 15px; margin: 22px 0 0; color: rgba(246,241,228,0.72);">Or call <a class="link" href="tel:+353868099535" style="color: #F5C21A; font-weight: 600;">+353 86 809 9535</a> &nbsp;&middot;&nbsp; 116A Lower Kilmacud Road, Stillorgan</p>
+        </div>
+        <div>
+          <ul class="tc-book-lines">
+            <li><span>Standalone session</span> <b>&euro;35</b></li>
+            <li><span>Added to a grooming appointment</span> <b>&euro;25</b></li>
+            <li><span>Grooming customers save</span> <b>29%</b></li>
+          </ul>
+          <p style="font-family: 'Work Sans', sans-serif; font-size: 14px; line-height: 1.65; color: rgba(246,241,228,0.6); margin: 0;">A dental hygiene and maintenance service &mdash; not veterinary dentistry. We&rsquo;ll refer you to your vet where dental disease is suspected.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FLOATING WHATSAPP (desktop / tablet) -->
+  <a href="https://wa.me/message/W2OAWUQCD5WCJ1" target="_blank" rel="noopener" aria-label="Chat on WhatsApp" class="tc-float" style="position: fixed; bottom: 28px; right: 28px; z-index: 999; width: 58px; height: 58px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(37,211,102,0.45), 0 0 24px rgba(37,211,102,0.25); transition: transform 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s ease;" onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 6px 22px rgba(37,211,102,0.55), 0 0 32px rgba(37,211,102,0.35)'" onmouseout="this.style.transform='none';this.style.boxShadow='0 4px 16px rgba(37,211,102,0.45), 0 0 24px rgba(37,211,102,0.25)'">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </a>
+
+  <!-- STICKY BOOKING BAR (mobile) -->
+  <div class="tc-sticky">
+    <div class="tc-sticky-price">
+      <span>With grooming &mdash; save 29%</span>
+      <b>&euro;25</b>
+    </div>
+    <a href="https://wa.me/message/W2OAWUQCD5WCJ1" target="_blank" rel="noopener" class="btn btn-whatsapp">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Book Now
+    </a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="reveal site-footer">
+    <div class="footer-dog" aria-hidden="true">
+      <img src="assets/client/grooming-cockapoo-table.jpg" alt="">
+    </div>
+    <div class="footer-glow" aria-hidden="true"></div>
+
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="assets/logo-footer-transparent.png" alt="Zoomies" class="site-logo" style="height: 120px; width: auto; margin-bottom: 14px;">
+        <p style="font-family: 'Work Sans', sans-serif; font-size: 14px; line-height: 1.6; color: #4B4A3E; margin: 0; max-width: 320px; font-style: italic;">Happier Dogs. Brighter Days.</p>
+        <div class="footer-social" aria-label="Social media">
+          <a class="footer-social-btn" href="https://www.instagram.com/zoomies_ireland/" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          </a>
+          <a class="footer-social-btn" href="https://www.facebook.com/zoomiesireland" target="_blank" rel="noopener" aria-label="Facebook">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M14 9h3V6h-3c-1.7 0-3 1.3-3 3v2H9v3h2v7h3v-7h3l1-3h-4V9c0-.6.4-1 1-1z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <div class="footer-kicker"><span class="footer-heading">Quick Link</span></div>
+        <nav style="display: flex; flex-direction: column; gap: 11px; font-size: 14.5px;">
+          <a class="link" href="Homepage.dc.html">Home</a>
+          <a class="link" href="Services.dc.html">Services</a>
+          <a class="link" href="Pricing.dc.html">Pricing</a>
+          <a class="link" href="Contact.dc.html">Contact Us</a>
+        </nav>
+      </div>
+
+      <div class="footer-col">
+        <div class="footer-kicker"><span class="footer-heading">Contact Info</span></div>
+        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 14.5px;">
+          <a class="fc-row" href="https://wa.me/353868099535" target="_blank" rel="noopener"><span class="fc-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0122 16.92z"/></svg></span><span>+353868099535</span></a>
+          <a class="fc-row" href="mailto:hello@zoomies.ie"><span class="fc-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></span><span>hello@zoomies.ie</span></a>
+          <div class="fc-row is-static"><span class="fc-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span>116A Lower Kilmacud Road, Stillorgan, Co. Dublin, A94 R2C9</span></div>
+        </div>
+      </div>
+
+      <div class="footer-col footer-news">
+        <div class="footer-kicker"><span class="footer-heading">Newsletter</span></div>
+        <p class="footer-news-copy">Paw-some updates, grooming tips &amp; academy news &mdash; straight to your inbox.</p>
+        <form class="footer-news-form" action="#" method="post" onsubmit="return false;">
+          <label class="sr-only" for="footer-email-teeth">Email</label>
+          <input id="footer-email-teeth" class="footer-news-input" type="email" name="email" placeholder="Your email" required autocomplete="email">
+          <button class="footer-news-btn" type="submit">Subscribe<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </form>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="footer-copy">
+        <button class="to-top" type="button" id="to-top" aria-label="Back to top">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        </button>
+        <span>&copy; 2026 Zoomies Grooming. All Rights Reserved.</span>
+      </div>
+      <div class="footer-legal">
+        <a class="link" href="#">Privacy Policy</a>
+        <span class="footer-dot" aria-hidden="true">&middot;</span>
+        <a class="link" href="#">Terms &amp; Conditions</a>
+      </div>
+    </div>
+  </footer>
+
+</div>
+]]>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+class Component extends StreamableLogic {
+  componentDidMount() {
+    if (typeof window === "undefined") return;
+
+    if ("IntersectionObserver" in window) {
+      const els = document.querySelectorAll(".reveal");
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) { entry.target.classList.add("is-visible"); io.unobserve(entry.target); }
+        });
+      }, { threshold: 0.15, rootMargin: "0px 0px -60px 0px" });
+      els.forEach((el) => io.observe(el));
+      this._io = io;
+    } else {
+      document.querySelectorAll(".reveal").forEach((el) => el.classList.add("is-visible"));
+    }
+
+    /* ---------- sticky header ---------- */
+    const header = document.querySelector(".site-header");
+    if (header) {
+      const onScrollStuck = () => {
+        const y = window.scrollY || document.documentElement.scrollTop || 0;
+        header.classList.toggle("is-stuck", y > 8);
+      };
+      window.addEventListener("scroll", onScrollStuck, { passive: true });
+      onScrollStuck();
+    }
+
+    /* ---------- FAQ: one open at a time ----------
+       Thirteen questions is a long list; letting several stand open makes
+       the page jump around under the reader. */
+    const faqs = Array.from(document.querySelectorAll(".faq-item"));
+    faqs.forEach((d) => {
+      d.addEventListener("toggle", () => {
+        if (!d.open) return;
+        faqs.forEach((other) => { if (other !== d) other.open = false; });
+      });
+    });
+
+    const scrollToTopRobust = (el) => {
+      const roots = [window, document.documentElement, document.body];
+      let p = el && el.parentElement;
+      while (p && p !== document.body) {
+        const s = getComputedStyle(p);
+        if ((s.overflowY === "auto" || s.overflowY === "scroll") && p.scrollHeight > p.clientHeight) roots.push(p);
+        p = p.parentElement;
+      }
+      roots.forEach((r) => {
+        try {
+          if (r === window) window.scrollTo({ top: 0, behavior: "smooth" });
+          else if (r.scrollTo) r.scrollTo({ top: 0, behavior: "smooth" });
+          else r.scrollTop = 0;
+        } catch (_) {}
+      });
+    };
+
+    /* ---------- back to top (footer) ---------- */
+    const wireToTop = (el) => {
+      if (!el) return;
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        scrollToTopRobust(el);
+      });
+    };
+    wireToTop(document.getElementById("to-top"));
+
+  }
+  componentWillUnmount() { if (this._io) this._io.disconnect(); }
+}
+</script>
+</body>
+</html>

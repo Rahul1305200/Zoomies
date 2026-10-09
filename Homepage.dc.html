@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<![CDATA[<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400;1,9..144,500;1,9..144,600;1,9..144,700;1,9..144,800&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #F6F1E4; color: #23281C; font-family: 'Work Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  /* Unlock scroll if dc-runtime injected height:100% without a scroller */
+  html { height: auto !important; overflow-x: hidden !important; overflow-y: auto !important; }
+  /* overflow-x must be `clip`, not `hidden`: `hidden` promotes the visible
+     vertical axis to `auto` and makes body a second scrollport that swallows
+     wheel gestures. */
+  body { height: auto !important; min-height: 100% !important; overflow-x: hidden !important; overflow-x: clip !important; overflow-y: visible !important; }
+  #dc-root, #dc-root > .sc-host { height: auto !important; max-height: none !important; overflow: visible !important; }
+  * { box-sizing: border-box; }
+  a { color: inherit; text-decoration: none; }
+  a.link { transition: color 0.2s ease; }
+  a.link:hover { color: #23281C; }
+  a[href]:not(.link) { transition: transform 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s cubic-bezier(.22,1,.36,1), background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease; }
+
+  /* ---- Load-in animation ---- */
+  @keyframes fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-in { animation: fade-up 0.7s cubic-bezier(.22,1,.36,1) both; }
+  .d1 { animation-delay: .05s; } .d2 { animation-delay: .12s; } .d3 { animation-delay: .19s; }
+
+  /* ---- Scroll-reveal ---- */
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s cubic-bezier(.22,1,.36,1), transform 0.7s cubic-bezier(.22,1,.36,1); }
+  .reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+  .nav-dropdown-wrap {
+    position: relative;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+  .nav-dropdown-wrap .nav-dropdown-caret { transition: transform 0.45s cubic-bezier(.34,1.3,.64,1); display: inline-block; }
+  .nav-dropdown-wrap:hover .nav-dropdown-caret,
+  .nav-dropdown-wrap:focus-within .nav-dropdown-caret { transform: rotate(180deg); }
+  .nav-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(14px) scale(0.96);
+    background: #FFFEFA;
+    border: 2px solid #F5C21A;
+    border-radius: 18px;
+    padding: 10px;
+    min-width: 224px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.42s ease,
+      transform 0.5s cubic-bezier(.22,1,.36,1),
+      visibility 0.42s,
+      box-shadow 0.4s ease;
+    transform-origin: top center;
+    z-index: 300;
+    box-shadow: 4px 4px 0 rgba(35,40,28,0.12), 0 16px 32px -16px rgba(35,40,28,0.35);
+  }
+  /* invisible bridge so mouse can travel from link to menu without closing */
+  .nav-dropdown::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0;
+    bottom: 100%;
+    height: 16px;
+  }
+  .nav-dropdown-wrap:hover .nav-dropdown,
+  .nav-dropdown-wrap:focus-within .nav-dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  .nav-dropdown-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 12px; border-radius: 11px;
+    font-family: 'Work Sans', sans-serif; font-size: 15.5px; font-weight: 500;
+    color: #23281C; white-space: nowrap;
+    transition:
+      background 0.4s ease,
+      transform 0.4s cubic-bezier(.22,1,.36,1),
+      padding-left 0.4s cubic-bezier(.22,1,.36,1),
+      box-shadow 0.35s ease;
+    pointer-events: auto;
+    position: relative; z-index: 1;
+  }
+  .nav-dropdown-item:hover {
+    background: #FBF3D9;
+    padding-left: 16px;
+    transform: translateX(2px);
+  }
+  .nav-dropdown-icon {
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    width: 32px; height: 32px; border-radius: 9px; background: #F6F1E4;
+    transition: background 0.4s ease, transform 0.45s cubic-bezier(.34,1.56,.64,1);
+  }
+  .nav-dropdown-item:hover .nav-dropdown-icon {
+    background: #F5C21A;
+    transform: rotate(-8deg) scale(1.08);
+  }
+
+  /* Buttons: solid rounded-rectangles, not pills */
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 15px clamp(16px, 1.9vw, 28px); border-radius: 10px; font-family: 'Lora', serif; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; transition: transform 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s cubic-bezier(.22,1,.36,1), background-color 0.2s ease, color 0.2s ease; }
+  .btn-yellow { background: #F5C21A; color: #23281C; box-shadow: 3px 3px 0 #23281C; }
+  .btn-yellow:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 #23281C; }
+  .btn-ink { background: #23281C; color: #F6F1E4; }
+  .btn-ink:hover { background: #F5C21A; color: #23281C; transform: translateY(-3px); }
+  .btn-outline { background: transparent; color: #23281C; border: 1.5px solid #23281C; }
+  .btn-outline:hover { background: #23281C; color: #F6F1E4; }
+  .btn-cream { background: #F6F1E4; color: #23281C; }
+  .btn-cream:hover { background: #23281C; color: #F6F1E4; }
+
+  .hero-text-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'Work Sans', sans-serif; font-size: 16px; font-weight: 600;
+    color: #23281C; padding: 8px 4px;
+    border-bottom: 1.5px solid rgba(35,40,28,0.28);
+    transition: gap 0.25s cubic-bezier(.22,1,.36,1), border-color 0.2s ease, color 0.2s ease;
+  }
+  .hero-text-link:hover { gap: 12px; border-color: #23281C; color: #C4632F; }
+
+  .hero-badge {
+    position: absolute; top: 20px; left: 20px;
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #F5C21A; color: #23281C;
+    padding: 11px 16px; border-radius: 12px;
+    font-family: 'Work Sans', sans-serif; font-size: 14.5px; font-weight: 600;
+    transform: rotate(-4deg);
+  }
+  .hero-stamp {
+    position: absolute; bottom: 20px; right: 20px;
+    width: 92px; height: 92px; border-radius: 50%;
+    background: #23281C; color: #F5C21A;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center; font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: 12px; letter-spacing: 0.02em; text-transform: uppercase;
+    line-height: 1.25; transform: rotate(6deg); border: 3px solid #F6F1E4;
+  }
+
+  /* Wolfitbox-style numbered flow */
+  .step-num {
+    width: 62px; height: 62px; border-radius: 50%;
+    background: #23281C; color: #F6F1E4;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fraunces'; font-weight: 700; font-size: clamp(16px, 1.5vw, 22px);
+    border: 5px solid #F6F1E4;
+  }
+  .wavy-photo {
+    aspect-ratio: 6/5; overflow: hidden;
+    border-radius: 24px;
+    background: #EFE2C8;
+  }
+  .wavy-photo-alt { aspect-ratio: 1; border-radius: 50%; }
+  .site-logo { height: 88px; width: auto; object-fit: contain; display: block; }
+  .btn-whatsapp { background: #25D366; color: #FFFFFF; }
+  /* in-flow WhatsApp CTA: ink body, green glyph — keeps the saturated green
+     for the persistent nav pill, the floating bubble and the closing CTA */
+  .btn-wa-ink svg { transition: fill 0.2s ease; }
+  .btn-wa-ink:hover svg { fill: #1a8f45; }
+  .btn-whatsapp:hover { background: #1ebe57; color: #FFFFFF; transform: translateY(-2px); }
+  .site-header {
+    background: #23281C;
+    color: #F6F1E4; position: relative; z-index: 100; overflow: visible; }
+  .site-header .promo {
+    text-align: center;
+    padding: 11px 20px;
+    font-size: 13.5px;
+    font-weight: 500;
+    background: #F5C21A;
+    color: #23281C;
+  }
+  .site-header .promo strong { color: #23281C; font-weight: 700; }
+  .site-header .nav-bar {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 10px clamp(21px, 3.3vw, 48px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(16px, 1.9vw, 28px); z-index: 101; overflow: visible; position: relative; }
+  .site-header .nav-links {
+    display: flex;
+    align-items: center;
+    gap: clamp(18px, 2.2vw, 30px);
+  }
+  .site-header .nav-links > a,
+  .site-header .nav-dropdown-wrap > a {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 15.5px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: rgba(246,241,228,0.9);
+    padding: 6px 2px;
+    border-radius: 0;
+    background: transparent;
+    transition: color 0.25s ease;
+    position: relative;
+  }
+  .site-header .nav-links > a:hover,
+  .site-header .nav-dropdown-wrap > a:hover {
+    color: #F5C21A;
+    background: transparent;
+    transform: none;
+  }
+  .site-header .nav-links > a.is-active {
+    color: #F5C21A;
+    background: transparent;
+    box-shadow: none;
+  }
+  .site-header .nav-links > a.is-active::after,
+  .site-header .nav-dropdown-wrap > a.is-active::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -4px;
+    height: 2px;
+    background: #F5C21A;
+    border-radius: 2px;
+  }
+  .site-header .nav-dropdown-wrap { padding-bottom: 0; margin-bottom: 0; }
+  .site-footer {
+    position: relative;
+    background: #23281C;
+    color: #F6F1E4;
+    margin-top: 40px;
+    padding: clamp(32px, 5vw, 72px) clamp(21px, 3.3vw, 48px) clamp(16px, 1.9vw, 28px);
+    overflow: visible;
+  }
+  .site-footer::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: -28px;
+    height: 36px;
+    background: #23281C;
+    border-radius: 100% 100% 0 0 / 100% 100% 0 0;
+  }
+  .footer-dog {
+    position: absolute;
+    right: 56px;
+    top: -78px;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 5px solid #F6F1E4;
+    background: #EFE2C8;
+    box-shadow: 0 10px 28px rgba(35,40,28,0.25);
+  }
+  .footer-dog img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; display: block; }
+  .footer-inner {
+    max-width: 1440px; margin: 0 auto;
+    display: grid; grid-template-columns: 1.2fr 0.7fr 1fr 1.1fr; gap: clamp(24px, 3.5vw, 48px);
+    position: relative; z-index: 1;
+  }
+  .footer-bottom {
+    max-width: 1440px; margin: 28px auto 0;
+    padding-top: 20px;
+    border-top: 1px solid rgba(246,241,228,0.15);
+    display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    font-size: 13px; color: rgba(246,241,228,0.65);
+  }
+  .site-footer a.link { color: rgba(246,241,228,0.82); }
+  .site-footer a.link:hover { color: #F5C21A; }
+  /* ---- Full-bleed cut-out imagery ----
+     Matches the live site, where these PNGs are section background overlays
+     anchored to the page edge, so the baked-in blob runs off-screen instead
+     of ending on a hard rectangular edge. */
+  .bleed { position: relative; overflow: hidden; }
+  .bleed-layer {
+    position: absolute; inset: 0; z-index: 0;
+    background-repeat: no-repeat; pointer-events: none;
+  }
+  .bleed-inner { position: relative; z-index: 1; }
+
+  @media (max-width: 900px) {
+    /* Stacked: the layer joins the flow and over-scales so it still runs off a side edge. */
+    .bleed { display: flex; flex-direction: column; }
+    .bleed-inner { order: 1; }
+    .bleed-layer {
+      order: 2;
+      position: static; width: 100%;
+      height: 62vw; max-height: 360px;
+      margin-top: clamp(16px, 4vw, 28px);
+    }
+
+  }
+
+  /* ---- Gallery tiles ----
+     The marquee this used to drive is gone; the tiles now sit in the
+     'A Peek Inside' grid, which owns their size and shape. All that is
+     left here is the lightbox affordance and the image fill. ---- */
+  .gal-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  /* ---- "Book Now" bone sticker ----
+     The art came back on a white field rather than with alpha, so it is
+     multiplied into the cream background; the label is real text on top so it
+     stays sharp and selectable. */
+  .book-sticker {
+    position: relative; display: inline-block;
+    width: min(265px, 68%);
+    transition: transform 0.3s cubic-bezier(.22,1,.36,1);
+  }
+  .book-sticker img { width: 100%; height: auto; display: block; mix-blend-mode: multiply; }
+  .book-sticker span {
+    position: absolute; left: 52.2%; top: 51.5%;
+    transform: translate(-50%, -50%) rotate(-13.9deg);
+    font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: clamp(15px, 1.5vw, 20px); letter-spacing: -0.01em;
+    color: #23281C; white-space: nowrap; pointer-events: none;
+  }
+  .book-sticker:hover { transform: rotate(-3deg) scale(1.05); }
+
+    /* Header is NOT sticky — keeps page scroll free */
+  .site-header { position: relative; top: auto; z-index: 100; }
+  .site-header.is-stuck { box-shadow: none; }
+
+
+  /* ---- Footer ---- */
+  /* overflow stays visible so the dog can straddle the top edge */
+  .site-footer { padding-bottom: clamp(16px, 1.9vw, 26px); }
+  .footer-glow {
+    position: absolute; top: -40px; right: -80px;
+    width: min(420px, 45vw); height: min(420px, 45vw);
+    border-radius: 50%; pointer-events: none; z-index: 0;
+    background: radial-gradient(circle, rgba(245,194,26,0.11) 0%, rgba(245,194,26,0) 68%);
+  }
+  .site-footer .footer-inner,
+  .site-footer .footer-bottom { position: relative; z-index: 1; }
+  .footer-inner {
+    grid-template-columns: 1.2fr 0.7fr 1fr 1.1fr !important;
+    gap: clamp(28px, 4vw, 56px) !important;
+    align-items: start;
+    padding-bottom: clamp(24px, 3vw, 40px);
+  }
+  .footer-kicker {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #F5C21A;
+    margin-bottom: 14px;
+  }
+  .footer-heading {
+    font-family: inherit;
+    position: relative;
+    display: inline-block;
+    padding-bottom: 0;
+  }
+  .footer-heading::after { content: none; display: none; }
+  .site-footer a.link { display: inline-flex; align-items: center; gap: 0; transition: gap 0.25s ease, color 0.2s ease; }
+  .site-footer a.link::before {
+    content: "›"; width: 0; opacity: 0; overflow: hidden;
+    color: #F5C21A; font-weight: 700;
+    transition: width 0.25s ease, opacity 0.25s ease;
+  }
+  .site-footer a.link:hover::before { width: 11px; opacity: 1; }
+  .site-footer a.link:hover { color: #F5C21A; }
+
+  /* contact rows with icon chips */
+  .fc-row {
+    display: grid; grid-template-columns: 30px 1fr; gap: 12px;
+    align-items: start; color: rgba(246,241,228,0.82);
+    line-height: 1.6; transition: color 0.2s ease, transform 0.25s ease;
+  }
+  .fc-row .fc-ico {
+    width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0;
+    background: rgba(246,241,228,0.08); color: #F5C21A;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.25s ease, color 0.25s ease;
+  }
+  a.fc-row:hover { color: #F6F1E4; transform: translateX(3px); }
+  a.fc-row:hover .fc-ico { background: #F5C21A; color: #23281C; }
+  .fc-row.is-static { cursor: default; }
+
+  @keyframes dog-bob { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-7px) rotate(2deg); } }
+  .footer-dog { animation: dog-bob 4.5s ease-in-out infinite; }
+
+  .footer-bottom { align-items: center; }
+  .footer-legal { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding-right: 76px; }
+  .footer-copy { display: flex; align-items: center; gap: 14px; }
+  .footer-dot { color: rgba(246,241,228,0.35); }
+  
+  @media (max-width: 900px) {
+    .footer-inner { grid-template-columns: 1fr !important; }
+    .footer-brand { text-align: left; }
+    .footer-bottom { flex-direction: column; align-items: flex-start; gap: 14px !important; }
+  }
+
+  /* ---- Price cards ---- */
+  .price-card {
+    position: relative; background: #FFFFFF;
+    border: 1.6px solid #23281C; border-radius: 22px;
+    box-shadow: 6px 6px 0 #23281C;
+    transition: transform 0.28s cubic-bezier(.22,1,.36,1), box-shadow 0.28s cubic-bezier(.22,1,.36,1);
+  }
+  .price-card:hover { transform: translate(-4px, -4px); box-shadow: 10px 10px 0 #23281C; }
+  .price-icon {
+    width: 66px; height: 66px; border-radius: 50%;
+    background: #F5C21A; border: 1.6px solid #23281C;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px; transition: transform 0.35s cubic-bezier(.22,1,.36,1);
+  }
+  .price-card:hover .price-icon { transform: rotate(-6deg); }
+  .price-pill {
+    display: inline-block; background: #23281C; color: #F5C21A;
+    font-family: 'Fraunces'; font-weight: 700;
+    padding: 9px 24px; border-radius: 999px;
+    transform: rotate(-2deg); transition: transform 0.3s ease;
+  }
+  .price-card:hover .price-pill { transform: rotate(2deg); }
+  .price-rule { width: 54px; height: 2px; background: repeating-linear-gradient(90deg,#23281C 0 6px,transparent 6px 12px); margin: 14px auto; opacity: 0.4; }
+
+  /* ---- Closing CTA panel ---- */
+  .cta-panel { position: relative; background: #23281C; color: #F6F1E4; border-radius: 28px; overflow: hidden; }
+  .cta-panel::after {
+    content: ""; position: absolute; right: -70px; top: -70px;
+    width: 230px; height: 230px; border-radius: 50%;
+    background: rgba(245,194,26,0.09); pointer-events: none;
+  }
+  .cta-card {
+    background: rgba(246,241,228,0.07); border: 1px solid rgba(246,241,228,0.14);
+    border-radius: 18px; transition: transform 0.28s cubic-bezier(.22,1,.36,1), background 0.25s ease;
+  }
+  .cta-card:hover { transform: translateY(-5px); background: rgba(246,241,228,0.12); }
+  .cta-card .cta-ico { transition: transform 0.35s cubic-bezier(.22,1,.36,1); }
+  .cta-card:hover .cta-ico { transform: rotate(-8deg) scale(1.08); }
+
+  /* ---- Reviews carousel ----
+     Mandatory snapping fights programmatic smooth scrolling (the animation gets
+     re-targeted every frame and lands back at 0), so use proximity snapping and
+     align the snap points with the track's own side padding. */
+  #reviews-track {
+    cursor: grab;
+    scroll-snap-type: x proximity !important;
+    scroll-padding-left: clamp(21px, 3.3vw, 48px);
+    /* The inline `overflow-x: auto` promotes the vertical axis to `auto` too,
+       which makes this a vertical scrollport the wheel can latch onto. Pin it
+       to `hidden` so vertical wheels chain straight to the page natively — no
+       JS wheel handler needed. */
+    overflow-y: hidden !important;
+    overscroll-behavior-x: contain;
+  }
+  #reviews-track.is-dragging { cursor: grabbing; scroll-behavior: auto; }
+  #reviews-track.is-dragging * { pointer-events: none; }
+  .rev-arrow:disabled { opacity: 0.3; cursor: not-allowed; }
+  .rev-dots { display: flex; gap: 7px; justify-content: center; margin-top: 18px; }
+  .rev-dot {
+    width: 8px; height: 8px; border-radius: 50%; border: 0; padding: 0; cursor: pointer;
+    background: rgba(35,40,28,0.22); transition: all 0.25s ease;
+  }
+  .rev-dot.is-active { background: #C4632F; width: 24px; border-radius: 4px; }
+
+  /* ---- Gallery lightbox ---- */
+  .gal-item { cursor: zoom-in; }
+  .lightbox {
+    position: fixed; inset: 0; z-index: 2000;
+    background: rgba(18,21,14,0.92);
+    display: none; align-items: center; justify-content: center;
+    padding: clamp(16px, 4vw, 48px);
+  }
+  .lightbox.is-open { display: flex; }
+  .lightbox img {
+    max-width: min(1100px, 92vw); max-height: 80vh;
+    border-radius: 16px; border: 5px solid #F6F1E4; display: block;
+    box-shadow: 0 30px 70px -30px rgba(0,0,0,0.8);
+  }
+  .lb-cap {
+    position: absolute; left: 0; right: 0; bottom: max(18px, 3vh);
+    text-align: center; color: rgba(246,241,228,0.9);
+    font-size: 14.5px; padding: 0 60px;
+  }
+  .lb-btn {
+    position: absolute; width: 48px; height: 48px; border-radius: 50%;
+    background: rgba(246,241,228,0.14); color: #F6F1E4; border: 0;
+    font-size: 22px; line-height: 1; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+  .lb-btn:hover { background: #F5C21A; color: #23281C; transform: scale(1.06); }
+  .lb-prev { left: max(12px, 2vw); top: 50%; margin-top: -24px; }
+  .lb-next { right: max(12px, 2vw); top: 50%; margin-top: -24px; }
+  .lb-close { top: max(12px, 2vh); right: max(12px, 2vw); }
+  @media (max-width: 640px) {
+    .lightbox img { max-height: 66vh; }
+    .lb-prev { left: 8px; } .lb-next { right: 8px; }
+  }
+
+  /* FAQ accordion */
+  .faq-item summary { position: relative; padding-right: 34px; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after {
+    content: ""; position: absolute; right: 0; top: 50%;
+    width: 11px; height: 11px; margin-top: -7px;
+    border-right: 2.2px solid #C4632F; border-bottom: 2.2px solid #C4632F;
+    transform: rotate(45deg); transition: transform 0.25s ease;
+  }
+  .faq-item[open] summary::after { transform: rotate(-135deg); margin-top: -3px; }
+  .faq-item { transition: border-color 0.2s ease; }
+  .faq-item:hover { border-color: rgba(35,40,28,0.25) !important; }
+
+  .flow-connector { pointer-events: none; }
+  @media (max-width: 900px) { .flow-connector { display: none; } }
+
+  /* The hero h1's clamp bottoms out at 38px, which wraps to four lines on a
+     375px screen and pushes the CTA toward the fold. The inline font-size on
+     the element outranks a plain rule, hence !important. */
+  @media (max-width: 480px) {
+    .bleed-hero h1 { font-size: 32px !important; }
+  }
+
+  /* price chips on the teeth-cleaning row. They hug the right on desktop to
+     match that row's right-aligned text, but responsive.css only resets
+     text-align when the row stacks — justify-content has to be undone here or
+     the chips sit 60px in from the heading on mobile. */
+  .svc-chips {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    justify-content: flex-end;
+    margin-bottom: clamp(16px, 1.9vw, 28px);
+  }
+  @media (max-width: 900px) { .svc-chips { justify-content: flex-start; } }
+
+  .review-card { transition: transform 0.3s cubic-bezier(.22,1,.36,1), box-shadow 0.3s cubic-bezier(.22,1,.36,1); }
+  .review-card:hover { transform: translateY(-4px);  }
+
+  .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+
+  .rev-arrow { width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid rgba(246,241,228,0.3); background: transparent; color: #F6F1E4; cursor: pointer; font-size: clamp(15px, 1.3vw, 18px); transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; }
+  .rev-arrow:hover { background: #F5C21A; color: #23281C; border-color: #F5C21A; }
+
+  /* Duotone split section */
+  .duotone-wrap {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 460px;
+    border-radius: 28px;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .duotone-side { position: relative; overflow: hidden; display: flex; }
+  .duotone-bg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center center;
+    z-index: 0;
+    transition: transform 0.8s cubic-bezier(.22,1,.36,1);
+  }
+  /* the duotone panels hold still on hover */
+  .duotone-overlay { position: absolute; inset: 0; z-index: 1; }
+  .duotone-overlay-yellow { background: rgba(245, 194, 26, 0.92); mix-blend-mode: multiply; }
+  .duotone-left { padding: clamp(23px, 3.6vw, 52px) clamp(49px, 9vw, 130px) clamp(23px, 3.6vw, 52px) clamp(25px, 3.9vw, 56px); }
+  .duotone-left .duotone-overlay-yellow { background: #F5C21A; opacity: 0.82; mix-blend-mode: normal; }
+  .duotone-overlay-ink { background: #23281C; opacity: 0.78; }
+  .duotone-right { padding: clamp(23px, 3.6vw, 52px) clamp(25px, 3.9vw, 56px) clamp(23px, 3.6vw, 52px) clamp(49px, 9vw, 130px); }
+  .duotone-content { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: center; width: 100%; }
+
+  /* Torn seam between the two sides — jagged edge over the divide */
+  .duotone-seam {
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 50%;
+    width: 40px;
+    transform: translateX(-50%);
+    background:
+      linear-gradient(180deg, transparent 0, transparent 100%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 500' preserveAspectRatio='none'><path d='M20 0 L28 40 L14 90 L26 140 L12 190 L28 240 L14 290 L26 340 L12 390 L28 440 L20 500 L0 500 L0 0 Z' fill='%23F5C21A'/><path d='M20 0 L28 40 L14 90 L26 140 L12 190 L28 240 L14 290 L26 340 L12 390 L28 440 L20 500 L40 500 L40 0 Z' fill='%2323281C'/></svg>") no-repeat center/100% 100%;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .duotone-orb {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 168px; height: 168px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 7px solid #F6F1E4;
+    z-index: 4;
+    transition: transform 0.5s cubic-bezier(.22,1,.36,1);
+  }
+  .duotone-orb img { width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block; }
+  .duotone-orb:hover { transform: translate(-50%, -50%) rotate(-6deg) scale(1.05); }
+
+  .duotone-vs {
+    position: absolute;
+    top: calc(50% + 88px); left: 50%;
+    transform: translateX(-50%) rotate(-4deg);
+    font-family: 'Fraunces', serif; font-weight: 700; font-size: clamp(13px, 1.3vw, 17px); text-transform: uppercase;
+    color: #F6F1E4;
+    background: #C4632F;
+    padding: 2px 16px 4px;
+    border-radius: 999px;
+    z-index: 4;
+    letter-spacing: -0.02em;
+  }
+
+  .duotone-sticker {
+    position: absolute; z-index: 5;
+    background: #F6F1E4;
+    padding: 10px 18px;
+    border-radius: 999px;
+    display: block;
+  }
+  .duotone-sticker-left { top: 26px; right: 40px; transform: rotate(-8deg); }
+  .duotone-sticker-right { bottom: 30px; left: 40px; transform: rotate(6deg); }
+
+  @media (max-width: 900px) {
+    .duotone-wrap { grid-template-columns: minmax(0, 1fr); }
+    .duotone-left, .duotone-right { padding: 48px 32px; }
+    .duotone-seam, .duotone-orb, .duotone-vs { display: none; }
+  }
+  .cta-wrap { text-align: center; padding-bottom: 80px; }
+  .cta-wrap .hand { font-size: 26px; margin-bottom: 10px; display: block; }
+  .hand { font-family: 'Fraunces', serif; font-optical-sizing: auto; font-style: italic; font-weight: 500; font-size: inherit; letter-spacing: -0.01em; color: #C4632F; }
+  .heading { font-family: 'Fraunces', serif; font-weight: 700; letter-spacing: -0.02em; color: #23281C; }
+  .page-width { max-width: 1440px; margin: 0 auto; padding-left: clamp(21px, 3.3vw, 48px); padding-right: clamp(21px, 3.3vw, 48px); }
+
+
+  /* ---- Footer typography + newsletter ---- */
+  .site-footer a.link,
+  .site-footer .fc-row,
+  .site-footer .footer-copy,
+  .site-footer .footer-legal,
+  .site-footer .footer-bottom {
+    font-family: 'Work Sans', sans-serif;
+  }
+  .footer-kicker {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #F5C21A;
+    margin-bottom: 14px;
+  }
+  .footer-heading {
+    font-family: inherit;
+    padding-bottom: 0;
+  }
+  .footer-brand p, .site-footer .footer-tagline {
+    font-family: 'Work Sans', sans-serif;
+  }
+  .footer-news-copy {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 14.5px; line-height: 1.55;
+    color: rgba(246,241,228,0.75); margin: 0 0 14px; max-width: 260px;
+  }
+  .footer-news-form {
+    display: flex; flex-direction: column; gap: 10px; max-width: 280px;
+  }
+  .footer-news-input {
+    width: 100%; box-sizing: border-box;
+    background: rgba(246,241,228,0.08);
+    border: 1px solid rgba(246,241,228,0.18);
+    border-radius: 999px;
+    padding: 12px 16px;
+    color: #F6F1E4;
+    font-family: 'Work Sans', sans-serif; font-size: 14.5px;
+    outline: none;
+  }
+  .footer-news-input::placeholder { color: rgba(246,241,228,0.45); }
+  .footer-news-input:focus { border-color: #F5C21A; background: rgba(246,241,228,0.12); }
+  .footer-news-btn {
+    align-self: flex-start;
+    background: #F5C21A; color: #23281C; border: 0;
+    border-radius: 999px;
+    padding: 11px 20px;
+    font-family: 'Work Sans', sans-serif; font-weight: 600; font-size: 14.5px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 3px 3px 0 #F6F1E4;
+  }
+  .footer-news-btn:hover {
+    background: #F6F1E4;
+    transform: translate(-2px,-2px);
+    box-shadow: 5px 5px 0 #F6F1E4;
+  }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+
+  .footer-social {
+    display: flex; gap: 10px; margin-top: 18px; align-items: center;
+  }
+  .footer-social-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(246,241,228,0.08);
+    color: #F5C21A;
+    border: 1.5px solid rgba(245,194,26,0.35);
+    transition: transform 0.35s cubic-bezier(.34,1.56,.64,1), background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  }
+  .footer-social-btn:hover {
+    background: #F5C21A; color: #23281C; border-color: #F5C21A;
+    transform: translateY(-4px) rotate(-6deg) scale(1.06);
+  }
+
+  @keyframes to-top-float-live {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .to-top {
+    width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+    background: #F5C21A; color: #23281C; border: 0; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    animation: to-top-float-live 2.2s ease-in-out infinite;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 6px 16px -8px rgba(245,194,26,0.7);
+  }
+  .to-top:hover {
+    animation-play-state: paused;
+    background: #F6F1E4;
+    transform: translateY(-3px);
+  }
+
+
+  /* =====================================================================
+     HOME PAGE — reference layout, house design
+     Squares and circles only, and no photo moves under the cursor.
+     ===================================================================== */
+
+  /* ---- hero: trust row + hand-lettered aside ---- */
+  .hp-trust {
+    display: flex; flex-wrap: wrap;
+    gap: clamp(16px, 2.2vw, 34px);
+    margin-top: clamp(22px, 2.8vw, 38px);
+  }
+  .hp-trust-item { display: flex; align-items: flex-start; gap: 10px; }
+  .hp-trust-ico {
+    width: 32px; height: 32px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hp-trust-item span:last-child {
+    display: flex; flex-direction: column;
+    font-size: 12px; line-height: 1.4; color: #4B4A3E;
+  }
+  .hp-trust-item strong {
+    font-size: 13.5px; font-weight: 600; color: #23281C;
+  }
+  .hero-media { display: flex; flex-direction: column; }
+  .hero-script {
+    margin-top: clamp(12px, 1.4vw, 20px);
+    font-family: 'Fraunces', serif; font-optical-sizing: auto;
+    font-style: italic; font-weight: 500;
+    font-size: clamp(19px, 1.9vw, 27px); letter-spacing: -0.01em;
+    line-height: 1.2;
+    color: #23281C; text-align: right;
+  }
+
+
+  /* ---- hero photo: a framed square, like every other photo on the site ---- */
+  .hero-frame {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    max-height: clamp(360px, 46vw, 600px);
+    border-radius: 24px;
+    overflow: hidden;
+    background: #EFE2C8;
+    border: 1.5px solid rgba(35,40,28,0.12);
+  }
+  .hero-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  @media (max-width: 900px) {
+    .hero-frame { aspect-ratio: 4 / 3; max-height: none; }
+  }
+
+  /* ---- four service tiles ---- */
+  .svc-tiles {
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(14px, 1.7vw, 24px);
+  }
+  .svc-tile {
+    display: flex; flex-direction: column;
+    background: #FFFFFF;
+    border: 1px solid rgba(35,40,28,0.1);
+    border-radius: 20px;
+    padding: clamp(12px, 1.2vw, 16px);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .svc-tile:hover {
+    border-color: #23281C;
+    box-shadow: 4px 4px 0 #F5C21A;
+  }
+  .svc-tile-media {
+    overflow: hidden; background: #EFE2C8;
+    aspect-ratio: 1; width: 100%;
+  }
+  .svc-tile-media.is-square { border-radius: 14px; }
+  .svc-tile-media.is-circle { border-radius: 50%; }
+  .svc-tile-media img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+  .svc-tile-body {
+    display: flex; flex-direction: column; flex: 1;
+    padding: clamp(14px, 1.4vw, 18px) 6px 6px;
+  }
+  .svc-tile-body h3 {
+    font-family: 'Fraunces', serif; font-optical-sizing: auto;
+    font-weight: 700; font-size: clamp(17px, 1.5vw, 21px);
+    letter-spacing: -0.02em; line-height: 1.15;
+    margin: 0 0 10px; color: #23281C;
+  }
+  .svc-tile-body p {
+    font-size: 14px; line-height: 1.6; color: #4B4A3E;
+    margin: 0 0 18px; flex: 1;
+  }
+  .svc-tile-link {
+    display: inline-flex; align-items: center; gap: 7px;
+    align-self: flex-start;
+    font-size: 13.5px; font-weight: 600; color: #23281C;
+    padding-bottom: 3px;
+    border-bottom: 1.5px solid #23281C;
+    transition: gap 0.25s cubic-bezier(.22,1,.36,1), color 0.2s ease, border-color 0.2s ease;
+  }
+  .svc-tile:hover .svc-tile-link { gap: 12px; color: #C4632F; border-color: #C4632F; }
+
+  /* ---- free daycare trial ---- */
+  .trial-split {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: clamp(16px, 2vw, 28px);
+    align-items: stretch;
+  }
+  .trial-photo {
+    position: relative; overflow: hidden;
+    border-radius: 24px; background: #EFE2C8;
+    min-height: clamp(300px, 34vw, 440px);
+  }
+  .trial-photo img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+  }
+  .trial-script {
+    position: absolute; left: clamp(18px, 2.2vw, 32px); top: clamp(18px, 2.2vw, 32px);
+    font-family: 'Fraunces', serif; font-optical-sizing: auto; font-style: italic; font-weight: 500; font-size: clamp(21px, 2.2vw, 32px); letter-spacing: -0.01em; font-weight: 500;
+    line-height: 1.22;
+    color: #F6F1E4;
+    text-shadow: 0 2px 10px rgba(35,40,28,0.45);
+    transform: rotate(-3deg);
+  }
+  .trial-panel {
+    position: relative; overflow: hidden;
+    background: #EFE2C8; border-radius: 24px;
+    padding: clamp(24px, 3vw, 44px) clamp(22px, 2.8vw, 40px);
+    display: flex; flex-direction: column; align-items: flex-start;
+  }
+  .trial-panel h2 {
+    font-family: 'Fraunces', serif; font-optical-sizing: auto;
+    font-weight: 800; font-size: clamp(26px, 2.9vw, 42px);
+    letter-spacing: -0.03em; line-height: 1.06;
+    margin: 0 0 14px; color: #23281C;
+  }
+  .trial-panel p {
+    font-size: 15.5px; line-height: 1.7; color: #4B4A3E;
+    margin: 0 0 20px; max-width: 440px;
+  }
+  .trial-checks {
+    list-style: none; margin: 0 0 24px; padding: 0;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .trial-checks li {
+    position: relative; padding-left: 30px;
+    font-size: 14.5px; line-height: 1.5; color: #23281C;
+  }
+  .trial-checks li::before {
+    content: "";
+    position: absolute; left: 0; top: 1px;
+    width: 19px; height: 19px; border-radius: 50%;
+    background: #23281C;
+  }
+  .trial-checks li::after {
+    content: "";
+    position: absolute; left: 5.5px; top: 7px;
+    width: 8px; height: 4px;
+    border-left: 2px solid #F5C21A;
+    border-bottom: 2px solid #F5C21A;
+    transform: rotate(-45deg);
+  }
+  .trial-stamp {
+    position: absolute; right: clamp(16px, 2vw, 30px); bottom: clamp(16px, 2vw, 30px);
+    width: clamp(94px, 9vw, 126px); height: clamp(94px, 9vw, 126px);
+    border-radius: 50%;
+    background: #F6F1E4; color: #23281C;
+    border: 2px dashed rgba(35,40,28,0.35);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; line-height: 1.1;
+    transform: rotate(-7deg);
+  }
+  .trial-stamp-sm {
+    font-size: 9.5px; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .trial-stamp-lg {
+    font-family: 'Fraunces', serif; font-weight: 800;
+    font-size: clamp(19px, 1.8vw, 25px); letter-spacing: -0.02em;
+    margin: 2px 0;
+  }
+
+  /* ---- shared section header: title left, "see all" right ---- */
+  .sec-head {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 20px; flex-wrap: wrap;
+    margin-bottom: clamp(18px, 2.2vw, 30px);
+  }
+  .sec-head h2 {
+    font-family: 'Fraunces', serif; font-optical-sizing: auto;
+    font-weight: 800; font-size: clamp(26px, 3.2vw, 46px);
+    letter-spacing: -0.03em; line-height: 1.04;
+    margin: 0; color: #23281C;
+  }
+  .sec-more {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 13.5px; font-weight: 600; color: #23281C;
+    padding-bottom: 2px;
+    transition: gap 0.25s cubic-bezier(.22,1,.36,1), color 0.2s ease;
+  }
+  .sec-more:hover { gap: 12px; color: #C4632F; }
+
+  /* ---- reviews ---- */
+  .rev-grid {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(14px, 1.7vw, 24px);
+  }
+  .rev-card {
+    margin: 0;
+    background: #FFFFFF;
+    border: 1px solid rgba(35,40,28,0.1);
+    border-radius: 20px;
+    padding: clamp(18px, 2vw, 28px);
+    display: grid;
+    grid-template-columns: 54px 1fr;
+    grid-template-areas:
+      "avatar stars"
+      "quote  quote"
+      "name   name";
+    column-gap: 14px;
+    align-items: center;
+  }
+  .rev-avatar {
+    grid-area: avatar;
+    width: 54px; height: 54px; border-radius: 50%;
+    overflow: hidden; background: #EFE2C8;
+  }
+  .rev-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .rev-stars {
+    grid-area: stars;
+    color: #F5C21A; font-size: 15px; letter-spacing: 2px;
+  }
+  .rev-card blockquote {
+    grid-area: quote;
+    margin: 16px 0 12px;
+    font-size: 14.5px; line-height: 1.65; color: #4B4A3E;
+  }
+  .rev-card figcaption {
+    grid-area: name;
+    font-size: 13px; font-weight: 600; color: #23281C;
+  }
+
+  /* ---- a peek inside ---- */
+  .peek-row {
+    display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: clamp(10px, 1.2vw, 18px);
+  }
+  .peek-tile {
+    aspect-ratio: 1; overflow: hidden;
+    background: #EFE2C8;
+  }
+  .peek-tile.is-square { border-radius: 16px; }
+  .peek-tile.is-circle { border-radius: 50%; }
+  .peek-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .peek-tile.gal-item { cursor: zoom-in; }
+  .peek-words {
+    display: flex; align-items: center; justify-content: center;
+    text-align: center; padding: 10px;
+    background: #F5C21A; color: #23281C;
+    font-family: 'Fraunces', serif; font-optical-sizing: auto; font-style: italic; font-weight: 500; font-size: clamp(14px, 1.3vw, 19px); letter-spacing: -0.01em; font-weight: 500;
+    line-height: 1.25;
+  }
+  .peek-words-ink { background: #23281C; color: #F5C21A; }
+
+  /* ---- pricing row ---- */
+  .pr-row {
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(14px, 1.7vw, 24px);
+  }
+  .pr-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: 42px 1fr 34px;
+    grid-template-areas:
+      "ico  name   go"
+      "ico  from   go"
+      "ico  amount go"
+      "note note   note";
+    column-gap: 12px;
+    align-items: center;
+    background: #FFFFFF;
+    border: 1px solid rgba(35,40,28,0.1);
+    border-radius: 20px;
+    padding: clamp(16px, 1.8vw, 24px);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .pr-card:hover { border-color: #23281C; box-shadow: 4px 4px 0 #F5C21A; }
+  .pr-ico {
+    grid-area: ico;
+    width: 42px; height: 42px; border-radius: 50%;
+    background: #F5C21A;
+    display: flex; align-items: center; justify-content: center;
+    align-self: start;
+  }
+  .pr-name {
+    grid-area: name;
+    font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: clamp(15px, 1.3vw, 18px); letter-spacing: -0.02em;
+    color: #23281C;
+  }
+  .pr-from { grid-area: from; font-size: 11.5px; color: #8A8570; }
+  .pr-amount {
+    grid-area: amount;
+    font-family: 'Fraunces', serif; font-optical-sizing: auto;
+    font-weight: 800; font-size: clamp(26px, 2.5vw, 36px);
+    letter-spacing: -0.03em; line-height: 1.05; color: #23281C;
+  }
+  .pr-note {
+    grid-area: note;
+    font-size: 12.5px; line-height: 1.5; color: #4B4A3E;
+    margin-top: 12px;
+  }
+  .pr-go {
+    grid-area: go;
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 1.5px solid rgba(35,40,28,0.25);
+    color: #23281C;
+    display: flex; align-items: center; justify-content: center;
+    align-self: center;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+  .pr-card:hover .pr-go { background: #F5C21A; border-color: #23281C; }
+
+  /* ---- FAQ, two columns ---- */
+  .faq-cols {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: clamp(12px, 1.4vw, 18px);
+    align-items: start;
+  }
+  .faq-row {
+    background: #FFFFFF;
+    border: 1px solid rgba(35,40,28,0.1);
+    border-radius: 14px;
+    padding: clamp(14px, 1.5vw, 19px) clamp(16px, 1.7vw, 22px);
+    transition: border-color 0.25s ease;
+  }
+  .faq-row:hover, .faq-row[open] { border-color: #23281C; }
+  .faq-row summary {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; cursor: pointer; list-style: none;
+    font-size: 14.5px; font-weight: 600; color: #23281C;
+  }
+  .faq-row summary::-webkit-details-marker { display: none; }
+  .faq-chev {
+    flex-shrink: 0; color: #23281C;
+    transition: transform 0.3s cubic-bezier(.22,1,.36,1);
+  }
+  .faq-row[open] .faq-chev { transform: rotate(90deg); }
+  .faq-row p {
+    font-size: 14px; line-height: 1.7; color: #4B4A3E;
+    margin: 12px 0 0;
+  }
+
+  /* ---- home page, narrower screens ---- */
+  @media (max-width: 1100px) {
+    .svc-tiles  { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .pr-row     { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .peek-row   { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .wa-script  { display: none; }
+  }
+  @media (max-width: 900px) {
+    .rev-grid     { grid-template-columns: minmax(0, 1fr); }
+    .trial-split  { grid-template-columns: minmax(0, 1fr); }
+    .faq-cols     { grid-template-columns: minmax(0, 1fr); }
+    /* responsive.css turns .bleed into a column flexbox here and gives
+       .bleed-inner order:1, so the aside needs an order of its own or it
+       floats above the headline. */
+    .hero-script { text-align: left; }
+    .wa-band      { flex-wrap: wrap; }
+    .wa-copy      { flex-basis: 100%; order: 2; }
+    .wa-cta       { order: 3; }
+  }
+  @media (max-width: 620px) {
+    .svc-tiles { grid-template-columns: minmax(0, 1fr); }
+    .pr-row    { grid-template-columns: minmax(0, 1fr); }
+    .peek-row  { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .hp-trust  { gap: 14px; }
+  }
+</style>
+<link rel="stylesheet" href="./responsive.css">
+<script src="./reveal.js" defer></script>
+</helmet>
+
+<div style="background: #F6F1E4; color: #23281C; font-family: 'Work Sans', sans-serif;">
+
+  <!-- HEADER -->
+  <header class="site-header fade-in">
+    <nav class="nav-bar fade-in d1">
+      <a href="Homepage.dc.html" style="display: flex; align-items: center; flex-shrink: 0;">
+        <img src="assets/logo-official.png" alt="Zoomies" class="site-logo">
+      </a>
+      <input type="checkbox" id="nav-toggle" class="nav-checkbox">
+      <label for="nav-toggle" class="nav-burger" aria-label="Toggle menu">
+        <svg class="nav-burger-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <svg class="nav-burger-close" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </label>
+      <div class="nav-links">
+        <a class="link" href="Grooming.dc.html">Dog Grooming</a>
+        <a class="link" href="Daycare.dc.html">Dog Daycare</a>
+        <a class="link" href="TeethCleaning.dc.html">Teeth Cleaning</a>
+        <a class="link" href="Training.dc.html">Grooming Courses</a>
+        <a class="link" href="Pricing.dc.html">Pricing</a>
+        <a class="link" href="Contact.dc.html">Contact Us</a>
+      </div>
+      <a href="https://wa.me/353868099535" target="_blank" rel="noopener" class="btn btn-whatsapp" style="padding: 13px 22px; font-size: 14px; flex-shrink: 0;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp Us
+      </a>
+    </nav>
+  </header>
+
+  <!-- HERO — eyebrow, headline, lead, two CTAs and a trust row -->
+  <section class="bleed bleed-hero" style="padding: clamp(25px, 3.9vw, 56px) 0 clamp(25px, 3.9vw, 56px);">
+    <div class="bleed-inner" style="max-width: 1440px; margin: 0 auto; padding: 0 clamp(21px, 3.3vw, 48px); display: grid; grid-template-columns: 1.05fr 0.95fr; gap: clamp(28px, 4.4vw, 64px); align-items: center; min-height: clamp(360px, 46vw, 660px);">
+      <div class="fade-in d2">
+        <div class="eyebrow" style="margin-bottom: 10px;">Happier dogs. Brighter days.</div>
+        <h1 style="font-family: 'Fraunces'; font-optical-sizing: auto; font-weight: 800; font-size: clamp(38px, 5.4vw, 78px); line-height: 1.02; letter-spacing: -0.03em; margin: 0 0 clamp(16px, 1.9vw, 26px); color: #23281C;">
+          Dog Grooming &amp;<br>Small Dog Daycare<br><span style="font-style: italic; font-weight: 500; color: #C4632F;">in Kilmacud</span>
+        </h1>
+        <p style="font-size: 17px; line-height: 1.65; color: #4B4A3E; margin: 0 0 clamp(20px, 2.4vw, 32px); max-width: 430px;">
+          Premium dog grooming and small-dog daycare in Kilmacud &ndash; delivered by an experienced team who genuinely love dogs.
+        </p>
+        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+          <a href="https://wa.me/message/W2OAWUQCD5WCJ1" target="_blank" rel="noopener" class="btn btn-ink" style="font-size: 15.5px;">
+            Book a Groom
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="Daycare.dc.html" class="btn btn-outline" style="font-size: 15.5px;">
+            Try Daycare Free
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+
+        <div class="hp-trust">
+          <div class="hp-trust-item">
+            <span class="hp-trust-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="#F5C21A" stroke="#23281C" stroke-width="1.2" stroke-linejoin="round"><path d="M12 2l2.9 6.26 6.85.72-5.1 4.6 1.43 6.72L12 16.9l-6.08 3.4 1.43-6.72-5.1-4.6 6.85-.72z"/></svg></span>
+            <span><strong>5-Star</strong>Google Rated</span>
+          </div>
+          <div class="hp-trust-item">
+            <span class="hp-trust-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></span>
+            <span><strong>Experienced</strong>Professional Groomers</span>
+          </div>
+          <div class="hp-trust-item">
+            <span class="hp-trust-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C4632F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></span>
+            <span><strong>Trusted by Hundreds</strong>of Dublin Dog Owners</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="fade-in d3 hero-media">
+        <div class="hero-frame">
+          <img src="assets/client/grooming-samoyed-bandana.jpg" alt="A samoyed in a Zoomies bandana on the grooming table">
+        </div>
+        <!-- sits under the frame in normal flow: it cannot overlap the photo -->
+        <div class="hero-script" aria-hidden="true">Small dogs.<br>Big happiness. <span style="color: #C4632F;">&hearts;</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOUR SERVICES — one card each, photo over copy -->
+  <section id="services" class="reveal" style="max-width: 1440px; margin: 0 auto; padding: 0 clamp(21px, 3.3vw, 48px) clamp(34px, 6.3vw, 90px);">
+    <div class="svc-tiles">
+      <a class="svc-tile" href="Grooming.dc.html">
+        <div class="svc-tile-media is-square">
+          <img src="assets/dog2.png" alt="A dog freshly groomed at Zoomies" loading="lazy">
+        </div>
+        <div class="svc-tile-body">
+          <h3>Professional<br>Dog Grooming</h3>
+          <p>Expert grooming for small dogs with a gentle, calming approach.</p>
+          <span class="svc-tile-link">View Grooming <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="svc-tile" href="Daycare.dc.html">
+        <div class="svc-tile-media is-square">
+          <img src="assets/client/daycare-yard-trio.jpg" alt="Small dogs playing in the Zoomies daycare yard" loading="lazy">
+        </div>
+        <div class="svc-tile-body">
+          <h3>Small Dog<br>Daycare</h3>
+          <p>A safe, fun and social space for small dogs to play, make friends and feel at home.</p>
+          <span class="svc-tile-link">Explore Daycare <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="svc-tile" href="TeethCleaning.dc.html">
+        <div class="svc-tile-media is-square">
+          <img src="assets/client/teeth-before-after-square.jpg" alt="Before and after Emmi-pet ultrasonic teeth cleaning at Zoomies" loading="lazy">
+        </div>
+        <div class="svc-tile-body">
+          <h3>Ultrasonic<br>Teeth Cleaning</h3>
+          <p>A gentle, effective way to support better oral health and fresher breath.</p>
+          <span class="svc-tile-link">See Teeth Cleaning <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+
+      <a class="svc-tile" href="Training.dc.html">
+        <div class="svc-tile-media is-square">
+          <img src="assets/client/team-trainer-with-dog.jpg" alt="A Zoomies trainer with a dog at the Kilmacud salon" loading="lazy">
+        </div>
+        <div class="svc-tile-body">
+          <h3>Grooming<br>Courses</h3>
+          <p>Zoomies Academy &ndash; hands-on dog grooming &amp; care training in our working Kilmacud salon.</p>
+          <span class="svc-tile-link">Explore Courses <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- FREE DAYCARE TRIAL — photo left, offer panel right -->
+  <section class="reveal" style="max-width: 1440px; margin: 0 auto; padding: 0 clamp(21px, 3.3vw, 48px) clamp(34px, 6.3vw, 90px);">
+    <div class="trial-split">
+      <div class="trial-photo">
+        <img src="assets/client/daycare-yard-sign-pair.jpg" alt="Small dogs playing together in the Zoomies daycare yard" loading="lazy">
+        <div class="trial-script">Play<br>Socialise<br>Rest<br>Belong <span style="color: #F5C21A;">&hearts;</span></div>
+      </div>
+
+      <div class="trial-panel">
+        <div class="eyebrow">New to Zoomies?</div>
+        <h2>Your first daycare<br>trial is <span style="font-style: italic; font-weight: 500; color: #C4632F;">on us</span> <span style="color: #C4632F;">&hearts;</span></h2>
+        <p>Let your dog experience a day of fun, friends and expert care with a FREE daycare trial. It&rsquo;s the perfect way to see if Zoomies is the right fit.</p>
+        <ul class="trial-checks">
+          <li>Structured play with well-matched small dogs</li>
+          <li>Socialisation and confidence building</li>
+          <li>Quiet rest time in a calm environment</li>
+          <li>Expert supervision at all times</li>
+        </ul>
+        <a href="Daycare.dc.html" class="btn btn-ink" style="font-size: 15.5px;">
+          Try Daycare Free
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <div class="trial-stamp" aria-hidden="true">
+          <span class="trial-stamp-sm">Small dogs</span>
+          <span class="trial-stamp-lg">BIG</span>
+          <span class="trial-stamp-sm">friendships</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       REVIEWS — THE THREE QUOTES BELOW ARE PLACEHOLDER TEXT, NOT REAL
+       REVIEWS. Replace with the live Google Reviews embed, or with real
+       quotes from the client, before this page goes near production.
+       ============================================================ -->
+  <section class="reveal" style="max-width: 1440px; margin: 0 auto; padding: 0 clamp(21px, 3.3vw, 48px) clamp(34px, 6.3vw, 90px);">
+    <div class="sec-head">
+      <h2>What Our Clients <span style="font-style: italic; font-weight: 500; color: #C4632F;">Say</span></h2>
+      <a class="sec-more" href="https://www.google.com/search?q=Zoomies+Grooming+Kilmacud+reviews" target="_blank" rel="noopener">See All Reviews <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+
+    <div class="rev-grid">
+      <figure class="rev-card">
+        <div class="rev-avatar"><img src="assets/client/grooming-maltese-purple.jpg" alt="" loading="lazy"></div>
+        <div class="rev-stars" aria-label="Five out of five stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <blockquote>&ldquo;Zoomies is an absolute gem! Our cavapoo Teddy looks and smells amazing after every groom. The team are so kind and caring.&rdquo;</blockquote>
+        <figcaption>Sarah M.</figcaption>
+      </figure>
+      <figure class="rev-card">
+        <div class="rev-avatar"><img src="assets/client/daycare-yard-pair.jpg" alt="" loading="lazy"></div>
+        <div class="rev-stars" aria-label="Five out of five stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <blockquote>&ldquo;Our little Luna adores daycare at Zoomies. She gets so excited when we arrive and comes home happy and tired!&rdquo;</blockquote>
+        <figcaption>David K.</figcaption>
+      </figure>
+      <figure class="rev-card">
+        <div class="rev-avatar"><img src="assets/client/grooming-cockapoo-blue.jpg" alt="" loading="lazy"></div>
+        <div class="rev-stars" aria-label="Five out of five stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <blockquote>&ldquo;Professional, friendly and such a lovely environment. The best grooming and daycare in South Dublin!&rdquo;</blockquote>
+        <figcaption>Emma R.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- A PEEK INSIDE — six tiles, squares and circles, two of them hand-lettered -->
+  <section class="reveal" style="max-width: 1440px; margin: 0 auto; padding: 0 clamp(21px, 3.3vw, 48px) clamp(34px, 6.3vw, 90px);">
+    <div class="sec-head">
+      <h2>A Peek Inside <span style="font-style: italic; font-weight: 500; color: #C4632F;">Zoomies</span></h2>
+      <a class="sec-more" href="https://www.instagram.com/zoomies_ireland/" target="_blank" rel="noopener">Follow Us
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+    </div>
+
+    <div class="peek-row">
+      <div class="gal-item peek-tile is-square"><img src="assets/client/facility-reception.jpg" alt="The Zoomies reception in Kilmacud" loading="lazy"></div>
+      <div class="peek-tile peek-words is-circle"><span>Good<br>Dogs<br>Belong<br>Here.</span></div>
+      <div class="gal-item peek-tile is-circle"><img src="assets/client/grooming-cockapoo-orange.jpg" alt="A sheepadoodle finished at the Zoomies salon" loading="lazy"></div>
+      <div class="gal-item peek-tile is-square"><img src="assets/client/grooming-retriever-puppy.jpg" alt="A retriever puppy at Zoomies" loading="lazy"></div>
+      <div class="peek-tile peek-words peek-words-ink is-square"><span>Happier<br>Dogs<br>Brighter<br>Days.</span></div>
+      <div class="gal-item peek-tile is-circle"><img src="assets/client/daycare-yard-spaniel.jpg" alt="A spaniel with a toy in the Zoomies daycare yard" loading="lazy"></div>
+    </div>
+  </section>
+
+  <!-- PRICING — four starting prices -->
+  <section class="reveal" style="max-width: 1440px; margin: 0 auto; padding: 0 clamp(21px, 3.3vw, 48px) clamp(34px, 6.3vw, 90px);">
+    <div class="sec-head">
+      <h2>Our <span style="font-style: italic; font-weight: 500; color: #C4632F;">Pricing</span></h2>
+      <a class="sec-more" href="Pricing.dc.html">View Full Pricing <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+
+    <div class="pr-row">
+      <a class="pr-card" href="Pricing.dc.html">
+        <span class="pr-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4L8.12 15.88M14.47 14.48L20 20M8.12 8.12L12 12"/></svg></span>
+        <span class="pr-name">Dog Grooming</span>
+        <span class="pr-from">From</span>
+        <span class="pr-amount">&euro;55</span>
+        <span class="pr-note">Professional grooming for small dogs.</span>
+        <span class="pr-go" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+      <a class="pr-card" href="Pricing.dc.html">
+        <span class="pr-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M4 20c0-4 3-6 8-6s8 2 8 6"/></svg></span>
+        <span class="pr-name">Small Dog Daycare</span>
+        <span class="pr-from">From</span>
+        <span class="pr-amount">&euro;34</span>
+        <span class="pr-note">Fun, safe daycare in Kilmacud.</span>
+        <span class="pr-go" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+      <a class="pr-card" href="Pricing.dc.html">
+        <span class="pr-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5C11.2 4.3 10.5 4 9.5 4C7.5 4 6.5 5.7 6.5 7.8C6.5 10.3 7.7 11.8 8.1 14.1L9 19C9.2 20 10.4 20.2 10.9 19.2L12 16.8L13.1 19.2C13.6 20.2 14.8 20 15 19L15.9 14.1C16.3 11.8 17.5 10.3 17.5 7.8C17.5 5.7 16.5 4 14.5 4C13.5 4 12.8 4.3 12 5Z"/></svg></span>
+        <span class="pr-name">Teeth Cleaning</span>
+        <span class="pr-from">From</span>
+        <span class="pr-amount">&euro;25</span>
+        <span class="pr-note">&euro;25 with a groom, &euro;35 standalone.</span>
+        <span class="pr-go" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+      <a class="pr-card" href="Training.dc.html">
+        <span class="pr-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20V4H6.5A2.5 2.5 0 004 6.5v13z"/></svg></span>
+        <span class="pr-name">Academy</span>
+        <span class="pr-from">5-day course</span>
+        <span class="pr-amount">&euro;975</span>
+        <span class="pr-note">Hands-on grooming &amp; care training.</span>
+        <span class="pr-go" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- FAQ — two columns of four -->
+  <section class="reveal" style="max-width: 1440px; margin: 0 auto; padding: 0 clamp(21px, 3.3vw, 48px) clamp(34px, 6.3vw, 90px);">
+    <div class="sec-head">
+      <h2>Frequently Asked <span style="font-style: italic; font-weight: 500; color: #C4632F;">Questions</span></h2>
+      <a class="sec-more" href="Grooming.dc.html#faq">View All FAQs <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+
+    <div class="faq-cols">
+      <details class="faq-row">
+        <summary>How long does a grooming appointment take?<span class="faq-chev" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></summary>
+        <p>Typically 1.5&ndash;3 hours depending on coat type. We never rush an appointment &mdash; your dog&rsquo;s comfort comes first.</p>
+      </details>
+      <details class="faq-row">
+        <summary>Do you take puppies?<span class="faq-chev" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></summary>
+        <p>Yes. Our gentle puppy packages introduce your new puppy to the grooming environment and build positive experiences early.</p>
+      </details>
+      <details class="faq-row">
+        <summary>Can you groom nervous dogs?<span class="faq-chev" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></summary>
+        <p>Of course. Our team are experienced with anxious and first-time dogs, and take all the extra time a dog needs.</p>
+      </details>
+      <details class="faq-row">
+        <summary>What vaccinations are required for daycare?<span class="faq-chev" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></summary>
+        <p>Dogs need to be up to date with DHPPi and Kennel Cough. This protects every dog visiting the salon and the daycare room.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- GALLERY LIGHTBOX -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Gallery image">
+    <button class="lb-btn lb-close" id="lb-close" type="button" aria-label="Close">&#10005;</button>
+    <button class="lb-btn lb-prev" id="lb-prev" type="button" aria-label="Previous image">&#8249;</button>
+    <img id="lb-img" src="" alt="">
+    <button class="lb-btn lb-next" id="lb-next" type="button" aria-label="Next image">&#8250;</button>
+    <div class="lb-cap" id="lb-cap"></div>
+  </div>
+
+  <!-- WHATSAPP BAND -->
+  <section class="reveal" style="max-width: 1440px; margin: 0 auto; padding: 0 clamp(21px, 3.3vw, 48px) clamp(34px, 6.3vw, 90px);">
+    <div class="wa-band">
+      <div class="wa-photo" aria-hidden="true">
+        <img src="assets/client/grooming-shepherd-table.jpg" alt="" loading="lazy">
+      </div>
+      <div class="wa-copy">
+        <div class="wa-kicker">Have a question?</div>
+        <h2>Chat to us on WhatsApp</h2>
+        <p>Get quick answers, check availability or ask about our services.</p>
+      </div>
+      <a class="wa-cta" href="https://wa.me/353868099535" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Message Us on WhatsApp
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <div class="wa-script" aria-hidden="true">We&rsquo;re here<br>for you &amp;<br>your pup!</div>
+    </div>
+  </section>
+
+
+  <!-- FLOATING WHATSAPP -->
+  <a href="https://wa.me/message/W2OAWUQCD5WCJ1" target="_blank" rel="noopener" aria-label="Chat on WhatsApp" style="position: fixed; bottom: 28px; right: 28px; z-index: 999; width: 58px; height: 58px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(37,211,102,0.45), 0 0 24px rgba(37,211,102,0.25); transition: transform 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s ease;" onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 6px 22px rgba(37,211,102,0.55), 0 0 32px rgba(37,211,102,0.35)'" onmouseout="this.style.transform='none';this.style.boxShadow='0 4px 16px rgba(37,211,102,0.45), 0 0 24px rgba(37,211,102,0.25)'">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </a>
+
+  <!-- FOOTER -->
+  <footer class="reveal site-footer">
+    <div class="footer-dog" aria-hidden="true">
+      <img src="assets/client/daycare-yard-resting.jpg" alt="">
+    </div>
+    <div class="footer-glow" aria-hidden="true"></div>
+
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="assets/logo-footer-transparent.png" alt="Zoomies" class="site-logo" style="height: 120px; width: auto; margin-bottom: 14px;">
+        <p style="font-family: 'Work Sans', sans-serif; font-size: 14px; line-height: 1.6; color: #4B4A3E; margin: 0; max-width: 320px; font-style: italic;">Happier Dogs. Brighter Days.</p>
+        <div class="footer-social" aria-label="Social media">
+          <a class="footer-social-btn" href="https://www.instagram.com/zoomies_ireland/" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          </a>
+          <a class="footer-social-btn" href="https://www.facebook.com/zoomiesireland" target="_blank" rel="noopener" aria-label="Facebook">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M14 9h3V6h-3c-1.7 0-3 1.3-3 3v2H9v3h2v7h3v-7h3l1-3h-4V9c0-.6.4-1 1-1z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <div class="footer-kicker"><span class="footer-heading">Quick Link</span></div>
+        <nav style="display: flex; flex-direction: column; gap: 11px; font-size: 14.5px;">
+          <a class="link" href="Homepage.dc.html">Home</a>
+          <a class="link" href="Services.dc.html">Services</a>
+          <a class="link" href="Pricing.dc.html">Pricing</a>
+          <a class="link" href="Contact.dc.html">Contact Us</a>
+        </nav>
+      </div>
+
+      <div class="footer-col">
+        <div class="footer-kicker"><span class="footer-heading">Contact Info</span></div>
+        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 14.5px;">
+          <a class="fc-row" href="https://wa.me/353868099535" target="_blank" rel="noopener"><span class="fc-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0122 16.92z"/></svg></span><span>+353868099535</span></a>
+          <a class="fc-row" href="mailto:hello@zoomies.ie"><span class="fc-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></span><span>hello@zoomies.ie</span></a>
+          <div class="fc-row is-static"><span class="fc-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span>116A Lower Kilmacud Road, Stillorgan, Co. Dublin, A94 R2C9</span></div>
+        </div>
+      </div>
+
+      <div class="footer-col footer-news">
+        <div class="footer-kicker"><span class="footer-heading">Newsletter</span></div>
+        <p class="footer-news-copy">Paw-some updates, grooming tips &amp; academy news — straight to your inbox.</p>
+        <form class="footer-news-form" action="#" method="post" onsubmit="return false;">
+          <label class="sr-only" for="footer-email-home">Email</label>
+          <input id="footer-email-home" class="footer-news-input" type="email" name="email" placeholder="Your email" required autocomplete="email">
+          <button class="footer-news-btn" type="submit">Subscribe<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </form>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="footer-copy">
+        <button class="to-top" type="button" id="to-top" aria-label="Back to top">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        </button>
+        <span>© 2026 Zoomies Grooming. All Rights Reserved.</span>
+      </div>
+      <div class="footer-legal">
+        <a class="link" href="#">Privacy Policy</a>
+        <span class="footer-dot" aria-hidden="true">·</span>
+        <a class="link" href="#">Terms &amp; Conditions</a>
+      </div>
+    </div>
+  </footer>
+
+</div>
+]]>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+class Component extends StreamableLogic {
+  componentDidMount() {
+    if (typeof window === "undefined") return;
+    /* never leave body locked from a previous lightbox open */
+    document.body.style.overflow = "";
+    this._cleanup = [];
+    const on = (el, ev, fn, opts) => {
+      if (!el) return;
+      el.addEventListener(ev, fn, opts);
+      this._cleanup.push(() => el.removeEventListener(ev, fn, opts));
+    };
+
+    /* ---------- scroll reveal ---------- */
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15, rootMargin: "0px 0px -60px 0px" });
+      document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      this._io = io;
+    } else {
+      document.querySelectorAll(".reveal").forEach((el) => el.classList.add("is-visible"));
+    }
+
+    /* ---------- sticky header state ---------- */
+    const header = document.querySelector(".site-header");
+    if (header) {
+      const onScrollStuck = () => {
+        const y = window.scrollY || document.documentElement.scrollTop || 0;
+        header.classList.toggle("is-stuck", y > 8);
+      };
+      window.addEventListener("scroll", onScrollStuck, { passive: true });
+      onScrollStuck();
+    }
+
+
+    const scrollToTopRobust = (el) => {
+      const roots = [window, document.documentElement, document.body];
+      let p = el && el.parentElement;
+      while (p && p !== document.body) {
+        const s = getComputedStyle(p);
+        if ((s.overflowY === "auto" || s.overflowY === "scroll") && p.scrollHeight > p.clientHeight) roots.push(p);
+        p = p.parentElement;
+      }
+      roots.forEach((r) => {
+        try {
+          if (r === window) window.scrollTo({ top: 0, behavior: "smooth" });
+          else if (r.scrollTo) r.scrollTo({ top: 0, behavior: "smooth" });
+          else r.scrollTop = 0;
+        } catch (_) {}
+      });
+    };
+
+    /* ---------- back to top (footer) ---------- */
+    const wireToTop = (el) => {
+      if (!el) return;
+      on(el, "click", (e) => {
+        e.preventDefault();
+        scrollToTopRobust(el);
+      });
+    };
+    wireToTop(document.getElementById("to-top"));
+
+    /* ---------- reviews carousel ---------- */
+    const track = document.getElementById("reviews-track");
+    const prev = document.getElementById("rev-prev");
+    const next = document.getElementById("rev-next");
+    const dotWrap = document.getElementById("rev-dots");
+    if (track) {
+      /* the runtime can re-render and swap these nodes, so measure live every time */
+      const liveCards = () => Array.from(track.children);
+      const step = () => {
+        const c = liveCards(), a = c[0], b = c[1];
+        if (b && b.offsetLeft !== a.offsetLeft) return b.offsetLeft - a.offsetLeft;
+        if (a && a.offsetWidth) return a.offsetWidth + 20;
+        return Math.max(280, Math.round(track.clientWidth * 0.8));
+      };
+      const maxScroll = () => track.scrollWidth - track.clientWidth;
+      const cards = liveCards();
+
+      if (dotWrap && cards.length) {
+        cards.forEach((_, i) => {
+          const d = document.createElement("button");
+          d.type = "button";
+          d.className = "rev-dot" + (i === 0 ? " is-active" : "");
+          d.setAttribute("aria-label", "Go to review " + (i + 1));
+          d.addEventListener("click", () => {
+            track.scrollTo({ left: Math.min(track.scrollWidth - track.clientWidth, i * step()), behavior: "smooth" });
+            sync(); [60, 220, 520].forEach((ms) => setTimeout(sync, ms));
+          });
+          dotWrap.appendChild(d);
+        });
+      }
+
+      const sync = () => {
+        const x = track.scrollLeft, max = maxScroll();
+        if (prev) prev.disabled = x <= 2;
+        if (next) next.disabled = x >= max - 2;
+        if (dotWrap) {
+          const i = Math.round(x / step());
+          Array.from(dotWrap.children).forEach((d, k) => d.classList.toggle("is-active", k === i));
+        }
+      };
+      /* Nudge the arrow/dot state ourselves too: a smooth scroll can settle
+         without us seeing a final scroll event. */
+      const syncSoon = () => {
+        sync();
+        [60, 220, 520].forEach((ms) => setTimeout(sync, ms));
+      };
+      const goTo = (left) => {
+        const target = Math.max(0, Math.min(maxScroll(), left));
+        track.scrollTo({ left: target, behavior: "smooth" });
+        syncSoon();
+      };
+      on(prev, "click", () => goTo(track.scrollLeft - step()));
+      on(next, "click", () => goTo(track.scrollLeft + step()));
+      on(track, "scroll", sync, { passive: true });
+      on(window, "resize", sync);
+      sync();
+
+      /* No wheel handler here on purpose. The track is `overflow-y: hidden`,
+         so a vertical wheel finds nothing to scroll and Chrome chains it to
+         the page on the compositor. The old non-passive handler that called
+         preventDefault() + window.scrollBy() cancelled the native gesture and
+         replaced smooth scrolling with a main-thread jump. */
+
+      /* drag to scroll — only engage after a real horizontal drag */
+      let down = false, dragging = false, startX = 0, startLeft = 0, moved = 0;
+      const endDrag = () => {
+        if (!down) return;
+        down = false;
+        dragging = false;
+        track.classList.remove("is-dragging");
+      };
+      on(track, "pointerdown", (e) => {
+        if (e.pointerType === "touch") return;
+        down = true; dragging = false; moved = 0;
+        startX = e.clientX; startLeft = track.scrollLeft;
+      });
+      on(window, "pointermove", (e) => {
+        if (!down) return;
+        /* The button can come up outside the window, or the gesture can be
+           cancelled, and then pointerup never reaches us — the track would
+           stay latched to the cursor and `.is-dragging *` would keep killing
+           pointer events. Trust `buttons` over ever seeing the release. */
+        if (!e.buttons) { endDrag(); return; }
+        const dx = e.clientX - startX;
+        moved = Math.max(moved, Math.abs(dx));
+        if (!dragging && moved < 6) return;
+        if (!dragging) {
+          dragging = true;
+          track.classList.add("is-dragging");
+        }
+        track.scrollLeft = startLeft - dx;
+      });
+      on(window, "pointerup", endDrag);
+      on(window, "pointercancel", endDrag);
+      on(window, "blur", endDrag);
+    }
+
+    /* ---------- gallery lightbox ---------- */
+    const lb = document.getElementById("lightbox");
+    const lbImg = document.getElementById("lb-img");
+    const lbCap = document.getElementById("lb-cap");
+    if (lb && lbImg) {
+      /* the marquee duplicates every tile; only the labelled originals form the set */
+      const shots = Array.from(document.querySelectorAll(".gal-item:not([aria-hidden]) img"));
+      let idx = 0;
+
+      const show = (i) => {
+        idx = (i + shots.length) % shots.length;
+        const src = shots[idx].getAttribute("src");
+        lbImg.setAttribute("src", src);
+        lbImg.setAttribute("alt", shots[idx].getAttribute("alt") || "");
+        if (lbCap) lbCap.textContent = (shots[idx].getAttribute("alt") || "") +
+          "  ·  " + (idx + 1) + " / " + shots.length;
+      };
+      const open = (i) => {
+        show(i);
+        lb.classList.add("is-open");
+        document.body.style.overflow = "hidden";
+      };
+      const close = () => {
+        lb.classList.remove("is-open");
+        document.body.style.overflow = "";
+        lbImg.setAttribute("src", "");
+      };
+
+      document.querySelectorAll(".gal-item").forEach((tile) => {
+        tile.addEventListener("click", () => {
+          const src = tile.querySelector("img").getAttribute("src");
+          const i = shots.findIndex((s) => s.getAttribute("src") === src);
+          open(i < 0 ? 0 : i);
+        });
+      });
+
+      on(document.getElementById("lb-close"), "click", close);
+      on(document.getElementById("lb-prev"), "click", (e) => { e.stopPropagation(); show(idx - 1); });
+      on(document.getElementById("lb-next"), "click", (e) => { e.stopPropagation(); show(idx + 1); });
+      on(lb, "click", (e) => { if (e.target === lb) close(); });
+      on(document, "keydown", (e) => {
+        if (!lb.classList.contains("is-open")) return;
+        if (e.key === "Escape") close();
+        else if (e.key === "ArrowLeft") show(idx - 1);
+        else if (e.key === "ArrowRight") show(idx + 1);
+      });
+      this._closeLightbox = close;
+    }
+  }
+
+  componentWillUnmount() {
+    if (this._io) this._io.disconnect();
+    if (this._closeLightbox) this._closeLightbox();
+    if (this._cleanup) this._cleanup.forEach((fn) => fn());
+  }
+}
+</script>
+</body>
+</html>

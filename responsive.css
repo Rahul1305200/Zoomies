@@ -1,0 +1,1322 @@
+/* =====================================================================
+   Zoomies — responsive layer
+   Loaded on every page. Overrides only layout at narrow widths; the
+   desktop design (>=1200px) is untouched. Rules use !important because
+   the pages carry heavy inline styles.
+   Breakpoints: 1200 / 1024 / 900 / 700 / 560 / 400
+   ===================================================================== */
+
+/* ---------- 0. Runtime artefact ----------
+   The .dc.html format wraps the template in <![CDATA[ ... ]]> but the runtime
+   never strips those markers. The opening one is swallowed as a bogus HTML
+   comment; the closing "]]>" survives as a bare text node at the end of
+   .sc-host and paints a stray strip under the footer. Zero it out here, and
+   restore a normal size on the real content. Affects every page. */
+.sc-host { font-size: 0; }
+.sc-host > * { font-size: 16px; }
+
+/* ---------- 1. Base safety ---------- */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/*
+  SCROLL ROOT CAUSE FIX
+  dc-runtime (support.js) can set html/body/#dc-root/.sc-host to height:100%
+  without giving any of them overflow-y:auto. That freezes vertical scrolling.
+  Force a real document scrollport and never clip the main axis.
+*/
+html {
+  height: auto !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: auto;
+}
+/*
+  body must NOT become a scrollport of its own. `overflow-y: visible` computes
+  to `auto` as soon as the other axis is not visible, so `overflow-x: hidden`
+  here quietly turned body into a second scroll container nested inside the
+  document one. It gains a ~28px range (the footer's unrevealed `.reveal`
+  translateY), Chrome latches the wheel gesture to it and refuses to chain
+  mid-gesture, and the page stops dead until you lift off and flick again.
+  `overflow-x: clip` clips the same way without promoting the vertical axis.
+*/
+body {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow-x: hidden !important; /* fallback: browsers without `clip` */
+  overflow-x: clip !important;
+  overflow-y: visible !important;
+  overscroll-behavior-y: auto;
+}
+#dc-root,
+#dc-root > .sc-host {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+img,
+svg,
+video,
+iframe {
+  max-width: 100%;
+}
+
+/* Long words / URLs must never push the page wide */
+p,
+h1,
+h2,
+h3,
+h4,
+li,
+a,
+span,
+div {
+  overflow-wrap: break-word;
+}
+
+/* =====================================================================
+   SECTION EYEBROW — the single global rule
+   ---------------------------------------------------------------------
+   The handwritten kicker that sits directly above a section heading.
+   This was previously six near-identical inline copies on Homepage and
+   Grooming, a `.kicker` uppercase class on Daycare/Services/Training,
+   and plain Work Sans / Fraunces italic elsewhere — four treatments for
+   one job. Every page links this file, so the style lives here only.
+   Markup is always:  <div class="eyebrow">text</div>  before the h1/h2.
+   ===================================================================== */
+.eyebrow {
+  /* inline-block, not block: the parent's text-align then positions it for
+     free, left / centre / right, without a modifier class per alignment. */
+  display: inline-block;
+  max-width: 100%;
+  font-family: 'Fraunces', serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-size: clamp(16px, 1.6vw, 25px);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: #C4632F;
+  margin: 0 0 -2px;
+  /* Sits flat, baseline parallel to the heading below it — no rotation.
+     Nothing here may set `transform`: the pages' own .fade-in animates
+     transform, and a tilt declared here would fight it. */
+  /* these undo the uppercase `.kicker` treatment this replaces */
+  text-transform: none;
+  font-style: italic;
+}
+
+/* On the dark panels (#23281C) terracotta goes muddy — use the brand
+   yellow the footer column labels already use on dark. */
+.eyebrow--light {
+  color: #F5C21A;
+}
+
+/* Tap targets */
+@media (hover: none) and (pointer: coarse) {
+  .btn,
+  .nav-dropdown-item,
+  .rev-arrow {
+    min-height: 44px;
+  }
+  /* a later block sets .rev-arrow width/height with !important; min-* is
+     resolved after width/height, so it wins without another !important */
+  .rev-arrow { min-width: 44px; }
+  /* footer nav links were 34px tall — under the 44px minimum */
+  .site-footer nav a.link {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  /* contact rows, legal links and the newsletter button were 34-40px */
+  .site-footer a.fc-row,
+  .site-footer .footer-legal a.link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .footer-news-btn { min-height: 44px; }
+  .to-top { min-width: 44px; min-height: 44px; }
+  /* the base .site-footer .footer-social-btn rule sits further down this file
+     at equal specificity, so it would win on order — min-* clamps the used
+     size regardless of which rule sets width/height */
+  .site-footer .footer-social-btn { min-width: 44px; min-height: 44px; }
+  /* Carousel dots are 8px. Keep them 8px visually — a fat dot looks wrong —
+     but give each an invisible square hit area, and open the gap so adjacent
+     targets do not sit on top of each other. */
+  .rev-dots { gap: 18px; }
+  .rev-dot { position: relative; }
+  .rev-dot::after {
+    content: "";
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 34px; height: 34px;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* =====================================================================
+   "BOOK NOW" BONE STICKER — mobile sizing
+   ---------------------------------------------------------------------
+   The art is a bone with sparkles drawn inside a square field, so a lot of
+   its box is transparent padding. At min(265px, 68%) it took 227px of the
+   375px hero — roughly a third of the first screen reading as empty space.
+   Present on Homepage, Contact and Services, so it is sized here once.
+   ===================================================================== */
+@media (max-width: 700px) {
+  .book-sticker { width: min(200px, 56%); }
+}
+@media (max-width: 480px) {
+  .book-sticker { width: 170px; }
+}
+
+/* The hero's second column holds only the decorative "5-star" stamp, which
+   is hidden below 700px (its line is repeated in the trust strip). The empty
+   grid item still created a row and inherited the container gap. */
+@media (max-width: 700px) {
+  .bleed-hero .bleed-inner > [aria-hidden="true"] { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-in,
+  .reveal {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* =====================================================================
+   2. Header / navigation
+   Six pages use .site-header > .promo + .nav-bar; Training uses .site-nav.
+   Both get a checkbox-driven burger menu below 1024px.
+   ===================================================================== */
+
+.nav-checkbox,
+.nav-burger {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .site-header .nav-bar,
+  .site-nav {
+    position: relative;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+  }
+
+  .site-header .nav-bar > a:first-of-type,
+  .site-nav > .nav-logo {
+    order: 1;
+    margin-right: auto;
+  }
+
+  .site-logo {
+    height: 62px !important;
+  }
+  .nav-logo img {
+    height: 62px !important;
+  }
+
+  .site-header .nav-bar > a.btn-whatsapp,
+  .site-nav .nav-cta {
+    order: 2;
+    padding: 11px 16px !important;
+    font-size: 13.5px !important;
+  }
+
+  .nav-checkbox {
+    display: block;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .nav-burger {
+    order: 3;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: #f5c21a;
+    color: #23281c;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .nav-burger .nav-burger-close {
+    display: none;
+  }
+  .nav-checkbox:checked ~ .nav-burger .nav-burger-open {
+    display: none;
+  }
+  .nav-checkbox:checked ~ .nav-burger .nav-burger-close {
+    display: block;
+  }
+
+  /* Drawer */
+  .site-header .nav-links,
+  .site-nav .nav-links {
+    order: 4;
+    display: none !important;
+    flex-basis: 100%;
+    width: 100%;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 2px !important;
+    padding: 6px 0 10px !important;
+    border-top: 1px solid rgba(246, 241, 228, 0.14);
+    margin-top: 4px;
+  }
+  .nav-checkbox:checked ~ .nav-links {
+    display: flex !important;
+  }
+
+  .site-header .nav-links > a,
+  .site-header .nav-dropdown-wrap > a,
+  .site-nav .nav-links > a,
+  .site-nav .nav-dropdown-wrap > a {
+    padding: 12px 2px !important;
+    font-size: 16px !important;
+  }
+
+  /* The current-page underline is `left: 0; right: 0` on a link that is only
+     as wide as its label. In the drawer the links stretch to the full width,
+     so that bar ran the whole panel. The yellow label already marks the
+     current page here, so the bar goes. */
+  .site-header .nav-links > a.is-active::after,
+  .site-header .nav-dropdown-wrap > a.is-active::after,
+  .site-nav .nav-links > a.is-active::after,
+  .site-nav .nav-dropdown-wrap > a.is-active::after {
+    content: none;
+  }
+
+  /* Dropdown becomes a plain nested list inside the drawer */
+  .nav-dropdown-wrap {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  .nav-dropdown {
+    position: static !important;
+    transform: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    border: 0 !important;
+    background: transparent !important;
+    padding: 0 0 6px 6px !important;
+    box-shadow: none !important;
+  }
+  .nav-dropdown-item {
+    color: rgba(246, 241, 228, 0.86) !important;
+    font-size: 15px !important;
+    padding: 10px 8px !important;
+  }
+  .nav-dropdown-item:hover {
+    background: rgba(246, 241, 228, 0.08) !important;
+    color: #f5c21a !important;
+    padding-left: 12px !important;
+  }
+  .nav-dropdown-wrap .nav-dropdown-caret {
+    display: none;
+  }
+
+  .site-header .promo,
+  .promo-strip {
+    font-size: 12.5px !important;
+    padding: 9px 16px !important;
+    line-height: 1.45;
+  }
+}
+
+@media (max-width: 700px) {
+  /* The stamp's line is repeated verbatim in the trust strip directly below,
+     and at this size it collides with the floating WhatsApp bubble. */
+  .hero-stamp {
+    display: none !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .site-logo,
+  .nav-logo img {
+    height: 52px !important;
+  }
+  .site-header .nav-bar > a.btn-whatsapp,
+  .site-nav .nav-cta {
+    padding: 10px 12px !important;
+    font-size: 12.5px !important;
+  }
+}
+
+/* =====================================================================
+   3. Grid collapse
+   ===================================================================== */
+
+/* --- 3a. Wide split layouts: two columns until 900px --- */
+@media (max-width: 900px) {
+  [style*="grid-template-columns: 1.05fr 0.95fr;"],
+  [style*="grid-template-columns: 0.95fr 1.05fr;"],
+  [style*="grid-template-columns: 1.1fr 0.9fr;"],
+  [style*="grid-template-columns: 1fr 1.1fr;"],
+  [style*="grid-template-columns: 1.15fr 0.85fr;"],
+  [style*="grid-template-columns: 1.4fr 1fr;"],
+  [style*="grid-template-columns: 1fr 1fr;"],
+  /* .hero-grid is left to each page — Training keeps a two-up hero on tablet */
+  .service-block,
+  .service-block.reverse,
+  .diff-grid,
+  .who-split,
+  .how-split,
+  .included-grid,
+  .glance-bottom,
+  .flow-row,
+  .duotone-wrap {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Grid children must be allowed to shrink */
+  [style*="display: grid"] > *,
+  .hero-grid > *,
+  .service-block > *,
+  .diff-grid > *,
+  .footer-inner > *,
+  .footer-grid > * {
+    min-width: 0;
+  }
+}
+
+/* --- 3b. Three / four / five column card rows --- */
+@media (max-width: 1024px) {
+  [style*="grid-template-columns: repeat(3, 1fr);"],
+  [style*="grid-template-columns: 1.15fr 1fr 1fr;"],
+  [style*="grid-template-columns: 1.15fr 0.85fr 0.85fr;"],
+  .card-grid,
+  .day-grid,
+  .glance-top {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  [style*="grid-template-columns: repeat(5, 1fr);"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 700px) {
+  [style*="grid-template-columns: repeat(3, 1fr);"],
+  [style*="grid-template-columns: 1.15fr 1fr 1fr;"],
+  [style*="grid-template-columns: 1.15fr 0.85fr 0.85fr;"],
+  [style*="grid-template-columns: 1.2fr auto;"],
+  [style*="grid-template-columns: 1.3fr 1fr auto;"],
+  .card-grid,
+  .day-grid,
+  .glance-top,
+  .topic-card,
+  .location-bar {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 560px) {
+  [style*="grid-template-columns: repeat(5, 1fr);"],
+  [style*="grid-template-columns: repeat(2, minmax(0, 1fr));"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Small stat strips stay two-up — they read better than a single column */
+@media (max-width: 1024px) {
+  [style*="grid-template-columns: repeat(4, 1fr);"],
+  .ensure-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* --- 3c. Footers --- */
+@media (max-width: 900px) {
+  [style*="grid-template-columns: 1.4fr 1fr 1fr;"],
+  [style*="grid-template-columns: 1.5fr 1fr 1.2fr;"],
+  .footer-inner,
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 28px !important;
+  }
+  .footer-bottom {
+    flex-direction: column !important;
+    gap: 6px !important;
+  }
+  .footer-dog {
+    width: 104px !important;
+    height: 104px !important;
+    right: 24px !important;
+    top: -54px !important;
+    border-width: 4px !important;
+  }
+  .site-footer {
+    padding-top: 74px !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .footer-dog {
+    width: 84px !important;
+    height: 84px !important;
+    right: 18px !important;
+    top: -44px !important;
+  }
+  .site-footer {
+    padding-top: 62px !important;
+  }
+}
+
+/* =====================================================================
+   4. Flex rows
+   ===================================================================== */
+@media (max-width: 700px) {
+  [style*="display: flex"]:not([style*="flex-direction: column"]):not([style*="overflow-x: auto"]):not([style*="overflow-x: scroll"]):not(.btn):not(.hero-badge):not(.hero-text-link):not(.nav-dropdown-item):not([style*="inline-flex"]) {
+    flex-wrap: wrap;
+  }
+
+  /* Button rows go full width so they are easy to hit */
+  [style*="display: flex"] > .btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  /* except the ones that sit inline in the header/nav */
+  .site-header .btn,
+  .site-nav .btn,
+  .wa-float .btn,
+  .wa-float {
+    width: auto !important;
+  }
+}
+
+/* =====================================================================
+   5. Homepage components
+   ===================================================================== */
+@media (max-width: 900px) {
+  [style*="min-height: 620px"],
+  [style*="min-height: 560px"],
+  [style*="min-height: 520px"],
+  [style*="min-height: 460px"],
+  [style*="min-height: 420px"],
+  [style*="min-height: 320px"],
+  .service-media,
+  .hero-media {
+    min-height: 0 !important;
+  }
+  .service-media,
+  .hero-media {
+    aspect-ratio: 4 / 3;
+  }
+
+  .hero-stamp {
+    width: 76px !important;
+    height: 76px !important;
+    font-size: 9.5px !important;
+    border-width: 3px !important;
+    bottom: 12px !important;
+    right: 12px !important;
+  }
+  .hero-badge {
+    font-size: 12.5px !important;
+    padding: 9px 12px !important;
+    top: 12px !important;
+    left: 12px !important;
+  }
+  .step-num {
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 18px !important;
+    border-width: 4px !important;
+  }
+  .wavy-photo {
+    aspect-ratio: 5 / 4;
+  }
+  .duotone-left,
+  .duotone-right {
+    padding: 38px 24px !important;
+  }
+  .duotone-sticker-left {
+    top: 16px !important;
+    right: 16px !important;
+  }
+  /* bottom-left would sit on top of the panel's CTA once stacked */
+  .duotone-sticker-right {
+    bottom: auto !important;
+    left: auto !important;
+    top: 16px !important;
+    right: 16px !important;
+  }
+  /* the "or" medallion in the "Groom day or play day!" headline */
+  h2 [style*="width: 72px"][style*="height: 72px"] {
+    width: 54px !important;
+    height: 54px !important;
+  }
+  .duotone-sticker {
+    padding: 6px 12px !important;
+    font-size: 12.5px !important;
+  }
+  /* keep the stacked panel's heading clear of the corner sticker */
+  .duotone-content {
+    padding-top: 30px;
+  }
+}
+
+/* Horizontal review rail */
+@media (max-width: 900px) {
+  #reviews-track {
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  #reviews-track > * {
+    scroll-snap-align: start;
+  }
+  .review-card {
+    flex: 0 0 min(82vw, 320px) !important;
+  }
+  .rev-arrow {
+    width: 38px !important;
+    height: 38px !important;
+  }
+}
+
+/* =====================================================================
+   6. Cards, panels and typography polish
+   ===================================================================== */
+@media (max-width: 700px) {
+  .service-card,
+  .svc-card,
+  .care-card,
+  .info-card,
+  .contact-card,
+  .price-row,
+  .day-card,
+  .topic-card,
+  .launching-card,
+  .faq-item,
+  .cta-box,
+  .include-row,
+  .include-row-dark {
+    padding-left: clamp(16px, 4.5vw, 24px) !important;
+    padding-right: clamp(16px, 4.5vw, 24px) !important;
+  }
+
+  /* NOT .care-photo — that is the <img> filling a .wavy-photo blob;
+     capping its width would expose the wrapper beige background. */
+  .service-media,
+  .hero-media,
+  .hero-visual {
+    max-width: 420px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    width: 100%;
+  }
+
+  /* Reversed splits read better with the image first on mobile */
+  .service-block.reverse .service-media {
+    order: -1;
+  }
+}
+
+@media (max-width: 560px) {
+  .stat-num {
+    font-size: clamp(30px, 11vw, 46px) !important;
+  }
+  .section-title,
+  .cta-title {
+    line-height: 1.15 !important;
+  }
+  .week-day {
+    font-size: 11px !important;
+    padding: 9px 2px !important;
+    letter-spacing: 0 !important;
+  }
+  .promise-row,
+  .loc-row,
+  .vs-list,
+  .topic-list,
+  .step-list {
+    gap: 12px !important;
+  }
+}
+
+/* =====================================================================
+   7. Floating WhatsApp bubble
+   ===================================================================== */
+@media (max-width: 700px) {
+  .wa-float,
+  a[style*="position: fixed"][style*="bottom: 28px"] {
+    bottom: 16px !important;
+    right: 16px !important;
+    width: 52px !important;
+    height: 52px !important;
+  }
+}
+
+/* =====================================================================
+   8. Tables / wide content fallback
+   ===================================================================== */
+@media (max-width: 700px) {
+  [style*="white-space: nowrap"] {
+    white-space: normal !important;
+  }
+  .site-header .nav-bar [style*="white-space: nowrap"],
+  .nav-dropdown-item {
+    white-space: nowrap !important;
+  }
+}
+
+/* Services menu — placeholder items (no page yet) */
+
+/* =====================================================================
+   SITE FOOTER — the old build's footer, carrying the new build's columns
+   ---------------------------------------------------------------------
+   The old site closed on cream with a hairline rule, quiet uppercase
+   labels and ink links: no dark panel, no curved lip, no dog medallion.
+   That is what this is. The columns themselves are the current set —
+   brand, quick links, contact info, newsletter.
+   Each page's inline <style> still carries its own older footer block;
+   this file loads after them and every selector is prefixed with
+   `.site-footer`, so it wins on specificity as well as order. Markup is
+   identical across pages apart from the newsletter input's id, which has
+   to stay unique for its <label>.
+   ===================================================================== */
+.site-footer {
+  position: relative;
+  background: transparent;
+  color: #23281C;
+  margin-top: clamp(20px, 3vw, 40px);
+  padding: 0 clamp(21px, 3.3vw, 48px) clamp(26px, 3vw, 48px);
+  overflow: visible;
+  border-radius: 0;
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
+}
+/* the old build's hairline, not a curved lip */
+.site-footer::before { content: none; }
+
+/* the dog medallion and the glow belong to the dark panel; both go */
+.site-footer .footer-dog,
+.site-footer .footer-glow { display: none; }
+
+.site-footer .footer-inner {
+  border-top: 1px solid rgba(35,40,28,0.15);
+  padding-top: clamp(28px, 3.6vw, 48px);
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1.15fr 1.2fr;
+  gap: clamp(24px, 2.8vw, 40px);
+  align-items: start;
+  max-width: none;
+}
+
+.site-footer a.link,
+.site-footer .fc-row,
+.site-footer .footer-copy,
+.site-footer .footer-legal,
+.site-footer .footer-brand p,
+.site-footer .footer-tagline {
+  font-family: 'Work Sans', sans-serif;
+}
+
+.site-footer .footer-brand p {
+  font-size: 14px; line-height: 1.6; font-style: italic;
+  color: #4B4A3E; margin: 0; max-width: 320px;
+}
+
+.site-footer a.link {
+  display: inline-flex; align-items: center;
+  color: #23281C;
+  transition: color 0.2s ease, padding-left 0.2s ease;
+}
+.site-footer a.link::before { content: none; }
+.site-footer a.link:hover { color: #C4632F; }
+
+/* column headings: the old build's quiet uppercase label */
+.site-footer .footer-kicker {
+  font-family: 'Work Sans', sans-serif;
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #23281C;
+  margin-bottom: 14px;
+}
+.site-footer .footer-heading { font-family: inherit; position: static; display: inline; }
+.site-footer .footer-heading::after { content: none; display: none; }
+
+.site-footer .fc-row {
+  display: grid; grid-template-columns: 28px minmax(0, 1fr);
+  gap: 11px; align-items: start;
+  color: #4B4A3E;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+.site-footer .fc-row .fc-ico {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: #EFE2C8; color: #23281C;
+  transition: background 0.2s ease;
+}
+.site-footer a.fc-row:hover { color: #23281C; transform: translateX(3px); }
+.site-footer a.fc-row:hover .fc-ico { background: #F5C21A; }
+.site-footer .fc-row.is-static { cursor: default; }
+
+.site-footer .footer-news-copy {
+  font-family: 'Work Sans', sans-serif;
+  font-size: 14px; line-height: 1.6;
+  color: #4B4A3E; margin: 0 0 14px; max-width: 280px;
+}
+.site-footer .footer-news-form {
+  display: flex; flex-direction: column; gap: 10px; max-width: 280px;
+}
+.site-footer .footer-news-input {
+  width: 100%; box-sizing: border-box;
+  background: #FFFFFF;
+  border: 1px solid rgba(35,40,28,0.2);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: #23281C;
+  font-family: 'Work Sans', sans-serif; font-size: 14.5px;
+  outline: none;
+}
+.site-footer .footer-news-input::placeholder { color: #8A8570; }
+.site-footer .footer-news-input:focus { border-color: #23281C; }
+.site-footer .footer-news-btn {
+  align-self: flex-start;
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #F5C21A; color: #23281C; border: 0;
+  border-radius: 10px;
+  padding: 12px 22px;
+  font-family: 'Lora', serif; font-weight: 600; font-size: 14.5px;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 #23281C;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.site-footer .footer-news-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 #23281C;
+}
+
+.site-footer .footer-social { display: flex; gap: 10px; margin-top: 18px; align-items: center; }
+.site-footer .footer-social-btn {
+  width: 38px; height: 38px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; color: #23281C;
+  border: 1.5px solid rgba(35,40,28,0.25);
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.site-footer .footer-social-btn:hover {
+  background: #F5C21A; color: #23281C; border-color: #23281C;
+  transform: none;
+}
+
+.site-footer .footer-bottom {
+  margin-top: clamp(26px, 3vw, 40px);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+  font-size: 13px; color: #4B4A3E;
+  border-top: 0;
+  padding-top: 0;
+}
+.site-footer .footer-copy { display: flex; align-items: center; gap: 14px; }
+.site-footer .footer-legal { display: flex; align-items: center; gap: 10px; padding-right: 0; }
+.site-footer .footer-dot { color: rgba(35,40,28,0.35); }
+
+.site-footer .to-top {
+  position: static;
+  width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+  background: transparent; color: #23281C;
+  border: 1.5px solid rgba(35,40,28,0.25);
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  animation: none;
+  box-shadow: none;
+  opacity: 1; visibility: visible; pointer-events: auto;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.site-footer .to-top:hover { background: #F5C21A; border-color: #23281C; transform: none; }
+
+@media (max-width: 1000px) {
+  .site-footer .footer-inner { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px) {
+  .site-footer .footer-inner { grid-template-columns: 1fr; gap: 28px; }
+  .site-footer .footer-brand { text-align: left; }
+  .site-footer .footer-bottom { flex-direction: column; align-items: flex-start; gap: 14px; }
+}
+
+/* =====================================================================
+   ELEMENT-LEVEL FADE-IN
+   ---------------------------------------------------------------------
+   Sections do not animate — they are painted in place at full opacity.
+   Only the content inside them fades up, staggered, as it comes into
+   view. `.reveal` used to fade whole sections; it is neutralised here
+   in CSS rather than in JS so there is no flash of an invisible section
+   before the script runs.
+   ===================================================================== */
+.reveal {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+/* The hidden state carries NO transition. These classes are applied by JS
+   to elements that are already painted at full opacity, so if the transition
+   lived here the element would animate 1 -> 0 and visibly flash in, fade out,
+   then fade back. The transition is armed one frame later, via .zr-armed on
+   <html>, so only the reveal animates. */
+.zr {
+  opacity: 0;
+  transform: translateY(18px);
+}
+html.zr-armed .zr {
+  transition:
+    opacity 0.6s ease var(--zr-delay, 0s),
+    transform 0.6s ease var(--zr-delay, 0s);
+}
+.zr.zr-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zr {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* =====================================================================
+   RESPONSIVE PASS — components added after this file was first written
+   ---------------------------------------------------------------------
+   Everything below is inside a max-width query. The desktop layout
+   (>=1200px) is deliberately untouched.
+
+   Found by measuring every page at 1280 / 1024 / 900 / 768 / 560 / 390:
+   no page overflowed horizontally, but several blocks were being clipped
+   by `body { overflow-x: clip }` rather than actually fitting.
+   ===================================================================== */
+
+@media (max-width: 900px) {
+  /* The decorative footer glow is anchored at right:-80px with a 420px
+     width, so it reached 455px inside a 375px viewport on every page.
+     Clipped and harmless, but it should not be the thing defining the
+     page's content width. */
+  .site-footer .footer-glow {
+    right: 0 !important;
+    width: min(260px, 55vw) !important;
+    height: min(260px, 55vw) !important;
+  }
+
+  /* A rotated hero blob's bounding box is wider than its own box, so a
+     percentage width still spilled past the column. */
+  .hero-media,
+  .reach-map {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Contact's bleed section kept two ~150px columns; its own collapse
+     rule was being outranked by `.bleed-contact .bleed-inner`. */
+  .bleed-contact .bleed-inner,
+  .bleed .bleed-inner {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 700px) {
+  /* The sticker pills are set `white-space: nowrap`. "Kilmacud favourites"
+     was therefore 401px wide and forced the whole Services hero column to
+     420px — wider than the viewport. Let them wrap instead. */
+  .hero-badge,
+  .hero-sticker,
+  .price-sticker,
+  .sticker-note,
+  .pack-flag {
+    white-space: normal !important;
+    max-width: 62vw !important;
+  }
+
+  /* Two-up comparison and step grids hold real content, not icons, so
+     they need a single column well before the 4-ups do. */
+  .vs-panel,
+  .why-intro,
+  .why-grid,
+  .limit-grid,
+  .visit-grid,
+  .reach-layout,
+  .groom-trust,
+  .journey-grid,
+  .rev-grid,
+  .touch-grid,
+  .pack-grid,
+  .groom-grid,
+  .reach-grid,
+  .schedule-grid,
+  .footer-inner {
+    grid-template-columns: 1fr !important;
+  }
+  .why-list {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 560px) {
+  /* Four-up stat rows were still two columns at ~143px each — too narrow
+     for a number plus a caption. */
+  [style*="repeat(4, 1fr)"],
+  [style*="repeat(3, 1fr)"],
+  .dark-ensure-grid,
+  .daycare-trust-band {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* icon + text rows: keep the icon column, just tighten it */
+  .fc-row { grid-template-columns: 26px 1fr !important; gap: 10px !important; }
+  .many-list li,
+  .yes-list li { grid-template-columns: 34px 1fr !important; gap: 12px !important; }
+  .li-ico { width: 32px !important; height: 32px !important; }
+
+  /* the blob heroes get very tall on a narrow screen */
+  .hero-media-wrap { min-height: clamp(260px, 72vw, 380px) !important; }
+  .hero-media { height: clamp(250px, 70vw, 360px) !important; }
+}
+
+@media (max-width: 400px) {
+  /* last-resort tightening so nothing has to be clipped */
+  .groom-trust-cell p { font-size: 13.5px !important; }
+  .journey-num { font-size: 26px !important; }
+  .faq-item { padding-left: 16px !important; padding-right: 16px !important; }
+  .vs-side { padding: 22px 18px !important; }
+}
+
+@media (max-width: 900px) {
+  /* Grid and flex items default to `min-width: auto`, so they refuse to
+     shrink below their min-content width. That is why the Services and
+     Daycare hero columns stayed 364px inside a 333px content box — the
+     column was being sized by an unbreakable heading, not by the grid.
+     This file already applies the same fix to `.footer-inner > *`. */
+  section > *,
+  .page-width > *,
+  .service-hero > *,
+  .hero-grid > *,
+  .bleed-inner > *,
+  .why-grid > *,
+  .limit-grid > *,
+  .vs-panel > *,
+  .reach-layout > * {
+    min-width: 0;
+  }
+}
+
+/* =====================================================================
+   9. Mobile polish pass
+   Everything below lives inside a max-width query, so the desktop
+   layout is untouched.
+   ===================================================================== */
+
+@media (max-width: 900px) {
+  /* Stickers hang above their card on a negative `top`. Side by side on
+     desktop that overhang falls in the empty gutter; once the grid stacks
+     it lands on the block above, so give the card room to hang into.
+     `:has()` catches the wrappers that carry no class of their own. */
+  .why-photo-wrap,
+  .why-photo,
+  *:has(> .sticker-note[style*="position: absolute"]) {
+    margin-top: 30px;
+  }
+
+  /* The hero badge wraps to two lines at this width and the first sparkle
+     lands on top of it. The other two sit clear, so only this one goes. */
+  .hero-spark.s1 {
+    display: none !important;
+  }
+}
+
+/* Tablets get the same floor as phones — 10px uppercase is no more
+   readable at 768 than at 390. */
+@media (max-width: 860px) {
+  /* Micro-labels: uppercase plus wide tracking reads far smaller than its
+     nominal size, so lift anything under 12px to a legible floor. */
+  .pack-name,
+  .pack-unit,
+  .pack-valid,
+  .touch-key,
+  .reach-key,
+  .rev-dog,
+  .split-tag,
+  .week-day,
+  .stat-label,
+  [style*="font-size: 10.5px"],
+  [style*="font-size: 11px"],
+  [style*="font-size: 11.5px"] {
+    font-size: 12px !important;
+  }
+  /* the tag pills are the tightest of these — buy the extra size back */
+  .split-tag {
+    letter-spacing: 0.08em !important;
+  }
+}
+
+@media (max-width: 700px) {
+  /* Footer links were an 18px-tall line box: too small to hit with a thumb.
+     The column gap comes down so the rhythm stays roughly where it was. */
+  .site-footer nav a.link {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+  .site-footer nav {
+    gap: 3px !important;
+  }
+  .site-footer .fc-row {
+    min-height: 34px;
+    align-items: center;
+  }
+  /* the legal pair in the bottom bar sits on one line, so pad rather than
+     stack it */
+  .site-footer .footer-legal a.link {
+    padding-top: 9px;
+    padding-bottom: 9px;
+  }
+
+  /* Some pages style the FAQ row with padding, some with none at all —
+     a floor gives every one of them a thumb-sized target. */
+  .faq-item > summary {
+    min-height: 46px;
+    display: flex;
+    align-items: center;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Homepage "Our Services" flow rows
+   Desktop alternates photo/text left and right; row 2 is right-aligned to
+   meet the photo beside it. Stacked, that right rag just reads as broken.
+   --------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .flow-row [style*="text-align: right"] {
+    text-align: left !important;
+  }
+  .flow-row [style*="margin-left: auto"] {
+    margin-left: 0 !important;
+  }
+  /* photo first in every row, so the three services stack to one rhythm */
+  .flow-row > div:has(> .step-num) {
+    order: -1;
+  }
+  /* the badge hangs 18px outside its column, which is nearly the whole
+     page gutter once the row is full width */
+  .flow-row .step-num[style*="left: -18px"] {
+    left: -10px !important;
+  }
+  .flow-row .step-num[style*="right: -18px"] {
+    right: -10px !important;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Training — "Launching September 2026" card
+   The paw trail is pinned to the card's bottom edge. The card keeps its
+   desktop min-height but the copy grows taller as it wraps, so the paws
+   end up stamped across "Kilmacud, South Dublin." Give them their own lane.
+   --------------------------------------------------------------------- */
+@media (max-width: 700px) {
+  .launching-card {
+    padding-bottom: 60px !important;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Bleed photo bands (Homepage hero / about / standards, Contact hero)
+
+   On desktop each band is a half-width panel beside the copy, deliberately
+   over-scaled (132-138%) and anchored to one edge so the photo runs off it.
+   Stacked full width on a phone that same treatment keeps the zoom but
+   loses the framing: only ~72% of the width and ~52% of the height survive,
+   so you get the dog jammed against the left edge, a hand sliced off at the
+   right, and dead backdrop through the middle.
+
+   On a small screen the band stops being a side panel and becomes a plain
+   photo, so it gets photo behaviour: cover at its natural scale in a 4:3
+   box, centred. All four of these images carry their subject inside the
+   middle 30-80%, so one centred rule frames every one of them.
+   --------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .bleed-layer {
+    height: auto !important;
+    /* no max-height: capping it re-letterboxes the band on a tablet and
+       brings the heavy crop straight back at 700-900px. */
+    max-height: none !important;
+    /* `cover` cropped these illustrations — the brush handle in the hero and
+       the blob edge in the about image were both cut off. They are composed
+       artworks, not photos, so nothing can be trimmed. `contain` shows all of
+       it, and each box is given its source image's own ratio so there are no
+       empty bands either. */
+    background-size: contain !important;
+    background-position: 50% 50% !important;
+  }
+}
+
+/* =====================================================================
+   WhatsApp band — shared by the home and contact pages
+   ===================================================================== */
+/* ---- WhatsApp band ---- */
+.wa-band {
+  position: relative; overflow: hidden;
+  background: #23281C; color: #F6F1E4;
+  border-radius: 24px;
+  padding: clamp(20px, 2.4vw, 30px) clamp(22px, 2.6vw, 40px);
+  display: flex; align-items: center;
+  gap: clamp(18px, 2.4vw, 34px);
+}
+.wa-photo {
+  width: clamp(88px, 9vw, 124px); height: clamp(88px, 9vw, 124px);
+  border-radius: 50%; overflow: hidden; flex-shrink: 0;
+  background: #EFE2C8;
+  border: 3px solid #F5C21A;
+}
+.wa-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.wa-copy { flex: 1; min-width: 0; }
+.wa-kicker {
+  font-family: 'Fraunces', serif; font-style: italic; font-weight: 500;
+  font-size: clamp(15px, 1.4vw, 20px); letter-spacing: -0.01em;
+  color: #F5C21A; margin-bottom: 2px;
+}
+.wa-copy h2 {
+  font-family: 'Fraunces', serif; font-optical-sizing: auto;
+  font-weight: 800; font-size: clamp(22px, 2.5vw, 36px);
+  letter-spacing: -0.03em; line-height: 1.08;
+  margin: 0 0 8px; color: #F6F1E4;
+}
+.wa-copy p {
+  font-size: 14.5px; line-height: 1.6;
+  color: rgba(246,241,228,0.75); margin: 0;
+}
+.wa-cta {
+  display: inline-flex; align-items: center; gap: 9px;
+  flex-shrink: 0;
+  background: #F6F1E4; color: #23281C;
+  border-radius: 999px;
+  padding: 15px 26px;
+  font-family: 'Lora', serif; font-size: 14.5px; font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: background 0.2s ease, gap 0.25s cubic-bezier(.22,1,.36,1);
+}
+.wa-cta:hover { background: #F5C21A; gap: 14px; }
+.wa-script {
+  flex-shrink: 0;
+  font-family: 'Fraunces', serif; font-optical-sizing: auto;
+  font-style: italic; font-weight: 500; letter-spacing: -0.01em;
+  font-size: clamp(14px, 1.3vw, 18px); line-height: 1.25;
+  color: #F5C21A; text-align: center;
+  transform: rotate(-5deg);
+}
+
+@media (max-width: 1100px) { .wa-script { display: none; } }
+@media (max-width: 900px) {
+  .wa-band { flex-wrap: wrap; }
+  .wa-copy { flex-basis: 100%; order: 2; }
+  .wa-cta  { order: 3; }
+}
+
+/* =====================================================================
+   PHOTO ROWS added for the client's October photo set
+   ---------------------------------------------------------------------
+   .ba-pair   two wide before/after shots, framed at the source images'
+              own 3:2 so neither the BEFORE nor the AFTER label is cropped
+   .duo-shots a square + a circle, the site's usual pairing
+   ===================================================================== */
+.ba-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(14px, 1.8vw, 26px);
+}
+.ba-shot { margin: 0; }
+.ba-shot img {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  display: block;
+  border-radius: 24px;
+  background: #EFE2C8;
+  border: 1.5px solid rgba(35, 40, 28, 0.12);
+}
+
+.duo-shots {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(16px, 2.2vw, 32px);
+  align-items: center;
+}
+.duo-shot {
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: #EFE2C8;
+}
+.duo-shot.is-square { border-radius: 24px; }
+.duo-shot.is-circle { border-radius: 50%; }
+.duo-shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+@media (max-width: 760px) {
+  .ba-pair,
+  .duo-shots { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* =====================================================================
+   GALLERY CAROUSEL — scroll-snap track + prev/next arrows (gallery.js)
+   --gal-per   slides visible at once   --gal-ratio  slide aspect ratio
+   Photos never move on hover.
+   ===================================================================== */
+.gal-car { --gal-per: 3; --gal-ratio: 3 / 4; --gal-gap: clamp(12px, 1.6vw, 22px); position: relative; }
+.gal-car.is-wide { --gal-per: 2; --gal-ratio: 3 / 2; }
+.gal-car.is-landscape { --gal-per: 3; --gal-ratio: 4 / 3; }
+.gal-track {
+  display: flex; gap: var(--gal-gap);
+  overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.gal-track::-webkit-scrollbar { display: none; }
+.gal-slide {
+  margin: 0; flex: 0 0 calc((100% - (var(--gal-per) - 1) * var(--gal-gap)) / var(--gal-per));
+  scroll-snap-align: start; aspect-ratio: var(--gal-ratio);
+  border-radius: 24px; overflow: hidden; background: #EFE2C8;
+  border: 1.5px solid rgba(35, 40, 28, 0.12);
+}
+.gal-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gal-nav { display: flex; justify-content: center; gap: 12px; margin-top: clamp(16px, 2vw, 24px); }
+.gal-btn {
+  width: 46px; height: 46px; border-radius: 50%; cursor: pointer;
+  border: 1.5px solid #23281C; background: #fff; color: #23281C;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+}
+.gal-btn:hover { background: #23281C; color: #F5C21A; }
+.gal-btn:disabled { opacity: 0.35; cursor: default; background: #fff; color: #23281C; }
+@media (max-width: 900px) {
+  .gal-car, .gal-car.is-landscape { --gal-per: 2; }
+  .gal-car.is-wide { --gal-per: 1; }
+}
+@media (max-width: 560px) {
+  .gal-car, .gal-car.is-landscape { --gal-per: 1.25; }
+  .gal-car.is-wide { --gal-per: 1.1; }
+}

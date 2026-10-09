@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<![CDATA[<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400;1,9..144,500;1,9..144,600;1,9..144,700;1,9..144,800&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #F6F1E4; color: #23281C; font-family: 'Work Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  a { color: inherit; text-decoration: none; }
+  a.link { transition: color 0.2s ease; }
+  a.link:hover { color: #A67C0A; }
+  a[href]:not(.link) { transition: transform 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s cubic-bezier(.22,1,.36,1), background-color 0.2s ease, color 0.2s ease; }
+
+  @keyframes fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-in { animation: fade-up 0.7s cubic-bezier(.22,1,.36,1) both; }
+  .d1 { animation-delay: .05s; } .d2 { animation-delay: .12s; } .d3 { animation-delay: .19s; }
+
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s cubic-bezier(.22,1,.36,1), transform 0.7s cubic-bezier(.22,1,.36,1); }
+  .reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+  .nav-dropdown-wrap {
+    position: relative;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+  .nav-dropdown-wrap .nav-dropdown-caret { transition: transform 0.45s cubic-bezier(.34,1.3,.64,1); display: inline-block; }
+  .nav-dropdown-wrap:hover .nav-dropdown-caret,
+  .nav-dropdown-wrap:focus-within .nav-dropdown-caret { transform: rotate(180deg); }
+  .nav-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(14px) scale(0.96);
+    background: #FFFEFA;
+    border: 2px solid #F5C21A;
+    border-radius: 18px;
+    padding: 10px;
+    min-width: 224px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.42s ease,
+      transform 0.5s cubic-bezier(.22,1,.36,1),
+      visibility 0.42s,
+      box-shadow 0.4s ease;
+    transform-origin: top center;
+    z-index: 300;
+    box-shadow: 4px 4px 0 rgba(35,40,28,0.12), 0 16px 32px -16px rgba(35,40,28,0.35);
+  }
+  /* invisible bridge so mouse can travel from link to menu without closing */
+  .nav-dropdown::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0;
+    bottom: 100%;
+    height: 16px;
+  }
+  .nav-dropdown-wrap:hover .nav-dropdown,
+  .nav-dropdown-wrap:focus-within .nav-dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  .nav-dropdown-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 12px; border-radius: 11px;
+    font-family: 'Work Sans', sans-serif; font-size: 15.5px; font-weight: 500;
+    color: #23281C; white-space: nowrap;
+    transition:
+      background 0.4s ease,
+      transform 0.4s cubic-bezier(.22,1,.36,1),
+      padding-left 0.4s cubic-bezier(.22,1,.36,1),
+      box-shadow 0.35s ease;
+    pointer-events: auto;
+    position: relative; z-index: 1;
+  }
+  .nav-dropdown-item:hover {
+    background: #FBF3D9;
+    padding-left: 16px;
+    transform: translateX(2px);
+  }
+  .nav-dropdown-icon {
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    width: 32px; height: 32px; border-radius: 9px; background: #F6F1E4;
+    transition: background 0.4s ease, transform 0.45s cubic-bezier(.34,1.56,.64,1);
+  }
+  .nav-dropdown-item:hover .nav-dropdown-icon {
+    background: #F5C21A;
+    transform: rotate(-8deg) scale(1.08);
+  }
+
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 15px clamp(16px, 1.9vw, 28px); border-radius: 10px; font-family: 'Lora', serif; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; transition: transform 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s cubic-bezier(.22,1,.36,1), background-color 0.2s ease, color 0.2s ease; }
+  .btn-yellow { background: #F5C21A; color: #23281C; }
+  .btn-yellow:hover { transform: translate(-2px, -2px); }
+  .btn-ink { background: #23281C; color: #F6F1E4; }
+  .btn-ink:hover { background: #F5C21A; color: #23281C; transform: translateY(-3px); }
+  .btn-outline { background: transparent; color: #23281C; border: 1.5px solid #23281C; }
+  .btn-outline:hover { background: #23281C; color: #F6F1E4; }
+  .btn-whatsapp { background: #25D366; color: #FFFFFF; }
+  .btn-whatsapp:hover { background: #1ebe57; color: #FFFFFF; transform: translateY(-2px); }
+  .site-logo { height: 88px; width: auto; object-fit: contain; display: block; }
+  .site-header { background: #23281C; color: #F6F1E4; position: relative; z-index: 100; overflow: visible; }
+  .site-header .promo {
+    text-align: center;
+    padding: 11px 20px;
+    font-size: 13.5px;
+    font-weight: 500;
+    background: #F5C21A;
+    color: #23281C;
+  }
+  .site-header .promo strong { color: #23281C; font-weight: 700; }
+  .site-header .nav-bar {
+    max-width: 1440px; margin: 0 auto; padding: 10px clamp(21px, 3.3vw, 48px);
+    display: flex; align-items: center; justify-content: space-between; gap: clamp(16px, 1.9vw, 28px);
+    position: relative; z-index: 101; overflow: visible;
+  }
+  .site-header .nav-links {
+    display: flex;
+    align-items: center;
+    gap: clamp(18px, 2.2vw, 30px);
+  }
+  .site-header .nav-links > a,
+  .site-header .nav-dropdown-wrap > a {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 15.5px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: rgba(246,241,228,0.9);
+    padding: 6px 2px;
+    border-radius: 0;
+    background: transparent;
+    transition: color 0.25s ease;
+    position: relative;
+  }
+  .site-header .nav-links > a:hover,
+  .site-header .nav-dropdown-wrap > a:hover {
+    color: #F5C21A;
+    background: transparent;
+    transform: none;
+  }
+  .site-header .nav-links > a.is-active {
+    color: #F5C21A;
+    background: transparent;
+    box-shadow: none;
+  }
+  .site-header .nav-links > a.is-active::after,
+  .site-header .nav-dropdown-wrap > a.is-active::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -4px;
+    height: 2px;
+    background: #F5C21A;
+    border-radius: 2px;
+  }
+
+  .contact-card { transition: transform 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s cubic-bezier(.22,1,.36,1); }
+  .contact-card:hover { transform: translateY(-4px); box-shadow: 0 24px 40px -28px rgba(35,40,28,0.28); }
+
+  /* =====================================================================
+     CONTACT FORM
+     Prototype only: the .dc runtime strips inline onsubmit, so the button
+     is type=button and nothing is sent anywhere yet. Wire it to a handler
+     before this goes live, or enquiries will silently vanish.
+     ===================================================================== */
+  .contact-form-section {
+    max-width: 1440px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(280px, 46%) minmax(0, 1fr);
+    align-items: stretch;
+    gap: clamp(24px, 4vw, 56px);
+    padding: clamp(31px, 4.9vw, 70px) clamp(21px, 3.3vw, 48px) clamp(32px, 4.2vw, 64px);
+  }
+  .contact-form-section .contact-form-map.reach-map-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    min-height: 0;
+  }
+  .contact-form-section .contact-form-map .reach-map {
+    flex: 1 1 auto;
+    height: 100%;
+    min-height: clamp(360px, 38vw, 480px);
+    max-width: none;
+    width: 100%;
+    margin-left: 0;
+  }
+  .contact-form-section .contact-form-copy {
+    min-width: 0;
+    align-self: start;
+  }
+  .contact-form-intro {
+    margin-bottom: clamp(24px, 3vw, 36px);
+    max-width: 540px;
+  }
+  .contact-form-intro .eyebrow { margin-bottom: 8px; }
+  .contact-form-intro .heading {
+    font-size: clamp(30px, 4.2vw, 56px);
+    margin: 0 0 12px;
+    line-height: 1.04;
+  }
+  .contact-form-lede {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 15.5px;
+    line-height: 1.65;
+    color: #4B4A3E;
+    margin: 0;
+    max-width: 480px;
+  }
+
+  .cf-card {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    background: #FFFFFF;
+    border: 1.5px solid #23281C;
+    border-radius: 22px;
+    padding: clamp(22px, 2.6vw, 36px);
+    box-shadow: 6px 6px 0 #23281C;
+    max-width: none;
+    margin: 0;
+    flex: 0 0 auto;
+  }
+  .cf-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    flex: 0 0 auto;
+    min-width: 0;
+    width: 100%;
+  }
+  .cf-field label {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #8A8677;
+  }
+  .cf-field input,
+  .cf-field textarea {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0;
+    box-sizing: border-box;
+    background-color: #F6F1E4;
+    border: 1.5px solid rgba(35,40,28,0.14);
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 15px;
+    color: #23281C;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  }
+  .cf-field input::placeholder,
+  .cf-field textarea::placeholder { color: #8A8677; opacity: 1; }
+  .cf-field input:focus,
+  .cf-field textarea:focus {
+    border-color: #23281C;
+    background-color: #FFFEFA;
+    box-shadow: 0 0 0 3px rgba(245,194,26,0.45);
+  }
+  /* Resize grip belongs on the message box only — never on single-line fields */
+  .cf-field textarea {
+    resize: vertical;
+    min-height: 128px;
+    line-height: 1.55;
+  }
+  .cf-field input:not([type="checkbox"]):not([type="radio"]) {
+    resize: none;
+  }
+  .cf-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    flex: 0 0 auto;
+  }
+  .cf-submit {
+    width: 100%;
+    justify-content: center;
+    margin-top: 0;
+    flex: 0 0 auto;
+    border: 0;
+    cursor: pointer;
+    font-family: 'Work Sans', sans-serif;
+    padding-top: 16px;
+    padding-bottom: 16px;
+    box-shadow: 3px 3px 0 #23281C;
+  }
+  .cf-submit.btn-yellow:hover { box-shadow: 5px 5px 0 #23281C; }
+  .cf-note {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: #8A8677;
+    margin: 16px 0 0;
+    text-align: left;
+  }
+
+  @media (max-width: 900px) {
+    .contact-form-section { grid-template-columns: 1fr; align-items: start; }
+    .contact-form-section .contact-form-map .reach-map {
+      flex: none;
+      height: clamp(280px, 62vw, 360px);
+    }
+  }
+  @media (max-width: 560px) {
+    .cf-row { grid-template-columns: 1fr; }
+  }
+
+    /* Header is NOT sticky — keeps page scroll free */
+  .site-header { position: relative; top: auto; z-index: 100; }
+  .site-header.is-stuck { box-shadow: none; }
+
+  .heading { font-family: 'Fraunces', serif; font-weight: 700; letter-spacing: -0.02em; color: #23281C; }
+
+  /* Full-bleed hero — same system as Homepage.dc.html */
+  .bleed { position: relative; overflow: hidden; }
+  .bleed-layer {
+    position: absolute; inset: 0; z-index: 0;
+    background-repeat: no-repeat; pointer-events: none;
+  }
+  .bleed-inner { position: relative; z-index: 1; }
+  /* Vertical spacing lives on .bleed section only — same as Homepage (no double pad). */
+  .bleed-contact .bleed-inner {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 clamp(21px, 3.3vw, 48px);
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: clamp(28px, 4.4vw, 64px);
+    align-items: center;
+    min-height: clamp(360px, 46vw, 660px);
+  }
+  .contact-hero-copy { max-width: 560px; min-width: 0; }
+  .contact-hero-lede {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.75;
+    color: #4B4A3E;
+    margin: 0 0 clamp(14px, 1.6vw, 20px);
+    max-width: 520px;
+  }
+
+  /* ---- "Book Now" bone sticker — copied from Homepage.dc.html ---- */
+  .book-sticker {
+    position: relative; display: inline-block;
+    width: min(265px, 68%);
+    transition: transform 0.3s cubic-bezier(.22,1,.36,1);
+  }
+  .book-sticker img { width: 100%; height: auto; display: block; mix-blend-mode: multiply; }
+  .book-sticker span {
+    position: absolute; left: 52.2%; top: 51.5%;
+    transform: translate(-50%, -50%) rotate(-13.9deg);
+    font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: clamp(15px, 1.5vw, 20px); letter-spacing: -0.01em;
+    color: #23281C; white-space: nowrap; pointer-events: none;
+  }
+  .book-sticker:hover { transform: rotate(-3deg) scale(1.05); }
+
+  /* =====================================================================
+     Salon details — secondary to map + form above; no duplicate "get in touch"
+     ===================================================================== */
+  .reach-wrap {
+    background: #F6F1E4;
+    margin-top: 0;
+    border-top: 1px solid rgba(35, 40, 28, 0.1);
+  }
+  .reach-section {
+    max-width: 1440px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(280px, 46%) minmax(0, 1fr);
+    align-items: start;
+    gap: clamp(24px, 4vw, 56px);
+    padding: clamp(31px, 4.9vw, 70px) clamp(21px, 3.3vw, 48px) clamp(32px, 4.2vw, 64px);
+  }
+  .reach-section--details {
+    grid-template-columns: 1fr;
+    padding-top: clamp(36px, 4.5vw, 56px);
+  }
+  .reach-section--details .reach-inner {
+    max-width: 640px;
+    margin: 0;
+    width: 100%;
+  }
+  .reach-section-head { max-width: 520px; margin-bottom: clamp(8px, 1.2vw, 12px); }
+  .reach-section-head .eyebrow { margin-bottom: 8px; }
+  .reach-section-title {
+    font-family: 'Fraunces', serif;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-size: clamp(26px, 3.2vw, 40px);
+    letter-spacing: -0.025em;
+    margin: 0 0 10px;
+    line-height: 1.08;
+    color: #23281C;
+  }
+  .reach-section-lede {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #4B4A3E;
+    margin: 0;
+  }
+  .reach-map-cell {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    min-width: 0;
+    position: relative;
+  }
+  .reach-map-cell::before,
+  .reach-map-cell::after {
+    content: "+";
+    position: absolute;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(35, 40, 28, 0.22);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .reach-map-cell::before { top: 6%; left: 18%; transform: rotate(12deg); }
+  .reach-map-cell::after { bottom: 10%; right: 8%; transform: rotate(-18deg); }
+  .reach-inner {
+    max-width: 620px;
+    padding: 0;
+  }
+
+  .reach-list {
+    display: flex;
+    flex-direction: column;
+    margin-top: clamp(20px, 2.5vw, 28px);
+  }
+  .reach-row {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 14px;
+    align-items: start;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(35,40,28,0.12);
+    color: inherit;
+  }
+  .reach-row:first-child { border-top: 1px solid rgba(35,40,28,0.12); }
+  .reach-row.is-static { cursor: default; }
+
+  .reach-ico {
+    width: 40px; height: 40px; border-radius: 12px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #F6F1E4; color: #C4632F;
+  }
+  .reach-row--key .reach-ico { background: #23281C; color: #F5C21A; }
+
+  .reach-text { display: flex; flex-direction: column; min-width: 0; }
+  .reach-key {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    color: #8A8677; margin-bottom: 5px;
+  }
+  .reach-val {
+    font-family: 'Work Sans', sans-serif;
+    font-weight: 600;
+    font-size: clamp(16px, 1.35vw, 18px);
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+    color: #23281C;
+  }
+  .reach-sub {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 14px; line-height: 1.55; color: #4B4A3E; margin-top: 4px;
+  }
+
+  .reach-map {
+    display: block;
+    position: relative;
+    width: 100%;
+    max-width: 540px;
+    height: clamp(360px, 38vw, 480px);
+    overflow: hidden;
+    border-radius: 24px;
+    border: 0;
+    box-shadow:
+      0 0 0 clamp(10px, 1.4vw, 16px) rgba(239, 226, 200, 0.95),
+      0 28px 56px -32px rgba(35, 40, 28, 0.28);
+    background: #EFE2C8;
+    margin-left: calc(-1 * clamp(12px, 2vw, 24px));
+    transition: transform 0.35s cubic-bezier(.22,1,.36,1), box-shadow 0.35s ease;
+  }
+  .reach-map iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+    pointer-events: auto;
+    filter: saturate(0.9);
+  }
+  .reach-map-pin { display: none; }
+
+  @media (max-width: 900px) {
+    .bleed { display: flex; flex-direction: column; }
+    .bleed-inner { order: 1; grid-template-columns: 1fr; min-height: 0; gap: 0; }
+    .bleed-layer {
+      order: 2;
+      position: static; width: 100%;
+      height: 62vw; max-height: 360px;
+      margin-top: clamp(16px, 4vw, 28px);
+    }
+    .bleed-contact .bleed-layer {
+      background-size: 138% auto;
+      background-position: 100% 50%;
+    }
+    .reach-section {
+      grid-template-columns: 1fr;
+      padding: clamp(32px, 5vw, 56px) clamp(21px, 3.3vw, 48px);
+    }
+    .reach-map-cell { justify-content: center; }
+    .reach-map {
+      margin-left: 0;
+      width: 100%;
+      max-width: 420px;
+      height: clamp(280px, 62vw, 360px);
+    }
+    .reach-inner { max-width: none; }
+  }
+
+  .hand { font-family: 'Fraunces', serif; font-optical-sizing: auto; font-style: italic; font-weight: 500; font-size: inherit; letter-spacing: -0.01em; color: #C4632F; }
+
+  /* ---- Footer typography + newsletter ---- */
+  .site-footer a.link,
+  .site-footer .fc-row,
+  .site-footer .footer-copy,
+  .site-footer .footer-legal,
+  .site-footer .footer-bottom {
+    font-family: 'Work Sans', sans-serif;
+  }
+  .footer-kicker {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #F5C21A;
+    margin-bottom: 14px;
+  }
+  .footer-heading {
+    font-family: inherit;
+    padding-bottom: 0;
+  }
+  .footer-brand p, .site-footer .footer-tagline {
+    font-family: 'Work Sans', sans-serif;
+  }
+  .footer-news-copy {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 14.5px; line-height: 1.55;
+    color: rgba(246,241,228,0.75); margin: 0 0 14px; max-width: 260px;
+  }
+  .footer-news-form {
+    display: flex; flex-direction: column; gap: 10px; max-width: 280px;
+  }
+  .footer-news-input {
+    width: 100%; box-sizing: border-box;
+    background: rgba(246,241,228,0.08);
+    border: 1px solid rgba(246,241,228,0.18);
+    border-radius: 999px;
+    padding: 12px 16px;
+    color: #F6F1E4;
+    font-family: 'Work Sans', sans-serif; font-size: 14.5px;
+    outline: none;
+  }
+  .footer-news-input::placeholder { color: rgba(246,241,228,0.45); }
+  .footer-news-input:focus { border-color: #F5C21A; background: rgba(246,241,228,0.12); }
+  .footer-news-btn {
+    align-self: flex-start;
+    background: #F5C21A; color: #23281C; border: 0;
+    border-radius: 999px;
+    padding: 11px 20px;
+    font-family: 'Work Sans', sans-serif; font-weight: 600; font-size: 14.5px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 3px 3px 0 #F6F1E4;
+  }
+  .footer-news-btn:hover {
+    background: #F6F1E4;
+    transform: translate(-2px,-2px);
+    box-shadow: 5px 5px 0 #F6F1E4;
+  }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+
+  .footer-social {
+    display: flex; gap: 10px; margin-top: 18px; align-items: center;
+  }
+  .footer-social-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(246,241,228,0.08);
+    color: #F5C21A;
+    border: 1.5px solid rgba(245,194,26,0.35);
+    transition: transform 0.35s cubic-bezier(.34,1.56,.64,1), background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  }
+  .footer-social-btn:hover {
+    background: #F5C21A; color: #23281C; border-color: #F5C21A;
+    transform: translateY(-4px) rotate(-6deg) scale(1.06);
+  }
+
+  @keyframes to-top-float-live {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .to-top {
+    width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+    background: #F5C21A; color: #23281C; border: 0; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    animation: to-top-float-live 2.2s ease-in-out infinite;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 6px 16px -8px rgba(245,194,26,0.7);
+  }
+  .to-top:hover {
+    animation-play-state: paused;
+    background: #F6F1E4;
+    transform: translateY(-3px);
+  }
+  @media (max-width: 900px) {
+    .footer-inner { grid-template-columns: 1fr !important; }
+  }
+
+
+  /* =====================================================================
+     CONTACT — reach us, find us, write to us, in that order
+     ===================================================================== */
+
+
+  /* ---- hero photo: a framed square, like every other photo on the site ---- */
+  .hero-frame {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    max-height: clamp(360px, 46vw, 600px);
+    border-radius: 24px;
+    overflow: hidden;
+    background: #EFE2C8;
+    border: 1.5px solid rgba(35,40,28,0.12);
+  }
+  .hero-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  @media (max-width: 900px) {
+    .hero-frame { aspect-ratio: 4 / 3; max-height: none; }
+  }
+  /* the contact hero takes the circle of the square/circle pair, with the same
+     yellow disc, rust accent and ink ring as the Pricing and Teeth Cleaning heroes */
+  .hero-media-wrap {
+    position: relative;
+    min-height: clamp(360px, 44vw, 520px);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hero-media-wrap::before {
+    content: "";
+    position: absolute;
+    width: 88%; height: 86%;
+    left: 1%; top: 8%;
+    background: #F5C21A;
+    border-radius: 50%;
+    transform: rotate(-9deg);
+    z-index: 0;
+  }
+  .hero-media-wrap::after {
+    content: "";
+    position: absolute;
+    width: 40%; height: 34%;
+    right: 0; bottom: 6%;
+    background: #C4632F;
+    opacity: 0.2;
+    border-radius: 50%;
+    z-index: 0;
+  }
+  .hero-media {
+    position: relative; z-index: 1;
+    width: min(92%, 500px); aspect-ratio: 1; height: auto;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 3.5px solid #23281C;
+    box-shadow: -10px 12px 0 #23281C;
+    background: #EFE2C8;
+  }
+  .hero-media img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+
+  /* ---- three ways to reach us ---- */
+  .cm-grid {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(14px, 1.7vw, 24px);
+  }
+  .cm-card {
+    display: flex; flex-direction: column;
+    background: #FFFFFF;
+    border: 1px solid rgba(35,40,28,0.1);
+    border-radius: 20px;
+    padding: clamp(20px, 2.2vw, 30px);
+  }
+  .cm-card:hover { border-color: #23281C; }
+  .cm-ico {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #F5C21A;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 16px;
+  }
+  .cm-title {
+    font-size: 11.5px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: #8A8570; margin-bottom: 6px;
+  }
+  .cm-val {
+    font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: clamp(17px, 1.6vw, 21px); letter-spacing: -0.02em;
+    color: #23281C; margin-bottom: 8px;
+  }
+  .cm-note { font-size: 14px; line-height: 1.6; color: #4B4A3E; }
+
+  /* ---- visit the salon ---- */
+  .visit-split {
+    display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(20px, 3vw, 48px);
+    align-items: stretch;
+  }
+  .visit-copy { align-self: center; }
+  .visit-title {
+    font-family: 'Fraunces', serif; font-optical-sizing: auto;
+    font-weight: 800; font-size: clamp(28px, 3.4vw, 48px);
+    letter-spacing: -0.03em; line-height: 1.04;
+    margin: 0 0 clamp(18px, 2.2vw, 30px); color: #23281C;
+  }
+  .visit-list { margin: 0 0 clamp(18px, 2.2vw, 28px); padding: 0; }
+  .visit-row {
+    display: grid; grid-template-columns: 108px minmax(0, 1fr);
+    gap: 16px; align-items: start;
+    padding: 14px 0;
+    border-top: 1px solid rgba(35,40,28,0.12);
+  }
+  .visit-row:last-child { border-bottom: 1px solid rgba(35,40,28,0.12); }
+  .visit-row dt {
+    font-size: 11.5px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: #8A8570; padding-top: 3px;
+  }
+  .visit-row dd {
+    margin: 0;
+    font-size: 15.5px; line-height: 1.55; color: #23281C;
+  }
+  .visit-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 600; color: #23281C;
+    padding-bottom: 3px;
+    border-bottom: 1.5px solid #23281C;
+    transition: gap 0.25s cubic-bezier(.22,1,.36,1), color 0.2s ease, border-color 0.2s ease;
+  }
+  .visit-link:hover { gap: 13px; color: #C4632F; border-color: #C4632F; }
+
+  /* a square map, sitting still */
+  .visit-map {
+    position: relative; overflow: hidden;
+    border-radius: 24px;
+    background: #EFE2C8;
+    min-height: clamp(300px, 34vw, 430px);
+    border: 1.5px solid rgba(35,40,28,0.14);
+  }
+  .visit-map iframe {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    border: 0; display: block;
+    filter: saturate(0.9);
+  }
+
+  /* ---- enquiry ---- */
+  .enq-split {
+    display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: clamp(22px, 3.2vw, 52px);
+    align-items: start;
+  }
+  .enq-intro { align-self: center; }
+  .enq-title {
+    font-family: 'Fraunces', serif; font-optical-sizing: auto;
+    font-weight: 800; font-size: clamp(28px, 3.4vw, 48px);
+    letter-spacing: -0.03em; line-height: 1.04;
+    margin: 0 0 16px; color: #23281C;
+  }
+  .enq-lede {
+    font-size: 15.5px; line-height: 1.7; color: #4B4A3E;
+    margin: 0 0 16px; max-width: 420px;
+  }
+  .enq-aside {
+    font-size: 14px; line-height: 1.6; color: #4B4A3E;
+    margin: 0; max-width: 420px;
+  }
+  .enq-inline {
+    font-weight: 600; color: #C4632F;
+    border-bottom: 1.5px solid rgba(196,99,47,0.4);
+  }
+  .enq-inline:hover { border-bottom-color: #C4632F; }
+
+  @media (max-width: 900px) {
+    .cm-grid     { grid-template-columns: minmax(0, 1fr); }
+    .visit-split { grid-template-columns: minmax(0, 1fr); }
+    .enq-split   { grid-template-columns: minmax(0, 1fr); }
+    .visit-row   { grid-template-columns: 92px minmax(0, 1fr); gap: 12px; }
+  }
+</style>
+<link rel="stylesheet" href="./responsive.css">
+<script src="./reveal.js" defer></script>
+</helmet>
+
+<div style="background: #F6F1E4; color: #23281C; font-family: 'Work Sans', sans-serif;">
+
+  <!-- HEADER -->
+  <header class="site-header fade-in">
+    <nav class="nav-bar">
+      <a href="Homepage.dc.html" style="display: flex; align-items: center; flex-shrink: 0;">
+        <img src="assets/logo-official.png" alt="Zoomies" class="site-logo">
+      </a>
+      <input type="checkbox" id="nav-toggle" class="nav-checkbox">
+      <label for="nav-toggle" class="nav-burger" aria-label="Toggle menu">
+        <svg class="nav-burger-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <svg class="nav-burger-close" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </label>
+      <div class="nav-links">
+        <a class="link" href="Grooming.dc.html">Dog Grooming</a>
+        <a class="link" href="Daycare.dc.html">Dog Daycare</a>
+        <a class="link" href="TeethCleaning.dc.html">Teeth Cleaning</a>
+        <a class="link" href="Training.dc.html">Grooming Courses</a>
+        <a class="link" href="Pricing.dc.html">Pricing</a>
+        <a class="link is-active" href="Contact.dc.html">Contact</a>
+      </div>
+      <a href="https://wa.me/353868099535" target="_blank" rel="noopener" class="btn btn-whatsapp" style="padding: 13px 22px; font-size: 14px; flex-shrink: 0;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp Us
+      </a>
+    </nav>
+  </header>
+
+  <!-- HERO — the old build's copy, tight: one promise and two ways to act on it -->
+  <section class="bleed bleed-contact" style="padding: clamp(25px, 3.9vw, 56px) 0 clamp(25px, 3.9vw, 56px);">
+    <div class="bleed-inner">
+      <div class="fade-in d2 contact-hero-copy">
+        <div class="eyebrow" style="margin-bottom: 10px;">Contact</div>
+        <h1 style="font-family: 'Fraunces'; font-optical-sizing: auto; font-weight: 800; font-size: clamp(38px, 5.4vw, 78px); line-height: 1.02; letter-spacing: -0.03em; margin: 0 0 clamp(16px, 1.9vw, 26px); color: #23281C;">
+          How can<br><span style="font-style: italic; font-weight: 500; color: #C4632F;">we help?</span>
+        </h1>
+        <p class="contact-hero-lede">For the quickest response, WhatsApp us your dog&rsquo;s name, breed, age, a photo and the service you&rsquo;re interested in. We&rsquo;ll get back to you with availability and pricing.</p>
+        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+          <a href="https://wa.me/message/W2OAWUQCD5WCJ1" target="_blank" rel="noopener" class="btn btn-ink" style="font-size: 15.5px;">
+            Message Zoomies on WhatsApp
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="#enquiry" class="btn btn-outline" style="font-size: 15.5px;">
+            Send a message
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="fade-in d3 hero-media-wrap">
+        <div class="hero-media">
+          <img src="assets/client/team-handler-with-dog.jpg" alt="A Zoomies team member with a dog at the Kilmacud salon">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THREE WAYS TO REACH US — the old build's contact cards -->
+  <section class="reveal" style="max-width: 1440px; margin: 0 auto; padding: 0 clamp(21px, 3.3vw, 48px) clamp(34px, 6.3vw, 90px);">
+    <div class="cm-grid">
+      <a class="cm-card contact-card" href="https://wa.me/message/W2OAWUQCD5WCJ1" target="_blank" rel="noopener">
+        <span class="cm-ico"><svg width="21" height="21" viewBox="0 0 24 24" fill="#23281C"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 004.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm0 1.67c2.2 0 4.27.86 5.83 2.42a8.2 8.2 0 012.41 5.83c0 4.54-3.7 8.24-8.25 8.24a8.2 8.2 0 01-4.19-1.15l-.3-.18-3.11.82.83-3.04-.2-.31a8.2 8.2 0 01-1.26-4.38c0-4.54 3.7-8.25 8.24-8.25zm-3.3 4.1c-.18 0-.47.07-.72.34-.25.27-.95.93-.95 2.26s.98 2.62 1.11 2.8c.14.18 1.9 2.9 4.6 4.07.64.28 1.14.45 1.53.57.64.2 1.23.18 1.69.11.52-.08 1.6-.65 1.82-1.29.23-.63.23-1.18.16-1.29-.07-.11-.25-.18-.52-.31-.27-.14-1.6-.79-1.85-.88-.25-.09-.43-.14-.61.14-.18.27-.7.88-.86 1.06-.16.18-.32.2-.59.07-.27-.14-1.14-.42-2.18-1.34-.8-.72-1.35-1.6-1.5-1.87-.16-.27-.02-.42.12-.55.12-.12.27-.32.4-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.83-2.01-.22-.53-.44-.46-.61-.47h-.5z"/></svg></span>
+        <span class="cm-title">WhatsApp</span>
+        <span class="cm-val">+353 86 809 9535</span>
+        <span class="cm-note">Fastest way to reach us &mdash; usually a same-day reply.</span>
+      </a>
+
+      <a class="cm-card contact-card" href="tel:+353868099535">
+        <span class="cm-ico"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0122 16.92z"/></svg></span>
+        <span class="cm-title">Call the salon</span>
+        <span class="cm-val">+353 86 809 9535</span>
+        <span class="cm-note">Mon&ndash;Sat during opening hours.</span>
+      </a>
+
+      <a class="cm-card contact-card" href="mailto:hello@zoomies.ie">
+        <span class="cm-ico"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></span>
+        <span class="cm-title">Email us</span>
+        <span class="cm-val">hello@zoomies.ie</span>
+        <span class="cm-note">Enquiries and Academy course registrations.</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- VISIT THE SALON — details beside the map -->
+  <section class="reveal" style="max-width: 1440px; margin: 0 auto; padding: 0 clamp(21px, 3.3vw, 48px) clamp(34px, 6.3vw, 90px);">
+    <div class="visit-split">
+      <div class="visit-copy">
+        <div class="eyebrow">Find us</div>
+        <h2 class="visit-title">Visit the <span style="font-style: italic; font-weight: 500; color: #C4632F;">salon</span></h2>
+
+        <dl class="visit-list">
+          <div class="visit-row">
+            <dt>Address</dt>
+            <dd>116A Lower Kilmacud Road<br>Stillorgan, Co. Dublin, A94 R2C9</dd>
+          </div>
+          <div class="visit-row">
+            <dt>Hours</dt>
+            <dd>Mon&ndash;Sat, 9:00&ndash;18:00</dd>
+          </div>
+          <div class="visit-row">
+            <dt>Serving</dt>
+            <dd>Kilmacud, Stillorgan, Dundrum, Sandyford and South Dublin</dd>
+          </div>
+        </dl>
+
+        <a class="visit-link" href="https://www.google.com/maps/search/?api=1&amp;query=116A+Lower+Kilmacud+Road+Stillorgan" target="_blank" rel="noopener">
+          Get directions
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+
+      <div class="visit-map">
+        <iframe
+          src="https://maps.google.com/maps?q=116A+Lower+Kilmacud+Road,+Stillorgan+South+County+Dublin&amp;t=m&amp;z=15&amp;output=embed&amp;iwloc=near"
+          title="Map showing Zoomies at 116A Lower Kilmacud Road, Stillorgan"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- ENQUIRY FORM -->
+  <section id="enquiry" class="reveal" style="max-width: 1440px; margin: 0 auto; padding: 0 clamp(21px, 3.3vw, 48px) clamp(34px, 6.3vw, 90px);">
+    <div class="enq-split">
+      <div class="enq-intro">
+        <div class="eyebrow">Send us a message</div>
+        <h2 class="enq-title">Tell us about <span style="font-style: italic; font-weight: 500; color: #C4632F;">your dog</span></h2>
+        <p class="enq-lede">Breed, age and what you&rsquo;re looking for is all we need. We&rsquo;ll come back with availability and a price.</p>
+        <p class="enq-aside">Prefer to talk? WhatsApp is the quickest &mdash; <a class="link enq-inline" href="https://wa.me/message/W2OAWUQCD5WCJ1" target="_blank" rel="noopener">message us there</a>.</p>
+      </div>
+
+      <form class="cf-card" aria-label="Contact form">
+        <div class="cf-row">
+          <div class="cf-field">
+            <label for="cf-name">Your name</label>
+            <input id="cf-name" type="text" autocomplete="name" placeholder="Sarah O&rsquo;Brien">
+          </div>
+          <div class="cf-field">
+            <label for="cf-email">Email</label>
+            <input id="cf-email" type="email" autocomplete="email" placeholder="sarah@example.ie">
+          </div>
+        </div>
+
+        <div class="cf-row">
+          <div class="cf-field">
+            <label for="cf-phone">Mobile</label>
+            <input id="cf-phone" type="tel" autocomplete="tel" placeholder="086 123 4567">
+          </div>
+          <div class="cf-field">
+            <label for="cf-dog">Dog&rsquo;s name</label>
+            <input id="cf-dog" type="text" placeholder="Bailey">
+          </div>
+        </div>
+
+        <div class="cf-field">
+          <label for="cf-service">Enquiry type</label>
+          <input id="cf-service" name="service" type="text" list="cf-service-options" placeholder="Choose a service&hellip;" autocomplete="off" required>
+          <datalist id="cf-service-options">
+            <option value="Dog Grooming">
+            <option value="Ultrasonic Teeth Cleaning">
+            <option value="Small Dog Daycare">
+            <option value="Grooming Assistant Course">
+            <option value="Something else">
+          </datalist>
+        </div>
+
+        <div class="cf-field">
+          <label for="cf-message">Message</label>
+          <textarea id="cf-message" placeholder="Breed, age, and what you&rsquo;re looking for&hellip;"></textarea>
+        </div>
+
+        <button type="button" class="btn btn-yellow cf-submit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>Send Message</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="reveal" style="max-width: 1440px; margin: 0 auto; padding: 0 clamp(21px, 3.3vw, 48px) clamp(34px, 6.3vw, 90px);">
+    <div class="wa-band">
+      <div class="wa-photo" aria-hidden="true">
+        <img src="assets/client/grooming-maltese-purple.jpg" alt="" loading="lazy">
+      </div>
+      <div class="wa-copy">
+        <div class="wa-kicker">Say hello</div>
+        <h2>Chat to us on WhatsApp</h2>
+        <p>Breed, age and a photo is all we need to confirm availability and a price.</p>
+      </div>
+      <a class="wa-cta" href="https://wa.me/353868099535" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Message Us on WhatsApp
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <div class="wa-script" aria-hidden="true">We&rsquo;re here<br>for you &amp;<br>your pup!</div>
+    </div>
+  </section>
+
+
+  <!-- FOOTER -->
+  <footer class="reveal site-footer">
+    <div class="footer-dog" aria-hidden="true">
+      <img src="assets/client/grooming-samoyed-bandana.jpg" alt="">
+    </div>
+    <div class="footer-glow" aria-hidden="true"></div>
+
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="assets/logo-footer-transparent.png" alt="Zoomies" class="site-logo" style="height: 120px; width: auto; margin-bottom: 14px;">
+        <p style="font-family: 'Work Sans', sans-serif; font-size: 14px; line-height: 1.6; color: #4B4A3E; margin: 0; max-width: 320px; font-style: italic;">Happier Dogs. Brighter Days.</p>
+        <div class="footer-social" aria-label="Social media">
+          <a class="footer-social-btn" href="https://www.instagram.com/zoomies_ireland/" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          </a>
+          <a class="footer-social-btn" href="https://www.facebook.com/zoomiesireland" target="_blank" rel="noopener" aria-label="Facebook">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M14 9h3V6h-3c-1.7 0-3 1.3-3 3v2H9v3h2v7h3v-7h3l1-3h-4V9c0-.6.4-1 1-1z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <div class="footer-kicker"><span class="footer-heading">Quick Link</span></div>
+        <nav style="display: flex; flex-direction: column; gap: 11px; font-size: 14.5px;">
+          <a class="link" href="Homepage.dc.html">Home</a>
+          <a class="link" href="Services.dc.html">Services</a>
+          <a class="link" href="Pricing.dc.html">Pricing</a>
+          <a class="link" href="Contact.dc.html">Contact Us</a>
+        </nav>
+      </div>
+
+      <div class="footer-col">
+        <div class="footer-kicker"><span class="footer-heading">Contact Info</span></div>
+        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 14.5px;">
+          <a class="fc-row" href="https://wa.me/353868099535" target="_blank" rel="noopener"><span class="fc-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0122 16.92z"/></svg></span><span>+353868099535</span></a>
+          <a class="fc-row" href="mailto:hello@zoomies.ie"><span class="fc-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></span><span>hello@zoomies.ie</span></a>
+          <div class="fc-row is-static"><span class="fc-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span>116A Lower Kilmacud Road, Stillorgan, Co. Dublin, A94 R2C9</span></div>
+        </div>
+      </div>
+
+      <div class="footer-col footer-news">
+        <div class="footer-kicker"><span class="footer-heading">Newsletter</span></div>
+        <p class="footer-news-copy">Paw-some updates, grooming tips &amp; academy news — straight to your inbox.</p>
+        <form class="footer-news-form" action="#" method="post" onsubmit="return false;">
+          <label class="sr-only" for="footer-email-contact">Email</label>
+          <input id="footer-email-contact" class="footer-news-input" type="email" name="email" placeholder="Your email" required autocomplete="email">
+          <button class="footer-news-btn" type="submit">Subscribe<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </form>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="footer-copy">
+        <button class="to-top" type="button" id="to-top" aria-label="Back to top">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        </button>
+        <span>© 2026 Zoomies Grooming. All Rights Reserved.</span>
+      </div>
+      <div class="footer-legal">
+        <a class="link" href="#">Privacy Policy</a>
+        <span class="footer-dot" aria-hidden="true">·</span>
+        <a class="link" href="#">Terms &amp; Conditions</a>
+      </div>
+    </div>
+  </footer>
+</div>
+]]>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+class Component extends StreamableLogic {
+  componentDidMount() {
+    if (typeof window === "undefined") return;
+
+    const revealEls = document.querySelectorAll(".reveal");
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) { entry.target.classList.add("is-visible"); io.unobserve(entry.target); }
+        });
+      }, { threshold: 0.08, rootMargin: "0px 0px 0px 0px" });
+      revealEls.forEach((el) => io.observe(el));
+      this._io = io;
+      /* file:// and dc preview often use a nested scroll root — don't leave sections invisible */
+      requestAnimationFrame(() => {
+        revealEls.forEach((el) => {
+          const r = el.getBoundingClientRect();
+          if (r.top < window.innerHeight && r.bottom > 0) el.classList.add("is-visible");
+        });
+      });
+    } else {
+      revealEls.forEach((el) => el.classList.add("is-visible"));
+    }
+
+    /* ---------- sticky header ---------- */
+    const header = document.querySelector(".site-header");
+    if (header) {
+      const onScrollStuck = () => {
+        const y = window.scrollY || document.documentElement.scrollTop || 0;
+        header.classList.toggle("is-stuck", y > 8);
+      };
+      window.addEventListener("scroll", onScrollStuck, { passive: true });
+      onScrollStuck();
+    }
+
+
+    const scrollToTopRobust = (el) => {
+      const roots = [window, document.documentElement, document.body];
+      let p = el && el.parentElement;
+      while (p && p !== document.body) {
+        const s = getComputedStyle(p);
+        if ((s.overflowY === "auto" || s.overflowY === "scroll") && p.scrollHeight > p.clientHeight) roots.push(p);
+        p = p.parentElement;
+      }
+      roots.forEach((r) => {
+        try {
+          if (r === window) window.scrollTo({ top: 0, behavior: "smooth" });
+          else if (r.scrollTo) r.scrollTo({ top: 0, behavior: "smooth" });
+          else r.scrollTop = 0;
+        } catch (_) {}
+      });
+    };
+
+    /* ---------- back to top (footer) ---------- */
+    const wireToTop = (el) => {
+      if (!el) return;
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        scrollToTopRobust(el);
+      });
+    };
+    wireToTop(document.getElementById("to-top"));
+
+  }
+  componentWillUnmount() { if (this._io) this._io.disconnect(); }
+}
+</script>
+</body>
+</html>

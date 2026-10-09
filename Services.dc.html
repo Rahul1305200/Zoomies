@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<![CDATA[<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400;1,9..144,500;1,9..144,600;1,9..144,700;1,9..144,800&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #F6F1E4; color: #23281C; font-family: 'Work Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  a { color: inherit; text-decoration: none; }
+  a.link { transition: color 0.2s ease; }
+  a.link:hover { color: #F5C21A; }
+  a[href]:not(.link) { transition: transform 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s cubic-bezier(.22,1,.36,1), background-color 0.2s ease, color 0.2s ease; }
+
+  @keyframes fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-in { animation: fade-up 0.7s cubic-bezier(.22,1,.36,1) both; }
+  .d2 { animation-delay: .1s; } .d3 { animation-delay: .18s; }
+
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.65s cubic-bezier(.22,1,.36,1), transform 0.65s cubic-bezier(.22,1,.36,1); }
+  .reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+  .nav-dropdown-wrap {
+    position: relative;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+  .nav-dropdown-wrap .nav-dropdown-caret { transition: transform 0.45s cubic-bezier(.34,1.3,.64,1); display: inline-block; }
+  .nav-dropdown-wrap:hover .nav-dropdown-caret,
+  .nav-dropdown-wrap:focus-within .nav-dropdown-caret { transform: rotate(180deg); }
+  .nav-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(14px) scale(0.96);
+    background: #FFFEFA;
+    border: 2px solid #F5C21A;
+    border-radius: 18px;
+    padding: 10px;
+    min-width: 224px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.42s ease,
+      transform 0.5s cubic-bezier(.22,1,.36,1),
+      visibility 0.42s,
+      box-shadow 0.4s ease;
+    transform-origin: top center;
+    z-index: 300;
+    box-shadow: 4px 4px 0 rgba(35,40,28,0.12), 0 16px 32px -16px rgba(35,40,28,0.35);
+  }
+  /* invisible bridge so mouse can travel from link to menu without closing */
+  .nav-dropdown::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0;
+    bottom: 100%;
+    height: 16px;
+  }
+  .nav-dropdown-wrap:hover .nav-dropdown,
+  .nav-dropdown-wrap:focus-within .nav-dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  .nav-dropdown-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 12px; border-radius: 11px;
+    font-family: 'Work Sans', sans-serif; font-size: 15.5px; font-weight: 500;
+    color: #23281C; white-space: nowrap;
+    transition:
+      background 0.4s ease,
+      transform 0.4s cubic-bezier(.22,1,.36,1),
+      padding-left 0.4s cubic-bezier(.22,1,.36,1),
+      box-shadow 0.35s ease;
+    pointer-events: auto;
+    position: relative; z-index: 1;
+  }
+  .nav-dropdown-item:hover {
+    background: #FBF3D9;
+    padding-left: 16px;
+    transform: translateX(2px);
+  }
+  .nav-dropdown-icon {
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    width: 32px; height: 32px; border-radius: 9px; background: #F6F1E4;
+    transition: background 0.4s ease, transform 0.45s cubic-bezier(.34,1.56,.64,1);
+  }
+  .nav-dropdown-item:hover .nav-dropdown-icon {
+    background: #F5C21A;
+    transform: rotate(-8deg) scale(1.08);
+  }
+
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 15px 28px; border-radius: 10px; font-family: 'Lora', serif; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; transition: transform 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s cubic-bezier(.22,1,.36,1), background-color 0.2s ease, color 0.2s ease; }
+  .btn-yellow { background: #F5C21A; color: #23281C; box-shadow: 3px 3px 0 #23281C; }
+  .btn-yellow:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 #23281C; }
+  .btn-whatsapp { background: #25D366; color: #FFFFFF; }
+  .btn-whatsapp:hover { background: #1ebe57; color: #FFFFFF; transform: translateY(-2px); }
+
+  /* Hero "Book Now" bone sticker — same as homepage */
+  .book-sticker {
+    position: relative; display: inline-block;
+    width: min(265px, 68%);
+    transition: transform 0.3s cubic-bezier(.22,1,.36,1);
+  }
+  .book-sticker img { width: 100%; height: auto; display: block; mix-blend-mode: multiply; }
+  .book-sticker span {
+    position: absolute; left: 52.2%; top: 51.5%;
+    transform: translate(-50%, -50%) rotate(-13.9deg);
+    font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: clamp(15px, 1.5vw, 20px); letter-spacing: -0.01em;
+    color: #23281C; white-space: nowrap; pointer-events: none;
+  }
+  .book-sticker:hover { transform: rotate(-3deg) scale(1.05); }
+
+  .site-logo { height: 88px; width: auto; object-fit: contain; display: block; }
+  .site-header { background: #23281C; color: #F6F1E4; position: relative; z-index: 100; overflow: visible; }
+  .site-header .promo {
+    text-align: center;
+    padding: 11px 20px;
+    font-size: 13.5px;
+    font-weight: 500;
+    background: #F5C21A;
+    color: #23281C;
+  }
+  .site-header .promo strong { color: #23281C; font-weight: 700; }
+  .site-header .nav-bar {
+    max-width: 1440px; margin: 0 auto; padding: 10px 48px;
+    display: flex; align-items: center; justify-content: space-between; gap: 28px;
+    position: relative; z-index: 101; overflow: visible;
+  }
+  .site-header .nav-links {
+    display: flex;
+    align-items: center;
+    gap: clamp(18px, 2.2vw, 30px);
+  }
+  .site-header .nav-links > a,
+  .site-header .nav-dropdown-wrap > a {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 15.5px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: rgba(246,241,228,0.9);
+    padding: 6px 2px;
+    border-radius: 0;
+    background: transparent;
+    transition: color 0.25s ease;
+    position: relative;
+  }
+  .site-header .nav-links > a:hover,
+  .site-header .nav-dropdown-wrap > a:hover {
+    color: #F5C21A;
+    background: transparent;
+    transform: none;
+  }
+  .site-header .nav-links > a.is-active {
+    color: #F5C21A;
+    background: transparent;
+    box-shadow: none;
+  }
+  .site-header .nav-links > a.is-active::after,
+  .site-header .nav-dropdown-wrap > a.is-active::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -4px;
+    height: 2px;
+    background: #F5C21A;
+    border-radius: 2px;
+  }
+
+  .page-width { max-width: 1440px; margin: 0 auto; padding-left: 48px; padding-right: 48px; }
+  .heading { font-family: 'Fraunces', serif; font-weight: 700; letter-spacing: -0.02em; color: #23281C; }
+  .hand { font-family: 'Fraunces', serif; font-optical-sizing: auto; font-style: italic; font-weight: 500; font-size: inherit; letter-spacing: -0.01em; color: #C4632F; }
+
+  /* HERO — live content + live image, our design */
+  .hero {
+    display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 40px; align-items: center;
+    padding-top: 56px; padding-bottom: 72px;
+  }
+  .hero-media-wrap {
+    position: relative;
+    min-height: 520px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  /* soft yellow blob behind the photo */
+  .hero-media-wrap::before {
+    content: "";
+    position: absolute;
+    width: 88%; height: 88%;
+    right: 2%; top: 6%;
+    background: #F5C21A;
+    border-radius: 50%;
+    transform: rotate(8deg);
+    z-index: 0;
+  }
+  /* soft rust accent blob */
+  .hero-media-wrap::after {
+    content: "";
+    position: absolute;
+    width: 42%; height: 36%;
+    left: 0; bottom: 8%;
+    background: #C4632F;
+    opacity: 0.22;
+    border-radius: 50%;
+    z-index: 0;
+  }
+  .hero-media {
+    position: relative; z-index: 1;
+    width: min(92%, 500px); aspect-ratio: 1; height: auto;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 3.5px solid #23281C;
+    box-shadow: 10px 12px 0 #23281C;
+    background: #EFE2C8;
+  }
+  .hero-media img {
+    width: 100%; height: 100%; object-fit: cover; object-position: 78% center;
+    display: block;
+  }
+  .hero-badge {
+    position: absolute; z-index: 2;
+    right: -4px; top: 28px;
+    background: #F6F1E4; color: #23281C;
+    border: 2.5px solid #23281C; border-radius: 999px;
+    padding: 10px 18px;
+    font-family: 'Lora', serif; font-weight: 600; font-size: 14.5px; letter-spacing: -0.01em;
+    box-shadow: 3px 3px 0 #23281C;
+    transform: rotate(8deg);
+    white-space: nowrap;
+  }
+  .hero-spark {
+    position: absolute; z-index: 2; color: #C4632F;
+    font-size: 22px; line-height: 1; pointer-events: none;
+  }
+  .hero-spark.s1 { left: 6%; top: 18%; }
+  .hero-spark.s2 { right: 10%; bottom: 22%; transform: rotate(20deg); }
+  .hero-spark.s3 { left: 14%; bottom: 14%; font-size: 16px; }
+
+  /* Services journey — visual path, compact */
+  .svc-section { padding-bottom: 72px; max-width: 1120px; }
+  .svc-section-head { text-align: center; margin-bottom: 40px; }
+  .svc-journey {
+    position: relative;
+    display: flex; flex-direction: column; gap: 0;
+  }
+  .svc-journey::before {
+    content: "";
+    position: absolute; left: 50%; top: 40px; bottom: 40px;
+    width: 3px; margin-left: -1.5px;
+    background: repeating-linear-gradient(
+      to bottom,
+      #23281C 0 10px,
+      transparent 10px 18px
+    );
+    opacity: 0.2;
+    z-index: 0;
+  }
+  .svc-stop {
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: center;
+    padding: 18px 0;
+  }
+  .svc-stop.reverse .svc-stop-visual { order: 2; }
+  .svc-stop.reverse .svc-stop-copy { order: 1; text-align: right; }
+  .svc-stop.reverse .svc-stop-copy .svc-points,
+  .svc-stop.reverse .svc-stop-copy .go { margin-left: auto; }
+  .svc-stop.reverse .svc-points li { grid-template-columns: 1fr 22px; text-align: right; }
+  .svc-stop.reverse .svc-points li::before { order: 2; }
+
+  .svc-stop-visual {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 220px;
+  }
+  .svc-photo {
+    position: relative; width: 78%; aspect-ratio: 1;
+    border-radius: 24px;
+    overflow: hidden; border: 3px solid #23281C;
+    box-shadow: 6px 6px 0 #23281C;
+    background: #EFE2C8;
+  }
+  .svc-stop:nth-child(even) .svc-photo { border-radius: 24px; }
+  /* journey photos hold still on hover */
+  .svc-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .svc-step {
+    position: absolute; z-index: 2;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #F5C21A; border: 2.5px solid #23281C;
+    box-shadow: 2px 2px 0 #23281C;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fraunces'; font-weight: 800; font-size: 18px; color: #23281C;
+    left: 8%; top: 10%;
+  }
+  .svc-stop:nth-child(even) .svc-step { left: auto; right: 8%; }
+  .svc-float-ico {
+    position: absolute; z-index: 2;
+    width: 64px; height: 64px; border-radius: 50%;
+    background: #FFFFFF; border: 2.5px solid #23281C;
+    box-shadow: 3px 3px 0 #23281C; overflow: hidden;
+    right: 6%; bottom: 8%;
+  }
+  .svc-stop:nth-child(even) .svc-float-ico { right: auto; left: 6%; }
+  .svc-float-ico img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .svc-stop-copy { padding: 8px 4px; }
+  .svc-stop-copy h2 {
+    font-family: 'Fraunces'; font-size: clamp(24px, 2.8vw, 32px); font-weight: 700;
+    letter-spacing: -0.02em; margin: 0 0 10px; line-height: 1.15;
+  }
+  .svc-stop-copy .lede {
+    margin: 0 0 12px; font-size: 15px; line-height: 1.55; color: #4B4A3E;
+  }
+  .svc-points {
+    list-style: none; margin: 0 0 16px; padding: 0;
+    display: flex; flex-direction: column; gap: 6px;
+    width: fit-content; max-width: 100%;
+  }
+  .svc-points li {
+    display: grid; grid-template-columns: 22px 1fr; gap: 8px; align-items: start;
+    font-size: 13.5px; line-height: 1.45; color: #4B4A3E;
+  }
+  .svc-points li::before {
+    content: ""; width: 9px; height: 9px; margin-top: 4px;
+    border-radius: 50%; background: #F5C21A; border: 1.5px solid #23281C;
+  }
+  .svc-stop .go {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'Work Sans', sans-serif; font-weight: 600; font-size: 14.5px; color: #23281C;
+    padding: 10px 16px; border-radius: 999px;
+    background: #F5C21A; border: 2px solid #23281C;
+    box-shadow: 2px 2px 0 #23281C; width: fit-content;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .svc-stop:hover .go { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 #23281C; }
+
+  .cta-wrap { text-align: center; padding-bottom: 80px; }
+  .cta-wrap .hand { font-size: 26px; margin-bottom: 10px; display: block; }
+
+  .site-footer {
+    position: relative; background: #23281C; color: #F6F1E4;
+    margin-top: 20px; padding: 72px 48px 28px; overflow: visible;
+  }
+  .site-footer::before {
+    content: ""; position: absolute; left: 0; right: 0; top: -28px; height: 36px;
+    background: #23281C; border-radius: 100% 100% 0 0 / 100% 100% 0 0;
+  }
+  .footer-dog {
+    position: absolute; right: 56px; top: -78px; width: 150px; height: 150px;
+    border-radius: 50%; overflow: hidden; border: 5px solid #F6F1E4; background: #EFE2C8;
+    box-shadow: 0 10px 28px rgba(35,40,28,0.25);
+  }
+  .footer-dog img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; display: block; }
+  .footer-inner {
+    max-width: 1440px; margin: 0 auto;
+    display: grid; grid-template-columns: 1.2fr 0.7fr 1fr 1.1fr; gap: clamp(24px, 3.5vw, 48px); position: relative; z-index: 1;
+  }
+  .footer-bottom {
+    max-width: 1440px; margin: 28px auto 0; padding-top: 20px;
+    border-top: 1px solid rgba(246,241,228,0.15);
+    display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    font-size: 13px; color: rgba(246,241,228,0.65);
+  }
+  .site-footer a.link { color: rgba(246,241,228,0.82); }
+  .site-footer a.link:hover { color: #F5C21A; }
+
+  @media (max-width: 900px) {
+    .site-header .nav-bar, .page-width { padding-left: 20px; padding-right: 20px; }
+    .site-logo { height: 68px; }
+    .hero, .footer-inner, .svc-stop, .svc-stop.reverse { grid-template-columns: 1fr; }
+    .svc-journey::before { display: none; }
+    .svc-stop.reverse .svc-stop-visual,
+    .svc-stop.reverse .svc-stop-copy { order: unset; text-align: left; }
+    .svc-stop.reverse .svc-stop-copy .svc-points,
+    .svc-stop.reverse .svc-stop-copy .go { margin-left: 0; }
+    .svc-stop.reverse .svc-points li { grid-template-columns: 22px 1fr; text-align: left; }
+    .svc-stop.reverse .svc-points li::before { order: unset; }
+    .svc-photo { width: 70%; max-width: 280px; }
+    .svc-stop-visual { min-height: 200px; padding-bottom: 8px; }
+    .hero-media-wrap { min-height: 380px; }
+    .hero-media { height: 360px; width: 100%; transform: none; }
+    .hero-badge { right: 8px; top: 12px; font-size: 18px; }
+    .footer-dog { right: 20px; width: 110px; height: 110px; top: -58px; }
+  }
+
+    /* Header is NOT sticky — keeps page scroll free */
+  .site-header { position: relative; top: auto; z-index: 100; }
+  .site-header.is-stuck { box-shadow: none; }
+
+  /* ---- Footer typography + newsletter ---- */
+  .site-footer a.link,
+  .site-footer .fc-row,
+  .site-footer .footer-copy,
+  .site-footer .footer-legal,
+  .site-footer .footer-bottom {
+    font-family: 'Work Sans', sans-serif;
+  }
+  .footer-kicker, .footer-heading {
+    font-family: 'Work Sans', sans-serif;
+  }
+  .footer-brand p, .site-footer .footer-tagline {
+    font-family: 'Work Sans', sans-serif;
+  }
+  .footer-news-copy {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 14.5px; line-height: 1.55;
+    color: rgba(246,241,228,0.75); margin: 0 0 14px; max-width: 260px;
+  }
+  .footer-news-form {
+    display: flex; flex-direction: column; gap: 10px; max-width: 280px;
+  }
+  .footer-news-input {
+    width: 100%; box-sizing: border-box;
+    background: rgba(246,241,228,0.08);
+    border: 1px solid rgba(246,241,228,0.18);
+    border-radius: 999px;
+    padding: 12px 16px;
+    color: #F6F1E4;
+    font-family: 'Work Sans', sans-serif; font-size: 14.5px;
+    outline: none;
+  }
+  .footer-news-input::placeholder { color: rgba(246,241,228,0.45); }
+  .footer-news-input:focus { border-color: #F5C21A; background: rgba(246,241,228,0.12); }
+  .footer-news-btn {
+    align-self: flex-start;
+    background: #F5C21A; color: #23281C; border: 0;
+    border-radius: 999px;
+    padding: 11px 20px;
+    font-family: 'Work Sans', sans-serif; font-weight: 600; font-size: 14.5px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .footer-news-btn:hover { background: #F6F1E4; transform: translateY(-1px); }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+
+  .footer-social {
+    display: flex; gap: 10px; margin-top: 18px; align-items: center;
+  }
+  .footer-social-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(246,241,228,0.08);
+    color: #F5C21A;
+    border: 1.5px solid rgba(245,194,26,0.35);
+    transition: transform 0.35s cubic-bezier(.34,1.56,.64,1), background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  }
+  .footer-social-btn:hover {
+    background: #F5C21A; color: #23281C; border-color: #F5C21A;
+    transform: translateY(-4px) rotate(-6deg) scale(1.06);
+  }
+
+  @keyframes to-top-float-live {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .to-top {
+    width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+    background: #F5C21A; color: #23281C; border: 0; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    animation: to-top-float-live 2.2s ease-in-out infinite;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 6px 16px -8px rgba(245,194,26,0.7);
+  }
+  .to-top:hover {
+    animation-play-state: paused;
+    background: #F6F1E4;
+    transform: translateY(-3px);
+  }
+
+</style>
+<link rel="stylesheet" href="./responsive.css">
+<script src="./reveal.js" defer></script>
+</helmet>
+
+<div style="background: #F6F1E4; color: #23281C; font-family: 'Work Sans', sans-serif;">
+
+  <header class="site-header fade-in">
+    <nav class="nav-bar">
+      <a href="Homepage.dc.html" style="display: flex; align-items: center; flex-shrink: 0;">
+        <img src="assets/logo-official.png" alt="Zoomies" class="site-logo">
+      </a>
+      <input type="checkbox" id="nav-toggle" class="nav-checkbox">
+      <label for="nav-toggle" class="nav-burger" aria-label="Toggle menu">
+        <svg class="nav-burger-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <svg class="nav-burger-close" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </label>
+      <div class="nav-links">
+        <a class="link" href="Grooming.dc.html">Dog Grooming</a>
+        <a class="link" href="Daycare.dc.html">Dog Daycare</a>
+        <a class="link" href="TeethCleaning.dc.html">Teeth Cleaning</a>
+        <a class="link" href="Training.dc.html">Grooming Courses</a>
+        <a class="link" href="Pricing.dc.html">Pricing</a>
+        <a class="link" href="Contact.dc.html">Contact</a>
+      </div>
+      <a href="https://wa.me/353868099535" target="_blank" rel="noopener" class="btn btn-whatsapp" style="padding: 13px 22px; font-size: 14px; flex-shrink: 0;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp Us
+      </a>
+    </nav>
+  </header>
+
+  <!-- HERO: live title + Book Now + live image -->
+  <section class="page-width hero">
+    <div class="fade-in d2">
+      <div class="eyebrow" style="margin-bottom: 10px;">Services</div>
+      <h1 class="heading" style="font-size: clamp(40px, 5.5vw, 64px); line-height: 1.05; margin: 0 0 28px;">
+        The highest standards of <span style="font-style: italic; color: #C4632F;">pet care</span>
+      </h1>
+      <a class="book-sticker" href="https://wa.me/353868099535" target="_blank" rel="noopener" aria-label="Book Now on WhatsApp">
+        <img src="assets/book-now-bone.webp" alt="" aria-hidden="true">
+        <span>Book Now</span>
+      </a>
+    </div>
+    <div class="hero-media-wrap fade-in d3">
+      <span class="hero-spark s1" aria-hidden="true">✦</span>
+      <span class="hero-spark s2" aria-hidden="true">✦</span>
+      <span class="hero-spark s3" aria-hidden="true">✦</span>
+      <div class="hero-badge">Kilmacud favourites</div>
+      <div class="hero-media">
+        <img src="assets/client/grooming-cocker-panelling.jpg" alt="A cocker spaniel freshly groomed at Zoomies">
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES JOURNEY -->
+  <section class="reveal page-width svc-section">
+    <div class="svc-section-head">
+      <div class="eyebrow" style="margin-bottom: 8px;">What we offer</div>
+      <h2 class="heading" style="font-size: clamp(32px, 4vw, 44px); margin: 0 0 8px;">Our services</h2>
+      <p class="hand" style="font-size: 26px; margin: 0;">A little journey for every good dog</p>
+    </div>
+
+    <div class="svc-journey">
+      <article class="svc-stop">
+        <div class="svc-stop-visual">
+          <span class="svc-step">1</span>
+          <div class="svc-photo"><img src="assets/client/grooming-before-after-poodle.jpg" alt="A poodle before and after a full groom at Zoomies"></div>
+          <span class="svc-float-ico"><img src="assets/icon-grooming.png" alt=""></span>
+        </div>
+        <div class="svc-stop-copy">
+          <div class="eyebrow">Salon care</div>
+          <h2>Dog Grooming</h2>
+          <p class="lede">Professional dog grooming in Kilmacud for all breeds, coat types and temperaments — calm handling, individual care and high-quality finishes.</p>
+          <ul class="svc-points">
+            <li>Consultation, calm handling &amp; clear post-groom feedback</li>
+            <li>Full grooms, mini grooms, puppy intros, bath &amp; brush</li>
+          </ul>
+          <a class="go" href="Grooming.dc.html">Explore grooming →</a>
+        </div>
+      </article>
+
+      <article class="svc-stop reverse">
+        <div class="svc-stop-visual">
+          <span class="svc-step">2</span>
+          <div class="svc-photo"><img src="assets/client/daycare-yard-sitting.jpg" alt="Small dogs in the Zoomies daycare yard"></div>
+          <span class="svc-float-ico"><img src="assets/icon-daycare.png" alt=""></span>
+        </div>
+        <div class="svc-stop-copy">
+          <div class="eyebrow">Daytime play</div>
+          <h2>Dog Daycare</h2>
+          <p class="lede">Daycare for dogs under 12kg — calm, structured play in a clean, carefully supervised environment across South Dublin.</p>
+          <ul class="svc-points">
+            <li>Trial day, vaccination check &amp; small groups</li>
+            <li>Photo &amp; video updates during the day</li>
+          </ul>
+          <a class="go" href="Daycare.dc.html">Explore daycare →</a>
+        </div>
+      </article>
+
+      <article class="svc-stop">
+        <div class="svc-stop-visual">
+          <span class="svc-step">3</span>
+          <div class="svc-photo"><img src="assets/client/team-trainer-with-dog.jpg" alt="A Zoomies trainer with a dog at the salon"></div>
+          <span class="svc-float-ico"><img src="assets/icon-training.png" alt=""></span>
+        </div>
+        <div class="svc-stop-copy">
+          <div class="eyebrow">Zoomies Academy</div>
+          <h2>Grooming Courses</h2>
+          <p class="lede">Five practical days inside a real working salon, learning alongside the Zoomies team. Now enrolling &ndash; limited to 2 students per course.</p>
+          <ul class="svc-points">
+            <li>Hands-on learning, not just theory</li>
+            <li>Train with experienced Zoomies groomers</li>
+          </ul>
+          <a class="go" href="Training.dc.html">Explore courses →</a>
+        </div>
+      </article>
+
+      <article class="svc-stop reverse">
+        <div class="svc-stop-visual">
+          <span class="svc-step">4</span>
+          <div class="svc-photo"><img src="assets/client/teeth-brush-doodle.jpg" alt="An ultrasonic toothbrush used on a dog at Zoomies"></div>
+          <span class="svc-float-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="1.8"><path d="M7 3h10v4a5 5 0 01-5 5 5 5 0 01-5-5V3z"/><path d="M12 12v4M9 20h6"/></svg></span>
+        </div>
+        <div class="svc-stop-copy">
+          <div class="eyebrow">Dental care</div>
+          <h2>Teeth Cleaning</h2>
+          <p class="lede">Gentle Emmi-pet ultrasonic teeth cleaning at our Kilmacud salon — no vigorous brushing, and always at your dog&rsquo;s own pace.</p>
+          <ul class="svc-points">
+            <li>Carried out while your dog is awake &mdash; no sedation or anaesthetic</li>
+            <li>Booked on its own, or added to your dog&rsquo;s grooming appointment</li>
+          </ul>
+          <a class="go" href="TeethCleaning.dc.html">Explore teeth cleaning &rarr;</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="reveal page-width cta-wrap">
+    <span class="hand">Ready to book?</span>
+    <h2 class="heading" style="font-size: 32px; margin: 0 0 20px;">Message us on WhatsApp</h2>
+    <a href="https://wa.me/353868099535" target="_blank" rel="noopener" class="btn btn-yellow">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      WhatsApp Us
+    </a>
+  </section>
+  <a href="https://wa.me/message/W2OAWUQCD5WCJ1" target="_blank" rel="noopener" aria-label="Chat on WhatsApp" style="position: fixed; bottom: 28px; right: 28px; z-index: 999; width: 58px; height: 58px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(37,211,102,0.45), 0 0 24px rgba(37,211,102,0.25);">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </a>
+
+  <footer class="reveal site-footer">
+    <div class="footer-dog" aria-hidden="true">
+      <img src="assets/client/daycare-yard-trio.jpg" alt="">
+    </div>
+    <div class="footer-glow" aria-hidden="true"></div>
+
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="assets/logo-footer-transparent.png" alt="Zoomies" class="site-logo" style="height: 120px; width: auto; margin-bottom: 14px;">
+        <p style="font-family: 'Work Sans', sans-serif; font-size: 14px; line-height: 1.6; color: #4B4A3E; margin: 0; max-width: 320px; font-style: italic;">Happier Dogs. Brighter Days.</p>
+        <div class="footer-social" aria-label="Social media">
+          <a class="footer-social-btn" href="https://www.instagram.com/zoomies_ireland/" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          </a>
+          <a class="footer-social-btn" href="https://www.facebook.com/zoomiesireland" target="_blank" rel="noopener" aria-label="Facebook">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M14 9h3V6h-3c-1.7 0-3 1.3-3 3v2H9v3h2v7h3v-7h3l1-3h-4V9c0-.6.4-1 1-1z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <div class="footer-kicker"><span class="footer-heading">Quick Link</span></div>
+        <nav style="display: flex; flex-direction: column; gap: 11px; font-size: 14.5px;">
+          <a class="link" href="Homepage.dc.html">Home</a>
+          <a class="link" href="Services.dc.html">Services</a>
+          <a class="link" href="Pricing.dc.html">Pricing</a>
+          <a class="link" href="Contact.dc.html">Contact Us</a>
+        </nav>
+      </div>
+
+      <div class="footer-col">
+        <div class="footer-kicker"><span class="footer-heading">Contact Info</span></div>
+        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 14.5px;">
+          <a class="fc-row" href="https://wa.me/353868099535" target="_blank" rel="noopener"><span class="fc-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0122 16.92z"/></svg></span><span>+353868099535</span></a>
+          <a class="fc-row" href="mailto:hello@zoomies.ie"><span class="fc-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></span><span>hello@zoomies.ie</span></a>
+          <div class="fc-row is-static"><span class="fc-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span>116A Lower Kilmacud Road, Stillorgan, Co. Dublin, A94 R2C9</span></div>
+        </div>
+      </div>
+
+      <div class="footer-col footer-news">
+        <div class="footer-kicker"><span class="footer-heading">Newsletter</span></div>
+        <p class="footer-news-copy">Paw-some updates, grooming tips &amp; academy news — straight to your inbox.</p>
+        <form class="footer-news-form" action="#" method="post" onsubmit="return false;">
+          <label class="sr-only" for="footer-email-services">Email</label>
+          <input id="footer-email-services" class="footer-news-input" type="email" name="email" placeholder="Your email" required autocomplete="email">
+          <button class="footer-news-btn" type="submit">Subscribe<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </form>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="footer-copy">
+        <button class="to-top" type="button" id="to-top" aria-label="Back to top">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        </button>
+        <span>© 2026 Zoomies Grooming. All Rights Reserved.</span>
+      </div>
+      <div class="footer-legal">
+        <a class="link" href="#">Privacy Policy</a>
+        <span class="footer-dot" aria-hidden="true">·</span>
+        <a class="link" href="#">Terms &amp; Conditions</a>
+      </div>
+    </div>
+  </footer>
+
+</div>
+]]>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+class Component extends StreamableLogic {
+  componentDidMount() {
+    if (typeof window === "undefined") return;
+
+    if ("IntersectionObserver" in window) {
+      const els = document.querySelectorAll(".reveal");
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) { entry.target.classList.add("is-visible"); io.unobserve(entry.target); }
+        });
+      }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+      els.forEach((el) => io.observe(el));
+      this._io = io;
+    } else {
+      document.querySelectorAll(".reveal").forEach((el) => el.classList.add("is-visible"));
+    }
+
+    /* ---------- sticky header ---------- */
+    const header = document.querySelector(".site-header");
+    if (header) {
+      const onScrollStuck = () => {
+        const y = window.scrollY || document.documentElement.scrollTop || 0;
+        header.classList.toggle("is-stuck", y > 8);
+      };
+      window.addEventListener("scroll", onScrollStuck, { passive: true });
+      onScrollStuck();
+    }
+
+
+    const scrollToTopRobust = (el) => {
+      const roots = [window, document.documentElement, document.body];
+      let p = el && el.parentElement;
+      while (p && p !== document.body) {
+        const s = getComputedStyle(p);
+        if ((s.overflowY === "auto" || s.overflowY === "scroll") && p.scrollHeight > p.clientHeight) roots.push(p);
+        p = p.parentElement;
+      }
+      roots.forEach((r) => {
+        try {
+          if (r === window) window.scrollTo({ top: 0, behavior: "smooth" });
+          else if (r.scrollTo) r.scrollTo({ top: 0, behavior: "smooth" });
+          else r.scrollTop = 0;
+        } catch (_) {}
+      });
+    };
+
+    /* ---------- back to top (footer) ---------- */
+    const wireToTop = (el) => {
+      if (!el) return;
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        scrollToTopRobust(el);
+      });
+    };
+    wireToTop(document.getElementById("to-top"));
+
+  }
+  componentWillUnmount() { if (this._io) this._io.disconnect(); }
+}
+</script>
+</body>
+</html>

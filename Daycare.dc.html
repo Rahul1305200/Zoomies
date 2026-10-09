@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<![CDATA[<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400;1,9..144,500;1,9..144,600;1,9..144,700;1,9..144,800&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #F6F1E4; color: #23281C; font-family: 'Work Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  a { color: inherit; text-decoration: none; }
+  a.link { transition: color 0.2s ease; }
+  a.link:hover { color: #F5C21A; }
+  a[href]:not(.link) { transition: transform 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s cubic-bezier(.22,1,.36,1), background-color 0.2s ease, color 0.2s ease; }
+
+  @keyframes fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-in { animation: fade-up 0.7s cubic-bezier(.22,1,.36,1) both; }
+  .d1 { animation-delay: .05s; } .d2 { animation-delay: .12s; } .d3 { animation-delay: .19s; }
+
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s cubic-bezier(.22,1,.36,1), transform 0.7s cubic-bezier(.22,1,.36,1); }
+  .reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+  .nav-dropdown-wrap {
+    position: relative;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+  .nav-dropdown-wrap .nav-dropdown-caret { transition: transform 0.45s cubic-bezier(.34,1.3,.64,1); display: inline-block; }
+  .nav-dropdown-wrap:hover .nav-dropdown-caret,
+  .nav-dropdown-wrap:focus-within .nav-dropdown-caret { transform: rotate(180deg); }
+  .nav-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(14px) scale(0.96);
+    background: #FFFEFA;
+    border: 2px solid #F5C21A;
+    border-radius: 18px;
+    padding: 10px;
+    min-width: 224px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.42s ease,
+      transform 0.5s cubic-bezier(.22,1,.36,1),
+      visibility 0.42s,
+      box-shadow 0.4s ease;
+    transform-origin: top center;
+    z-index: 300;
+    box-shadow: 4px 4px 0 rgba(35,40,28,0.12), 0 16px 32px -16px rgba(35,40,28,0.35);
+  }
+  /* invisible bridge so mouse can travel from link to menu without closing */
+  .nav-dropdown::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0;
+    bottom: 100%;
+    height: 16px;
+  }
+  .nav-dropdown-wrap:hover .nav-dropdown,
+  .nav-dropdown-wrap:focus-within .nav-dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  .nav-dropdown-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 12px; border-radius: 11px;
+    font-family: 'Work Sans', sans-serif; font-size: 15.5px; font-weight: 500;
+    color: #23281C; white-space: nowrap;
+    transition:
+      background 0.4s ease,
+      transform 0.4s cubic-bezier(.22,1,.36,1),
+      padding-left 0.4s cubic-bezier(.22,1,.36,1),
+      box-shadow 0.35s ease;
+    pointer-events: auto;
+    position: relative; z-index: 1;
+  }
+  .nav-dropdown-item:hover {
+    background: #FBF3D9;
+    padding-left: 16px;
+    transform: translateX(2px);
+  }
+  .nav-dropdown-icon {
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    width: 32px; height: 32px; border-radius: 9px; background: #F6F1E4;
+    transition: background 0.4s ease, transform 0.45s cubic-bezier(.34,1.56,.64,1);
+  }
+  .nav-dropdown-item:hover .nav-dropdown-icon {
+    background: #F5C21A;
+    transform: rotate(-8deg) scale(1.08);
+  }
+
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 15px clamp(16px, 1.9vw, 28px); border-radius: 10px; font-family: 'Lora', serif; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; transition: transform 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s cubic-bezier(.22,1,.36,1), background-color 0.2s ease, color 0.2s ease; }
+  .btn-yellow { background: #F5C21A; color: #23281C; box-shadow: 3px 3px 0 #23281C; }
+  .btn-yellow:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 #23281C; }
+  .btn-outline { background: transparent; color: #23281C; border: 1.5px solid #23281C; }
+  .btn-outline:hover { background: #23281C; color: #F6F1E4; }
+  .btn-ink { background: #23281C; color: #F6F1E4; }
+  .btn-ink:hover { background: #F5C21A; color: #23281C; transform: translateY(-3px); }
+  .btn-whatsapp { background: #25D366; color: #FFFFFF; }
+  .btn-whatsapp:hover { background: #1ebe57; color: #FFFFFF; transform: translateY(-2px); }
+
+  .site-logo { height: 88px; width: auto; object-fit: contain; display: block; }
+  .site-header { background: #23281C; color: #F6F1E4; position: relative; z-index: 100; overflow: visible; }
+  .site-header .promo {
+    text-align: center;
+    padding: 11px 20px;
+    font-size: 13.5px;
+    font-weight: 500;
+    background: #F5C21A;
+    color: #23281C;
+  }
+  .site-header .promo strong { color: #23281C; font-weight: 700; }
+  .site-header .nav-bar {
+    max-width: 1440px; margin: 0 auto; padding: 10px clamp(21px, 3.3vw, 48px);
+    display: flex; align-items: center; justify-content: space-between; gap: clamp(16px, 1.9vw, 28px); z-index: 101; overflow: visible; position: relative; }
+  .site-header .nav-links {
+    display: flex;
+    align-items: center;
+    gap: clamp(18px, 2.2vw, 30px);
+  }
+  .site-header .nav-links > a,
+  .site-header .nav-dropdown-wrap > a {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 15.5px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: rgba(246,241,228,0.9);
+    padding: 6px 2px;
+    border-radius: 0;
+    background: transparent;
+    transition: color 0.25s ease;
+    position: relative;
+  }
+  .site-header .nav-links > a:hover,
+  .site-header .nav-dropdown-wrap > a:hover {
+    color: #F5C21A;
+    background: transparent;
+    transform: none;
+  }
+  .site-header .nav-links > a.is-active {
+    color: #F5C21A;
+    background: transparent;
+    box-shadow: none;
+  }
+  .site-header .nav-links > a.is-active::after,
+  .site-header .nav-dropdown-wrap > a.is-active::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -4px;
+    height: 2px;
+    background: #F5C21A;
+    border-radius: 2px;
+  }
+
+  .page-width { max-width: 1440px; margin: 0 auto; padding-left: clamp(21px, 3.3vw, 48px); padding-right: clamp(21px, 3.3vw, 48px); }
+  .heading { font-family: 'Fraunces', serif; font-weight: 700; letter-spacing: -0.02em; color: #23281C; }
+
+  .service-hero {
+    max-width: 1440px; margin: 0 auto;
+    padding: clamp(21px, 3.3vw, 48px) clamp(21px, 3.3vw, 48px) clamp(20px, 3vw, 36px);
+    display: grid; grid-template-columns: 1.05fr 0.95fr; gap: clamp(28px, 4.4vw, 64px); align-items: center;
+    min-height: 560px;
+  }
+  .service-lede {
+    font-size: clamp(15px, 1.3vw, 18px); line-height: 1.65; color: #4B4A3E;
+    margin: 0 0 28px; max-width: 480px;
+  }
+  /* Hero photo — same assembly as Services.dc.html */
+  .service-hero .hero-media-wrap {
+    position: relative;
+    min-height: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .service-hero .hero-media-wrap::before {
+    content: "";
+    position: absolute;
+    width: 88%;
+    height: 88%;
+    right: 2%;
+    top: 6%;
+    background: #F5C21A;
+    border-radius: 50%;
+    transform: rotate(8deg);
+    z-index: 0;
+  }
+  .service-hero .hero-media-wrap::after {
+    content: "";
+    position: absolute;
+    width: 42%;
+    height: 36%;
+    left: 0;
+    bottom: 8%;
+    background: #C4632F;
+    opacity: 0.22;
+    border-radius: 50%;
+    z-index: 0;
+  }
+  .service-hero .hero-media {
+    position: relative;
+    z-index: 1;
+    width: min(92%, 500px);
+    aspect-ratio: 1;
+    height: auto;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 3.5px solid #23281C;
+    box-shadow: 10px 12px 0 #23281C;
+    background: #EFE2C8;
+  }
+  .service-hero .hero-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 18%;
+    display: block;
+  }
+  .service-hero .hero-badge {
+    position: absolute;
+    z-index: 2;
+    right: -4px;
+    top: 28px;
+    background: #F6F1E4;
+    color: #23281C;
+    border: 2.5px solid #23281C;
+    border-radius: 999px;
+    padding: 10px 18px;
+    font-family: 'Lora', serif;
+    font-weight: 600;
+    font-size: 14.5px;
+    letter-spacing: -0.01em;
+    box-shadow: 3px 3px 0 #23281C;
+    transform: rotate(8deg);
+    white-space: nowrap;
+  }
+  .service-hero .hero-spark {
+    position: absolute;
+    z-index: 2;
+    color: #C4632F;
+    font-size: 22px;
+    line-height: 1;
+    pointer-events: none;
+  }
+  .service-hero .hero-spark.s1 { left: 6%; top: 18%; }
+  .service-hero .hero-spark.s2 { right: 10%; bottom: 22%; transform: rotate(20deg); }
+  .service-hero .hero-spark.s3 { left: 14%; bottom: 14%; font-size: 16px; }
+
+  .daycare-trust-strip {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 clamp(21px, 3.3vw, 48px) clamp(32px, 4.9vw, 70px);
+  }
+  .daycare-trust-band {
+    background: #23281C;
+    color: #F6F1E4;
+    border-radius: 24px;
+    padding: clamp(22px, 2.6vw, 36px) clamp(18px, 2.2vw, 28px);
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(18px, 2.2vw, 28px);
+    align-items: start;
+  }
+  .daycare-trust-cell { text-align: center; }
+  .daycare-trust-orb {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #F5C21A;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+  }
+  .daycare-trust-title {
+    font-family: 'Work Sans', sans-serif;
+    font-weight: 600;
+    font-size: clamp(14px, 1.25vw, 15.5px);
+    line-height: 1.4;
+    margin: 0;
+    color: #F6F1E4;
+  }
+  .daycare-trust-sub {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 6px 0 0;
+    color: rgba(246,241,228,0.68);
+  }
+  @media (max-width: 900px) {
+    .daycare-trust-band { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 520px) {
+    .daycare-trust-band { grid-template-columns: 1fr; gap: 22px; }
+    .daycare-trust-cell {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 12px 14px;
+      text-align: left;
+      align-items: start;
+    }
+    .daycare-trust-orb { margin: 0; grid-row: 1 / span 2; }
+    .daycare-trust-title { grid-column: 2; }
+    .daycare-trust-sub { grid-column: 2; margin-top: 0; }
+  }
+  .wavy-photo {
+    aspect-ratio: 6/5; overflow: hidden;
+    border-radius: 24px;
+    background: #EFE2C8;
+  }
+  .wavy-photo-alt { aspect-ratio: 1; border-radius: 50%; }
+  .care-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .sticker-note {
+    display: inline-block; background: #F5C21A; color: #23281C;
+    padding: 7px 14px; border-radius: 999px; font-size: 12px;
+    font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+    font-family: 'Work Sans', sans-serif;
+  }
+  /* The glyph that sits inside the yellow orb. The artwork is ink-only on a
+     transparent field, so the orb stays a CSS circle and nothing doubles up. */
+  .orb-ico { width: 30px; height: 30px; display: block; object-fit: contain; }
+  .icon-orb {
+    width: 54px; height: 54px; border-radius: 50%;
+    background: #F5C21A; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 12px 24px -18px rgba(35,40,28,0.35);
+  }
+  .info-card {
+    background: #EFE2C8; border-radius: 22px; padding: clamp(17px, 2.1vw, 30px) clamp(15px, 1.8vw, 26px);
+    transition: transform 0.3s cubic-bezier(.22,1,.36,1), box-shadow 0.3s cubic-bezier(.22,1,.36,1);
+  }
+  .info-card--white { background: #FFFFFF; }
+  .info-card:hover { transform: translateY(-4px); box-shadow: 0 18px 34px -24px rgba(35,40,28,0.28); }
+  .service-split {
+    display: grid; grid-template-columns: 1fr 1fr; gap: clamp(20px, 2.4vw, 32px); align-items: start;
+  }
+  .schedule-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(14px, 1.7vw, 24px);
+  }
+  .schedule-lead-photo {
+    max-width: 720px; margin: 0 auto clamp(28px, 3.5vw, 40px);
+  }
+  .schedule-lead-photo .wavy-photo { aspect-ratio: 16/11; }
+  /* ---- Why we're different ----
+     Was two free-standing cards: a 4-item list on the left against a photo
+     plus a 6-item card on the right. The columns could never balance, so
+     the left ended ~700px short and the section ran to ~1500px of mostly
+     empty space. Now the intro and photo share the top row, and the
+     comparison is ONE panel split down the middle, so the two sides are
+     the same height by construction. */
+  .why-intro {
+    display: grid; grid-template-columns: 1.15fr 0.85fr;
+    gap: clamp(24px, 3.4vw, 52px); align-items: center;
+    margin-bottom: clamp(26px, 3.4vw, 46px);
+  }
+  .split-lede {
+    margin: 0;
+    font-size: 15.5px; line-height: 1.75; color: #4B4A3E;
+  }
+  .why-photo { position: relative; }
+  .why-photo .wavy-photo { aspect-ratio: 5/4; width: 100%; }
+
+  .vs-panel {
+    display: grid; grid-template-columns: 1fr 1.15fr;
+    border-radius: 22px; overflow: hidden;
+    border: 1px solid rgba(35,40,28,0.12);
+  }
+  /* The two halves are grid siblings so they share a height, but the left
+     carries 4 rows against the right Y 6 plus a CTA. That left ~200px (37%)
+     of empty panel pooled at the bottom, which read as unfinished. Centring
+     the content splits the remaining space evenly instead. */
+  .vs-side {
+    padding: clamp(24px, 2.8vw, 38px);
+    display: flex; flex-direction: column;
+  }
+  .vs-side--them { justify-content: center; }
+  /* A column flex container stretches its children across the cross axis, so
+     the pill labels and the CTA were being blown out to the full column
+     width. Headings and lists still stretch (they need the width to wrap
+     properly) — only the shrink-to-fit elements opt out. */
+  .vs-side .split-tag,
+  .vs-side .btn { align-self: flex-start; }
+  /* the left half is the quiet one — it states the problem, not the pitch */
+  .vs-side--them { background: #EFE2C8; }
+  .vs-side--us { background: #FFFFFF; border-left: 1px solid rgba(35,40,28,0.12); }
+  .vs-title {
+    font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: clamp(18px, 1.8vw, 22px); margin: 0 0 14px;
+  }
+  /* parallel in structure, deliberately lower in contrast — this side states
+     the problem, it should not compete with the pitch opposite */
+  .vs-title--them { color: #625E52; font-weight: 600; }
+
+  .split-tag {
+    display: inline-block;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 10.5px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.14em;
+    padding: 5px 13px; border-radius: 999px;
+    margin-bottom: 14px;
+    white-space: nowrap;
+  }
+  /* #8A8677 on the #EFE2C8 panel is 2.8:1 — under the 3:1 floor for
+     non-text UI. Darkened to stay quiet without being washed out. */
+  .split-tag--them { background: rgba(35,40,28,0.09); color: #625E52; }
+  .split-tag--us   { background: #F5C21A; color: #23281C; }
+
+  @media (max-width: 900px) {
+    .why-intro { grid-template-columns: 1fr; }
+    .vs-panel { grid-template-columns: 1fr; }
+    .vs-side--us { border-left: 0; border-top: 1px solid rgba(35,40,28,0.12); }
+  }
+
+  .many-list { list-style: none; margin: 20px 0 0; padding: 0; display: flex; flex-direction: column; gap: 15px; }
+  .many-list li {
+    display: grid; grid-template-columns: 42px 1fr; gap: 15px; align-items: center;
+    font-size: 15px; line-height: 1.45; color: #4B4A3E;
+  }
+  .li-ico {
+    width: 40px; height: 40px;
+    display: block;
+    object-fit: contain;
+  }
+  .many-list .li-ico { filter: brightness(0.74); }
+  .many-x { color: #C4632F; font-weight: 700; font-size: 18px; line-height: 1; }
+  .yes-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 15px; }
+  .yes-list li {
+    display: grid; grid-template-columns: 42px 1fr; gap: 15px; align-items: center;
+    font-size: 15px; line-height: 1.45; color: #4B4A3E;
+  }
+  .yes-mark { color: #C4632F; font-weight: 700; font-size: 16px; line-height: 1; }
+  .dark-ensure-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 24px 0;
+  }
+  .dark-ensure-item {
+    display: grid; grid-template-columns: 28px 1fr; gap: 12px; align-items: center;
+    background: rgba(246,241,228,0.06); border: 1px solid rgba(246,241,228,0.12);
+    border-radius: 14px; padding: 16px 16px;
+    font-family: 'Work Sans', sans-serif; font-weight: 600; font-size: 14.5px; color: #F6F1E4;
+  }
+  .dark-ensure-item span:first-child {
+    width: 28px; height: 28px; border-radius: 50%; background: #F5C21A;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .faq-list { display: flex; flex-direction: column; gap: 12px; }
+  .faq-item {
+    background: #FFFFFF; border-radius: 18px; overflow: hidden;
+    border: 1px solid rgba(35,40,28,0.08);
+  }
+  .faq-item summary {
+    list-style: none; cursor: pointer; padding: 20px clamp(14px, 1.7vw, 24px);
+    font-family: 'Work Sans', sans-serif; font-weight: 600; font-size: 17px; color: #23281C;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after {
+    content: "+"; font-family: 'Fraunces'; font-size: clamp(18px, 1.7vw, 24px); font-weight: 700; color: #C4632F; line-height: 1;
+    transition: transform 0.2s ease;
+  }
+  .faq-item[open] summary::after { content: "–"; }
+  .faq-body { padding: 0 clamp(14px, 1.7vw, 24px) 22px; font-size: 15px; line-height: 1.65; color: #4B4A3E; }
+  .faq-body ul { margin: 10px 0 0; padding-left: 18px; }
+  .faq-check { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .faq-check li { display: flex; align-items: flex-start; gap: 10px; }
+  .faq-check li::before { content: "✔"; color: #C4632F; font-weight: 700; flex-shrink: 0; }
+
+  .trial-list { list-style: none; margin: 20px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .trial-list li {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 15px; font-weight: 600; color: rgba(246,241,228,0.92);
+  }
+  .trial-list li::before {
+    content: ""; width: 8px; height: 8px; border-radius: 50%; background: #F5C21A; flex-shrink: 0;
+  }
+  .dark-band-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: clamp(26px, 4.2vw, 60px); align-items: center;
+  }
+
+  .site-footer {
+    position: relative; background: #23281C; color: #F6F1E4;
+    margin-top: 40px; padding: clamp(32px, 5vw, 72px) clamp(21px, 3.3vw, 48px) clamp(16px, 1.9vw, 28px); overflow: visible;
+  }
+  .site-footer::before {
+    content: ""; position: absolute; left: 0; right: 0; top: -28px; height: 36px;
+    background: #23281C; border-radius: 100% 100% 0 0 / 100% 100% 0 0;
+  }
+  .footer-dog {
+    position: absolute; right: 56px; top: -78px; width: 150px; height: 150px;
+    border-radius: 50%; overflow: hidden; border: 5px solid #F6F1E4; background: #EFE2C8;
+    box-shadow: 0 10px 28px rgba(35,40,28,0.25);
+  }
+  .footer-dog img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; display: block; }
+  .footer-inner {
+    max-width: 1440px; margin: 0 auto;
+    display: grid; grid-template-columns: 1.2fr 0.7fr 1fr 1.1fr; gap: clamp(24px, 3.5vw, 48px); position: relative; z-index: 1;
+  }
+  .footer-bottom {
+    max-width: 1440px; margin: 28px auto 0; padding-top: 20px;
+    border-top: 1px solid rgba(246,241,228,0.15);
+    display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    font-size: 13px; color: rgba(246,241,228,0.65);
+  }
+  .site-footer a.link { color: rgba(246,241,228,0.82); }
+  .site-footer a.link:hover { color: #F5C21A; }
+
+  @media (max-width: 900px) {
+    .site-header .nav-bar, .page-width { padding-left: 20px; padding-right: 20px; }
+    .site-logo { height: 68px; }
+    .service-hero, .service-split, .schedule-grid, .dark-band-grid, .footer-inner { grid-template-columns: 1fr; }
+    .service-hero > div:last-child { order: -1; }
+    .service-hero .hero-media-wrap { min-height: 380px; }
+    .service-hero .hero-media { height: 360px; width: 100%; transform: none; }
+    .service-hero .hero-badge { right: 8px; top: 12px; font-size: 18px; }
+    .footer-dog { right: 20px; width: 110px; height: 110px; top: -58px; }
+  }
+  /* ---- Reviews ----
+     Static three-up rather than the Homepage carousel: three cards fit
+     without scrolling, so a horizontal scroller would only add a wheel
+     trap for no gain. */
+  .rev-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: clamp(16px, 2vw, 26px); align-items: stretch;
+  }
+  .rev-card {
+    display: flex; flex-direction: column;
+    margin: 0;
+    background: #FFFFFF;
+    border: 1px solid rgba(35,40,28,0.1);
+    border-radius: 18px;
+    padding: clamp(22px, 2.5vw, 34px);
+    transition: transform 0.3s cubic-bezier(.22,1,.36,1), box-shadow 0.3s ease;
+  }
+  .rev-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 24px 46px -30px rgba(35,40,28,0.55);
+  }
+  .rev-stars { color: #F5C21A; letter-spacing: 3px; font-size: 15px; margin-bottom: 14px; }
+  .rev-body {
+    margin: 0;
+    font-family: 'Work Sans', sans-serif; font-size: 15.5px; line-height: 1.65;
+    color: #4B4A3E;
+  }
+  .rev-by {
+    margin-top: auto; padding-top: 18px;
+    display: flex; flex-direction: column; gap: 3px;
+  }
+  .rev-name {
+    font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: 16px; letter-spacing: -0.02em; color: #23281C;
+  }
+  .rev-dog {
+    font-size: 11.5px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.14em; color: #8A8677;
+  }
+  @media (max-width: 900px) {
+    .rev-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ---- Get in touch ---- */
+  .touch-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: clamp(16px, 2vw, 26px); align-items: stretch;
+  }
+  .touch-card {
+    display: flex; flex-direction: column;
+    background: #FFFFFF; border: 1px solid rgba(35,40,28,0.1);
+    border-radius: 18px; padding: clamp(22px, 2.5vw, 32px);
+    color: inherit;
+    transition: transform 0.3s cubic-bezier(.22,1,.36,1), box-shadow 0.3s ease;
+  }
+  .touch-card:hover { transform: translateY(-5px); box-shadow: 0 24px 46px -30px rgba(35,40,28,0.55); }
+  .touch-ico {
+    width: 44px; height: 44px; border-radius: 13px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: #EFE2C8; color: #C4632F; margin-bottom: 16px;
+  }
+  /* WhatsApp is the channel we want used, so it starts emphasised */
+  .touch-card--key .touch-ico { background: #23281C; color: #F5C21A; }
+  .touch-key {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.15em;
+    color: #8A8677; margin-bottom: 7px;
+  }
+  .touch-val {
+    font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: clamp(16px, 1.6vw, 20px); letter-spacing: -0.02em;
+    line-height: 1.3; color: #23281C;
+  }
+  @media (max-width: 900px) { .touch-grid { grid-template-columns: 1fr; } }
+
+  .hand { font-family: 'Fraunces', serif; font-optical-sizing: auto; font-style: italic; font-weight: 500; font-size: inherit; letter-spacing: -0.01em; color: #C4632F; }
+
+    /* Header is NOT sticky — keeps page scroll free */
+  .site-header { position: relative; top: auto; z-index: 100; }
+  .site-header.is-stuck { box-shadow: none; }
+
+
+  /* ---- Footer typography + newsletter ---- */
+  .site-footer a.link,
+  .site-footer .fc-row,
+  .site-footer .footer-copy,
+  .site-footer .footer-legal,
+  .site-footer .footer-bottom {
+    font-family: 'Work Sans', sans-serif;
+  }
+  .footer-kicker {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #F5C21A;
+    margin-bottom: 14px;
+  }
+  .footer-heading {
+    font-family: inherit;
+    padding-bottom: 0;
+  }
+  .footer-brand p, .site-footer .footer-tagline {
+    font-family: 'Work Sans', sans-serif;
+  }
+  .footer-news-copy {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 14.5px; line-height: 1.55;
+    color: rgba(246,241,228,0.75); margin: 0 0 14px; max-width: 260px;
+  }
+  .footer-news-form {
+    display: flex; flex-direction: column; gap: 10px; max-width: 280px;
+  }
+  .footer-news-input {
+    width: 100%; box-sizing: border-box;
+    background: rgba(246,241,228,0.08);
+    border: 1px solid rgba(246,241,228,0.18);
+    border-radius: 999px;
+    padding: 12px 16px;
+    color: #F6F1E4;
+    font-family: 'Work Sans', sans-serif; font-size: 14.5px;
+    outline: none;
+  }
+  .footer-news-input::placeholder { color: rgba(246,241,228,0.45); }
+  .footer-news-input:focus { border-color: #F5C21A; background: rgba(246,241,228,0.12); }
+  .footer-news-btn {
+    align-self: flex-start;
+    background: #F5C21A; color: #23281C; border: 0;
+    border-radius: 999px;
+    padding: 11px 20px;
+    font-family: 'Work Sans', sans-serif; font-weight: 600; font-size: 14.5px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 3px 3px 0 #F6F1E4;
+  }
+  .footer-news-btn:hover {
+    background: #F6F1E4;
+    transform: translate(-2px,-2px);
+    box-shadow: 5px 5px 0 #F6F1E4;
+  }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+
+  .footer-social {
+    display: flex; gap: 10px; margin-top: 18px; align-items: center;
+  }
+  .footer-social-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(246,241,228,0.08);
+    color: #F5C21A;
+    border: 1.5px solid rgba(245,194,26,0.35);
+    transition: transform 0.35s cubic-bezier(.34,1.56,.64,1), background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  }
+  .footer-social-btn:hover {
+    background: #F5C21A; color: #23281C; border-color: #F5C21A;
+    transform: translateY(-4px) rotate(-6deg) scale(1.06);
+  }
+
+  @keyframes to-top-float-live {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .to-top {
+    width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+    background: #F5C21A; color: #23281C; border: 0; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    animation: to-top-float-live 2.2s ease-in-out infinite;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 6px 16px -8px rgba(245,194,26,0.7);
+  }
+  .to-top:hover {
+    animation-play-state: paused;
+    background: #F6F1E4;
+    transform: translateY(-3px);
+  }
+
+</style>
+<link rel="stylesheet" href="./responsive.css">
+<script src="./reveal.js" defer></script>
+<script src="./gallery.js" defer></script>
+</helmet>
+
+<div style="background: #F6F1E4; color: #23281C; font-family: 'Work Sans', sans-serif;">
+
+  <header class="site-header fade-in">
+    <nav class="nav-bar">
+      <a href="Homepage.dc.html" style="display: flex; align-items: center; flex-shrink: 0;">
+        <img src="assets/logo-official.png" alt="Zoomies" class="site-logo">
+      </a>
+      <input type="checkbox" id="nav-toggle" class="nav-checkbox">
+      <label for="nav-toggle" class="nav-burger" aria-label="Toggle menu">
+        <svg class="nav-burger-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <svg class="nav-burger-close" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </label>
+      <div class="nav-links">
+        <a class="link" href="Grooming.dc.html">Dog Grooming</a>
+        <a class="link is-active" href="Daycare.dc.html">Dog Daycare</a>
+        <a class="link" href="TeethCleaning.dc.html">Teeth Cleaning</a>
+        <a class="link" href="Training.dc.html">Grooming Courses</a>
+        <a class="link" href="Pricing.dc.html">Pricing</a>
+        <a class="link" href="Contact.dc.html">Contact</a>
+      </div>
+      <a href="https://wa.me/353868099535" target="_blank" rel="noopener" class="btn btn-whatsapp" style="padding: 13px 22px; font-size: 14px; flex-shrink: 0;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp Us
+      </a>
+    </nav>
+  </header>
+
+  <!-- HERO (same structure as Grooming.dc.html) -->
+  <section class="service-hero">
+    <div class="fade-in d2" style="max-width: 520px;">
+      <div class="eyebrow" style="margin-bottom: 8px;">Dog daycare · Kilmacud</div>
+      <h1 style="font-family: 'Fraunces'; font-optical-sizing: auto; font-size: clamp(34px, 4.8vw, 64px); line-height: 1.04; letter-spacing: -0.03em; margin: 0 0 22px; color: #23281C;">
+        A Safe, Calm Daycare Designed Just for Small Dogs
+      </h1>
+      <p class="service-lede">
+        No large dogs. No overcrowding. No chaos. Structured play and rest for dogs under 15kg, with constant supervision so they go home happy and tired — not wired.
+      </p>
+      <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+        <a href="https://wa.me/353868099535?text=Hi%20Zoomies%20%E2%80%94%20I%27d%20like%20to%20book%20a%20FREE%20daycare%20trial" target="_blank" rel="noopener" class="btn btn-yellow">
+          Book Free Trial
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a href="Pricing.dc.html" class="btn btn-outline">See prices<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </div>
+    <div class="hero-media-wrap fade-in d3">
+      <span class="hero-spark s1" aria-hidden="true">✦</span>
+      <span class="hero-spark s2" aria-hidden="true">✦</span>
+      <span class="hero-spark s3" aria-hidden="true">✦</span>
+      <div class="hero-badge">Under 15kg only</div>
+      <div class="hero-media">
+        <img src="assets/client/daycare-handler-bichon.jpg" alt="A Zoomies handler with a small dog in the daycare room" width="600" height="600">
+      </div>
+    </div>
+  </section>
+
+  <section class="daycare-trust-strip reveal" aria-label="Service area and trust highlights">
+    <div class="daycare-trust-band">
+      <div class="daycare-trust-cell">
+        <div class="daycare-trust-orb" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <p class="daycare-trust-title">Kilmacud &amp; South Dublin</p>
+        <p class="daycare-trust-sub">Dundrum · Stillorgan · Sandyford</p>
+      </div>
+      <div class="daycare-trust-cell">
+        <div class="daycare-trust-orb" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v8H4v-8"/><path d="M12 3v13"/><path d="M7 8l5-5 5 5"/></svg>
+        </div>
+        <p class="daycare-trust-title">Free daycare trial</p>
+        <p class="daycare-trust-sub">First half-day completely free</p>
+      </div>
+      <div class="daycare-trust-cell">
+        <div class="daycare-trust-orb" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="#23281C"><path d="M12 2l2.9 6.26 6.85.72-5.1 4.6 1.43 6.72L12 16.9l-6.08 3.4 1.43-6.72-5.1-4.6 6.85-.72z"/></svg>
+        </div>
+        <p class="daycare-trust-title">5-star rated on Google</p>
+      </div>
+      <div class="daycare-trust-cell">
+        <div class="daycare-trust-orb" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        </div>
+        <p class="daycare-trust-title">Trusted by hundreds of dog owners</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY DIFFERENT -->
+  <section id="zoomies" class="reveal" style="max-width: 1200px; margin: 0 auto; padding: 0 clamp(21px, 3.3vw, 48px) clamp(42px, 7.6vw, 110px);">
+    <div style="text-align: center; margin-bottom: clamp(32px, 4vw, 56px);">
+      <div class="eyebrow">why we&rsquo;re different</div>
+      <h2 style="font-family: 'Fraunces'; font-optical-sizing: auto; font-weight: 800; font-size: clamp(31px, 4.7vw, 68px); margin: 0; letter-spacing: -0.03em; line-height: 1.02;">Why Zoomies Daycare Is <span style="font-style: italic; font-weight: 500; color: #C4632F;">Different</span></h2>
+    </div>
+    <div class="why-intro">
+      <p class="split-lede"><strong>We built Zoomies specifically around small dogs.</strong> Carefully managed playgroups, structured play, enrichment and proper rest help dogs socialise without becoming overwhelmed.</p>
+      <div class="why-photo">
+        <div class="sticker-note" style="position: absolute; top: -10px; left: 0; z-index: 2; transform: rotate(-5deg);">10+ years</div>
+        <div class="wavy-photo wavy-photo-alt">
+          <img src="assets/client/daycare-daybed-group.jpg" class="care-photo" alt="Small dogs resting together on the Zoomies daycare daybed" style="object-position: center 30%;">
+        </div>
+      </div>
+    </div>
+
+    <!-- one panel, split down the middle: everyone else | Zoomies -->
+    <div class="vs-panel">
+      <div class="vs-side vs-side--them">
+        <div class="split-tag split-tag--them">Many daycare centres</div>
+        <p class="vs-title vs-title--them">Most daycares work like this.</p>
+        <ul class="many-list">
+          <li><img class="li-ico" src="assets/icons/neg-1-mix-sizes.png" alt="" aria-hidden="true" width="256" height="256"> Mix all sizes together</li>
+          <li><img class="li-ico" src="assets/icons/neg-2-overcrowd.png" alt="" aria-hidden="true" width="256" height="256"> Overcrowd playgroups</li>
+          <li><img class="li-ico" src="assets/icons/neg-3-volume.png" alt="" aria-hidden="true" width="256" height="256"> Focus on volume</li>
+          <li><img class="li-ico" src="assets/icons/neg-4-just-run.png" alt="" aria-hidden="true" width="256" height="256"> Let dogs &ldquo;just run&rdquo;</li>
+        </ul>
+      </div>
+      <div class="vs-side vs-side--us">
+        <div class="split-tag split-tag--us">Zoomies daycare</div>
+        <p class="vs-title">We built Zoomies differently.</p>
+        <ul class="yes-list">
+          <li><img class="li-ico" src="assets/icons/pos-1-small-dog.png" alt="" aria-hidden="true" width="256" height="256"> Dogs under 15kg</li>
+          <li><img class="li-ico" src="assets/icons/pos-2-playgroups.png" alt="" aria-hidden="true" width="256" height="256"> Carefully matched groups</li>
+          <li><img class="li-ico" src="assets/icons/pos-3-routine.png" alt="" aria-hidden="true" width="256" height="256"> Structured play &amp; enrichment</li>
+          <li><img class="li-ico" src="assets/icons/pos-4-rest.png" alt="" aria-hidden="true" width="256" height="256"> Scheduled rest periods</li>
+          <li><img class="li-ico" src="assets/icons/pos-6-supervision.png" alt="" aria-hidden="true" width="256" height="256"> Constant supervision</li>
+        </ul>
+        <a href="https://wa.me/353868099535" target="_blank" rel="noopener" class="btn btn-yellow" style="margin-top: 22px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="#25D366" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>Contact on WhatsApp</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- GROUP SIZES + TRIAL (live section 7) -->
+  <section id="groups" class="reveal" style="background: #23281C; color: #F6F1E4; padding: clamp(34px, 6.3vw, 90px) clamp(21px, 3.3vw, 48px); margin-bottom: clamp(34px, 6.3vw, 90px);">
+    <div style="max-width: 1440px; margin: 0 auto;" class="dark-band-grid">
+      <div class="care-card" style="position: relative; display: flex; justify-content: center;">
+        <div class="sticker-note" style="position: absolute; top: -20px; left: 24px; z-index: 2; transform: rotate(-6deg);">small groups</div>
+        <div class="wavy-photo wavy-photo-alt" style="width: min(360px, 100%);">
+          <img src="assets/client/daycare-yard-play.jpg" class="care-photo" alt="A small playgroup in the Zoomies daycare yard">
+        </div>
+      </div>
+      <div>
+        <div class="eyebrow eyebrow--light" style="margin-bottom: 6px;">free daycare trial</div>
+        <h2 style="font-family: 'Fraunces'; font-size: clamp(28px, 3.8vw, 54px); font-weight: 800; margin: 0 0 18px; line-height: 0.98; letter-spacing: -0.03em;">Your dog&rsquo;s first half-day is completely <span style="font-weight: 500; font-style: italic; color: #F5C21A;">FREE</span></h2>
+        <p style="font-size: 16px; line-height: 1.7; color: rgba(246,241,228,0.85); margin: 0 0 14px;">Includes their behavioural assessment, supervised introduction, play, rest and a full update from our team.</p>
+        <p style="font-family: 'Fraunces', serif; font-weight: 800; font-size: clamp(18px, 1.8vw, 24px); color: #F5C21A; margin: 0;">No commitment. No obligation.</p>
+        <a href="https://wa.me/message/W2OAWUQCD5WCJ1" target="_blank" rel="noopener" class="btn btn-yellow" style="margin-top: 22px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="#25D366" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>Book Free Trial</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- TYPICAL DAY -->
+  <section id="daily" class="reveal page-width" style="padding-bottom: clamp(42px, 7.6vw, 110px);">
+    <div style="text-align: center; margin-bottom: clamp(28px, 3.5vw, 40px);">
+      <div class="eyebrow">daily schedule</div>
+      <h2 style="font-family: 'Fraunces'; font-weight: 800; font-size: clamp(29px, 4.4vw, 64px); margin: 0; letter-spacing: -0.03em; line-height: 1;">What a typical day <span style="font-style: italic; font-weight: 500; color: #C4632F;">looks like</span></h2>
+    </div>
+    <div class="schedule-lead-photo care-card">
+      <div class="wavy-photo">
+        <img src="assets/client/daycare-yard-sitting.jpg" class="care-photo" alt="Small dogs waiting for a ball in the Zoomies daycare yard">
+      </div>
+    </div>
+    <div class="schedule-grid">
+      <div class="info-card info-card--white">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div class="icon-orb"><img class="orb-ico" src="assets/icons/sched-1-morning.png" alt="" aria-hidden="true" width="256" height="256"></div><div class="sticker-note">01</div></div>
+        <h3 style="font-family:'Fraunces';font-weight:700;font-size:clamp(17px,1.6vw,22px);margin:0 0 8px;">Morning structured play</h3>
+        <p style="font-size:15px;line-height:1.65;color:#4B4A3E;margin:0;">Dogs begin the day with guided play to build confidence.</p>
+      </div>
+      <div class="info-card info-card--white">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div class="icon-orb"><img class="orb-ico" src="assets/icons/sched-2-enrichment.png" alt="" aria-hidden="true" width="256" height="256"></div><div class="sticker-note">02</div></div>
+        <h3 style="font-family:'Fraunces';font-weight:700;font-size:clamp(17px,1.6vw,22px);margin:0 0 8px;">Calm enrichment</h3>
+        <p style="font-size:15px;line-height:1.65;color:#4B4A3E;margin:0;">Interactive toys and activities stimulate minds while keeping dogs calm.</p>
+      </div>
+      <div class="info-card info-card--white">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div class="icon-orb"><img class="orb-ico" src="assets/icons/sched-3-supervised.png" alt="" aria-hidden="true" width="256" height="256"></div><div class="sticker-note">03</div></div>
+        <h3 style="font-family:'Fraunces';font-weight:700;font-size:clamp(17px,1.6vw,22px);margin:0 0 8px;">Supervised interaction</h3>
+        <p style="font-size:15px;line-height:1.65;color:#4B4A3E;margin:0;">Trained staff monitor play ensuring safe, positive social interactions.</p>
+      </div>
+      <div class="info-card info-card--white">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div class="icon-orb"><img class="orb-ico" src="assets/icons/sched-4-rest.png" alt="" aria-hidden="true" width="256" height="256"></div><div class="sticker-note">04</div></div>
+        <h3 style="font-family:'Fraunces';font-weight:700;font-size:clamp(17px,1.6vw,22px);margin:0 0 8px;">Rest breaks</h3>
+        <p style="font-size:15px;line-height:1.65;color:#4B4A3E;margin:0;">Quiet rest periods help dogs recharge and prevent overstimulation.</p>
+      </div>
+      <div class="info-card info-card--white">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div class="icon-orb"><img class="orb-ico" src="assets/icons/sched-5-afternoon.png" alt="" aria-hidden="true" width="256" height="256"></div><div class="sticker-note">05</div></div>
+        <h3 style="font-family:'Fraunces';font-weight:700;font-size:clamp(17px,1.6vw,22px);margin:0 0 8px;">Afternoon play session</h3>
+        <p style="font-size:15px;line-height:1.65;color:#4B4A3E;margin:0;">Another fun play session keeps dogs active and happily engaged.</p>
+      </div>
+      <div class="info-card info-card--white">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div class="icon-orb"><img class="orb-ico" src="assets/icons/sched-6-winddown.png" alt="" aria-hidden="true" width="256" height="256"></div><div class="sticker-note">06</div></div>
+        <h3 style="font-family:'Fraunces';font-weight:700;font-size:clamp(17px,1.6vw,22px);margin:0 0 8px;">Wind-down period</h3>
+        <p style="font-size:15px;line-height:1.65;color:#4B4A3E;margin:0;">Dogs relax calmly preparing for pickup after a fulfilling day.</p>
+      </div>
+    </div>
+    <p style="text-align: center; font-family: 'Work Sans', sans-serif; font-weight: 600; font-size: clamp(16px, 1.5vw, 18px); line-height: 1.5; color: #23281C; margin: clamp(28px, 3.5vw, 40px) auto 0; max-width: 520px;">
+      Dogs go home happy and tired not overstimulated.
+    </p>
+  </section>
+
+  <!-- ASSESSMENT (live section 4) -->
+  <section id="assessment" class="reveal" style="background: #23281C; color: #F6F1E4; padding: clamp(34px, 6.3vw, 90px) clamp(21px, 3.3vw, 48px); margin-bottom: clamp(34px, 6.3vw, 90px);">
+    <div style="max-width: 1440px; margin: 0 auto;" class="dark-band-grid">
+      <div class="care-card" style="position: relative; display: flex; justify-content: center;">
+        <div class="sticker-note" style="position: absolute; top: -20px; left: 24px; z-index: 2; transform: rotate(-6deg);">safety first</div>
+        <div class="wavy-photo wavy-photo-alt" style="width: min(360px, 100%);">
+          <img src="assets/client/daycare-yard-shiba.jpg" class="care-photo" alt="Two well-matched small dogs in the Zoomies daycare yard" style="object-position: center 35%;">
+        </div>
+      </div>
+      <div>
+        <div class="eyebrow eyebrow--light" style="margin-bottom: 6px;">safety first</div>
+        <h2 style="font-family: 'Fraunces'; font-size: clamp(26px, 3.4vw, 48px); font-weight: 800; margin: 0 0 18px; line-height: 1.02; letter-spacing: -0.03em;">Every dog must complete an assessment <span style="font-weight: 500; font-style: italic; color: #F5C21A;">before joining.</span></h2>
+        <p style="font-size: 15px; font-weight: 600; margin: 0 0 12px;">We ensure:</p>
+        <div class="dark-ensure-grid">
+          <div class="dark-ensure-item"><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span>Compatibility</div>
+          <div class="dark-ensure-item"><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span>Balanced group dynamics</div>
+          <div class="dark-ensure-item"><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span>Calm introductions</div>
+          <div class="dark-ensure-item"><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#23281C" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span>Ongoing supervision</div>
+        </div>
+        <p style="font-family: 'Fraunces', serif; font-style: italic; font-weight: 500; font-size: clamp(16px, 1.6vw, 22px); line-height: 1.4; letter-spacing: -0.01em; color: #F5C21A; margin: 22px 0 0;">We don&rsquo;t accept every dog &mdash; we accept the right dogs.</p>
+        <a href="https://wa.me/message/W2OAWUQCD5WCJ1" target="_blank" rel="noopener" class="btn btn-yellow" style="margin-top: 22px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="#25D366" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>Book Free Trial</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- A DAY AT DAYCARE — the client's October photos -->
+  <section class="reveal page-width" style="padding-bottom: clamp(32px, 5vw, 72px);">
+    <div style="text-align: center; margin-bottom: clamp(22px, 3vw, 38px);">
+      <div class="eyebrow">inside the room</div>
+      <h2 style="font-family: 'Fraunces'; font-weight: 800; font-size: clamp(29px, 4.4vw, 64px); margin: 0; letter-spacing: -0.03em; line-height: 1;">A day at <span style="font-weight: 500; font-style: italic; color: #C4632F;">daycare</span></h2>
+    </div>
+    <div class="gal-car is-landscape">
+      <div class="gal-track">
+        <figure class="gal-slide"><img src="assets/client/daycare-yard-sign-pair.jpg" alt="Two dogs in the Zoomies daycare yard beneath the sign" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/daycare-handler-bichon.jpg" alt="A Zoomies handler with a small dog in the daycare room" style="object-position: center 25%;" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/daycare-yard-trio.jpg" alt="Three small dogs in the Zoomies daycare yard" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/daycare-yard-play.jpg" alt="Small dogs playing in the daycare yard" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/daycare-daybed-group.jpg" alt="Small dogs resting together on the daycare daybed" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/daycare-yard-pair.jpg" alt="A happy dog in the Zoomies daycare yard" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/daycare-yard-resting.jpg" alt="A dog resting in the daycare yard" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/daycare-daybed-toys.jpg" alt="A dog with toys on the daycare daybed" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/daycare-yard-sitting.jpg" alt="A dog sitting in the daycare yard" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/daycare-yard-spaniel.jpg" alt="A spaniel in the Zoomies daycare yard" style="object-position: center 30%;" loading="lazy"></figure>
+        <figure class="gal-slide"><img src="assets/client/daycare-yard-shiba.jpg" alt="A shiba in the Zoomies daycare yard" style="object-position: center 30%;" loading="lazy"></figure>
+      </div>
+      <div class="gal-nav">
+        <button type="button" class="gal-btn" data-gal="prev" aria-label="Previous photos"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <button type="button" class="gal-btn" data-gal="next" aria-label="Next photos"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section class="reveal page-width" style="padding-bottom: clamp(32px, 5vw, 72px);">
+    <div style="text-align: center; margin-bottom: clamp(26px, 3.5vw, 44px);">
+      <div class="eyebrow">happy dogs</div>
+      <h2 style="font-family: 'Fraunces'; font-weight: 800; font-size: clamp(29px, 4.4vw, 64px); margin: 0; letter-spacing: -0.03em; line-height: 1;">What Our Clients <span style="font-weight: 500; font-style: italic; color: #C4632F;">Say</span></h2>
+    </div>
+    <div class="rev-grid">
+        <figure class="rev-card">
+          <div class="rev-stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <blockquote class="rev-body">Lola LOVES going to Zoomies. She adores the girls who spoil her and all her new doggy friends. Great to know your dog is being minded by people who genuinely love her.</blockquote>
+          <figcaption class="rev-by">
+            <span class="rev-name">Sarah M.</span>
+            <span class="rev-dog">Lola · daycare</span>
+          </figcaption>
+        </figure>
+        <figure class="rev-card">
+          <div class="rev-stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <blockquote class="rev-body">The small-dog-only thing is exactly what we needed. Bailey is nervous around bigger dogs and he comes home tired and happy rather than wound up.</blockquote>
+          <figcaption class="rev-by">
+            <span class="rev-name">Aoife K.</span>
+            <span class="rev-dog">Bailey · daycare</span>
+          </figcaption>
+        </figure>
+        <figure class="rev-card">
+          <div class="rev-stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <blockquote class="rev-body">The free assessment day sold it to us. They sent a full update on how she got on and were honest about what she needed. Couldn't recommend them more.</blockquote>
+          <figcaption class="rev-by">
+            <span class="rev-name">David R.</span>
+            <span class="rev-dog">Molly · daycare</span>
+          </figcaption>
+        </figure>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="FAQs" class="reveal page-width" style="padding-bottom: clamp(32px, 5vw, 72px);">
+    <div style="text-align: center; margin-bottom: 36px;">
+      <div class="eyebrow" style="margin-bottom: 8px;">Questions</div>
+      <h2 class="heading" style="font-size: clamp(29px, 4.4vw, 56px); letter-spacing: -0.03em; line-height: 1.02; margin: 0;">Daycare FAQs</h2>
+    </div>
+    <div class="faq-list" style="max-width: 820px; margin: 0 auto;">
+      <details class="faq-item" open>
+        <summary>What vaccinations are required?</summary>
+        <div class="faq-body">
+          For safety, all dogs must be up-to-date with:
+          <ul class="faq-check">
+            <li>DHPPi</li>
+            <li>Kennel Cough</li>
+          </ul>
+          Vaccination records must be provided before attendance.
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>Do dogs need to be neutered?</summary>
+        <div class="faq-body">
+          <ul class="faq-check">
+            <li>Female dogs over 1 year old must be neutered.</li>
+          </ul>
+          This helps maintain calm, balanced playgroups. If you&rsquo;re unsure, just message us — we&rsquo;re happy to advise.
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>What happens during the free trial?</summary>
+        <div class="faq-body">
+          Your dog receives:
+          <ul>
+            <li>A behaviour assessment</li>
+            <li>A free half day of daycare</li>
+            <li>Supervised play in small groups</li>
+            <li>Rest periods</li>
+            <li>A full update sent to you</li>
+          </ul>
+          There is no obligation to continue.
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>What if my dog hasn’t been to daycare before?</summary>
+        <div class="faq-body">
+          That’s exactly why we offer a free assessment and trial. We take introductions slowly and prioritise your dog’s comfort.
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>Do dogs go outside to toilet?</summary>
+        <div class="faq-body">
+          Many dogs naturally toilet indoors in daycare environments due to scent and routine changes. This is completely normal and managed by our team.
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>How are dogs grouped?</summary>
+        <div class="faq-body">
+          We group based on size, temperament and energy level. Groups are carefully balanced for safe, positive socialisation.
+        </div>
+      </details>
+      <details class="faq-item">
+        <summary>How many dogs are in each group?</summary>
+        <div class="faq-body">
+          We keep numbers controlled to maintain supervision and quality. We do not overcrowd.
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- GET IN TOUCH (live section 8) -->
+  <section class="reveal page-width" style="padding-bottom: clamp(38px, 6.3vw, 90px);">
+    <div style="text-align: center; max-width: 720px; margin: 0 auto clamp(26px, 3.4vw, 44px);">
+      <div class="eyebrow">say hello</div>
+      <h2 class="heading" style="font-size: clamp(28px, 3.9vw, 54px); margin: 0 0 16px; line-height: 1.02;">Get In Touch With Zoomies</h2>
+      <p style="font-size: 15.5px; line-height: 1.7; color: #4B4A3E; margin: 0;">We&rsquo;d love to hear from you! Whether it&rsquo;s to book an appointment, ask a question, or discuss your dog&rsquo;s daycare needs, our friendly team is ready to help.</p>
+    </div>
+    <div class="touch-grid">
+      <a class="touch-card touch-card--key" href="https://wa.me/353868099535" target="_blank" rel="noopener">
+        <span class="touch-ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 004.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2z"/></svg></span>
+        <span class="touch-key">Whatsapp</span>
+        <span class="touch-val">+353868099535</span>
+      </a>
+      <a class="touch-card" href="mailto:hello@zoomies.ie">
+        <span class="touch-ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></span>
+        <span class="touch-key">Email</span>
+        <span class="touch-val">hello@zoomies.ie</span>
+      </a>
+      <a class="touch-card" href="https://www.google.com/maps/search/?api=1&amp;query=116A+Lower+Kilmacud+Road+Stillorgan" target="_blank" rel="noopener">
+        <span class="touch-ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+        <span class="touch-key">Address</span>
+        <span class="touch-val">116A Lower Kilmacud Road, Stillorgan, Co. Dublin, A94 R2C9</span>
+      </a>
+    </div>
+  </section>
+
+  <a href="https://wa.me/message/W2OAWUQCD5WCJ1" target="_blank" rel="noopener" aria-label="Chat on WhatsApp" style="position: fixed; bottom: 28px; right: 28px; z-index: 999; width: 58px; height: 58px; border-radius: 50%; background: #25D366; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(37,211,102,0.45), 0 0 24px rgba(37,211,102,0.25);">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </a>
+
+  <footer class="reveal site-footer">
+    <div class="footer-dog" aria-hidden="true">
+      <img src="assets/client/daycare-daybed-toys.jpg" alt="">
+    </div>
+    <div class="footer-glow" aria-hidden="true"></div>
+
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="assets/logo-footer-transparent.png" alt="Zoomies" class="site-logo" style="height: 120px; width: auto; margin-bottom: 14px;">
+        <p style="font-family: 'Work Sans', sans-serif; font-size: 14px; line-height: 1.6; color: #4B4A3E; margin: 0; max-width: 320px; font-style: italic;">Happier Dogs. Brighter Days.</p>
+        <div class="footer-social" aria-label="Social media">
+          <a class="footer-social-btn" href="https://www.instagram.com/zoomies_ireland/" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          </a>
+          <a class="footer-social-btn" href="https://www.facebook.com/zoomiesireland" target="_blank" rel="noopener" aria-label="Facebook">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M14 9h3V6h-3c-1.7 0-3 1.3-3 3v2H9v3h2v7h3v-7h3l1-3h-4V9c0-.6.4-1 1-1z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <div class="footer-kicker"><span class="footer-heading">Quick Link</span></div>
+        <nav style="display: flex; flex-direction: column; gap: 11px; font-size: 14.5px;">
+          <a class="link" href="Homepage.dc.html">Home</a>
+          <a class="link" href="Services.dc.html">Services</a>
+          <a class="link" href="Pricing.dc.html">Pricing</a>
+          <a class="link" href="Contact.dc.html">Contact Us</a>
+        </nav>
+      </div>
+
+      <div class="footer-col">
+        <div class="footer-kicker"><span class="footer-heading">Contact Info</span></div>
+        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 14.5px;">
+          <a class="fc-row" href="https://wa.me/353868099535" target="_blank" rel="noopener"><span class="fc-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0122 16.92z"/></svg></span><span>+353868099535</span></a>
+          <a class="fc-row" href="mailto:hello@zoomies.ie"><span class="fc-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></span><span>hello@zoomies.ie</span></a>
+          <div class="fc-row is-static"><span class="fc-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span>116A Lower Kilmacud Road, Stillorgan, Co. Dublin, A94 R2C9</span></div>
+        </div>
+      </div>
+
+      <div class="footer-col footer-news">
+        <div class="footer-kicker"><span class="footer-heading">Newsletter</span></div>
+        <p class="footer-news-copy">Paw-some updates, grooming tips &amp; academy news — straight to your inbox.</p>
+        <form class="footer-news-form" action="#" method="post" onsubmit="return false;">
+          <label class="sr-only" for="footer-email-daycare">Email</label>
+          <input id="footer-email-daycare" class="footer-news-input" type="email" name="email" placeholder="Your email" required autocomplete="email">
+          <button class="footer-news-btn" type="submit">Subscribe<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </form>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="footer-copy">
+        <button class="to-top" type="button" id="to-top" aria-label="Back to top">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        </button>
+        <span>© 2026 Zoomies Grooming. All Rights Reserved.</span>
+      </div>
+      <div class="footer-legal">
+        <a class="link" href="#">Privacy Policy</a>
+        <span class="footer-dot" aria-hidden="true">·</span>
+        <a class="link" href="#">Terms &amp; Conditions</a>
+      </div>
+    </div>
+  </footer>
+
+</div>
+]]>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+class Component extends StreamableLogic {
+  componentDidMount() {
+    if (typeof window === "undefined") return;
+
+    if ("IntersectionObserver" in window) {
+      const els = document.querySelectorAll(".reveal");
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) { entry.target.classList.add("is-visible"); io.unobserve(entry.target); }
+        });
+      }, { threshold: 0.15, rootMargin: "0px 0px -60px 0px" });
+      els.forEach((el) => io.observe(el));
+      this._io = io;
+    } else {
+      document.querySelectorAll(".reveal").forEach((el) => el.classList.add("is-visible"));
+    }
+
+    /* ---------- sticky header ---------- */
+    const header = document.querySelector(".site-header");
+    if (header) {
+      const onScrollStuck = () => {
+        const y = window.scrollY || document.documentElement.scrollTop || 0;
+        header.classList.toggle("is-stuck", y > 8);
+      };
+      window.addEventListener("scroll", onScrollStuck, { passive: true });
+      onScrollStuck();
+    }
+
+
+    const scrollToTopRobust = (el) => {
+      const roots = [window, document.documentElement, document.body];
+      let p = el && el.parentElement;
+      while (p && p !== document.body) {
+        const s = getComputedStyle(p);
+        if ((s.overflowY === "auto" || s.overflowY === "scroll") && p.scrollHeight > p.clientHeight) roots.push(p);
+        p = p.parentElement;
+      }
+      roots.forEach((r) => {
+        try {
+          if (r === window) window.scrollTo({ top: 0, behavior: "smooth" });
+          else if (r.scrollTo) r.scrollTo({ top: 0, behavior: "smooth" });
+          else r.scrollTop = 0;
+        } catch (_) {}
+      });
+    };
+
+    /* ---------- back to top (footer) ---------- */
+    const wireToTop = (el) => {
+      if (!el) return;
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        scrollToTopRobust(el);
+      });
+    };
+    wireToTop(document.getElementById("to-top"));
+
+  }
+  componentWillUnmount() { if (this._io) this._io.disconnect(); }
+}
+</script>
+</body>
+</html>
