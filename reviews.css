@@ -1,0 +1,55 @@
+/* =====================================================================
+   REVIEW SLIDER — real Google reviews, scroll-snap track + prev/next arrows.
+   Reuses the gallery carousel (.gal-car / .gal-track / .gal-nav / .gal-btn
+   in responsive.css, driven by gallery.js); only the card is new.
+   ===================================================================== */
+.rv-car { --gal-per: 3; align-items: stretch; }
+.rv-car .gal-track { align-items: stretch; padding: 2px; margin: -2px; }
+
+.rv-car .rv-card {
+  /* undo the photo-slide look from .gal-slide */
+  aspect-ratio: auto; overflow: visible;
+  display: flex; flex-direction: column;
+  margin: 0; background: #FFFFFF;
+  border: 1px solid rgba(35, 40, 28, 0.1); border-radius: 20px;
+  padding: clamp(20px, 2.2vw, 30px);
+  transition: none; transform: none;
+}
+.rv-car .rv-card:hover { transform: none; box-shadow: none; }
+
+.rv-head { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.rv-avatar {
+  flex: 0 0 54px; width: 54px; height: 54px; border-radius: 50%;
+  overflow: hidden; background: #EFE2C8;
+}
+.rv-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.rv-who { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.rv-name {
+  font-family: 'Fraunces', serif; font-weight: 700; font-size: 16px;
+  letter-spacing: -0.02em; color: #23281C; line-height: 1.2;
+}
+.rv-stars { color: #F5C21A; font-size: 15px; letter-spacing: 2px; line-height: 1; }
+
+.rv-body {
+  margin: 0; flex: 1 1 auto;
+  font-family: 'Work Sans', sans-serif; font-size: 15px; line-height: 1.65; color: #4B4A3E;
+  white-space: pre-line;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 6; line-clamp: 6;
+  overflow: hidden;
+}
+.rv-more {
+  align-self: flex-start; margin-top: 14px;
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'Work Sans', sans-serif; font-size: 13.5px; font-weight: 600;
+  color: #23281C; text-decoration: none;
+  border-bottom: 1.5px solid #C4632F; padding-bottom: 1px;
+  transition: color 0.2s ease, gap 0.2s ease;
+}
+.rv-more:hover { color: #C4632F; gap: 9px; }
+
+@media (max-width: 900px) {
+  .rv-car { --gal-per: 2; }
+}
+@media (max-width: 560px) {
+  .rv-car { --gal-per: 1.12; }
+}

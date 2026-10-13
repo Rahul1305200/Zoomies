@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<![CDATA[<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400;1,9..144,500;1,9..144,600;1,9..144,700;1,9..144,800&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #F6F1E4; color: #23281C; font-family: 'Work Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  a { color: inherit; text-decoration: none; }
+  a.link { transition: color 0.2s ease; }
+  a.link:hover { color: #A67C0A; }
+  a[href]:not(.link) { transition: transform 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s cubic-bezier(.22,1,.36,1), background-color 0.2s ease, color 0.2s ease; }
+
+  @keyframes fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-in { animation: fade-up 0.7s cubic-bezier(.22,1,.36,1) both; }
+  .d1 { animation-delay: .05s; } .d2 { animation-delay: .12s; }
+
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s cubic-bezier(.22,1,.36,1), transform 0.7s cubic-bezier(.22,1,.36,1); }
+  .reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+  .nav-dropdown-wrap {
+    position: relative;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+  .nav-dropdown-wrap .nav-dropdown-caret { transition: transform 0.45s cubic-bezier(.34,1.3,.64,1); display: inline-block; }
+  .nav-dropdown-wrap:hover .nav-dropdown-caret,
+  .nav-dropdown-wrap:focus-within .nav-dropdown-caret { transform: rotate(180deg); }
+  .nav-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(14px) scale(0.96);
+    background: #FFFEFA;
+    border: 2px solid #F5C21A;
+    border-radius: 18px;
+    padding: 10px;
+    min-width: 224px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.42s ease,
+      transform 0.5s cubic-bezier(.22,1,.36,1),
+      visibility 0.42s,
+      box-shadow 0.4s ease;
+    transform-origin: top center;
+    z-index: 300;
+    box-shadow: 4px 4px 0 rgba(35,40,28,0.12), 0 16px 32px -16px rgba(35,40,28,0.35);
+  }
+  /* invisible bridge so mouse can travel from link to menu without closing */
+  .nav-dropdown::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0;
+    bottom: 100%;
+    height: 16px;
+  }
+  .nav-dropdown-wrap:hover .nav-dropdown,
+  .nav-dropdown-wrap:focus-within .nav-dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  .nav-dropdown-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 12px; border-radius: 11px;
+    font-family: 'Work Sans', sans-serif; font-size: 15.5px; font-weight: 500;
+    color: #23281C; white-space: nowrap;
+    transition:
+      background 0.4s ease,
+      transform 0.4s cubic-bezier(.22,1,.36,1),
+      padding-left 0.4s cubic-bezier(.22,1,.36,1),
+      box-shadow 0.35s ease;
+    pointer-events: auto;
+    position: relative; z-index: 1;
+  }
+  .nav-dropdown-item:hover {
+    background: #FBF3D9;
+    padding-left: 16px;
+    transform: translateX(2px);
+  }
+  .nav-dropdown-icon {
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    width: 32px; height: 32px; border-radius: 9px; background: #F6F1E4;
+    transition: background 0.4s ease, transform 0.45s cubic-bezier(.34,1.56,.64,1);
+  }
+  .nav-dropdown-item:hover .nav-dropdown-icon {
+    background: #F5C21A;
+    transform: rotate(-8deg) scale(1.08);
+  }
+
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 15px clamp(16px, 1.9vw, 28px); border-radius: 10px; font-family: 'Lora', serif; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; transition: transform 0.25s cubic-bezier(.22,1,.36,1), box-shadow 0.25s cubic-bezier(.22,1,.36,1), background-color 0.2s ease, color 0.2s ease; }
+  .btn-whatsapp { background: #25D366; color: #FFFFFF; }
+  .btn-whatsapp:hover { background: #1ebe57; color: #FFFFFF; transform: translateY(-2px); }
+  .site-logo { height: 88px; width: auto; object-fit: contain; display: block; }
+  .site-header { background: #23281C; color: #F6F1E4; position: relative; z-index: 100; overflow: visible; }
+  .site-header .promo {
+    text-align: center;
+    padding: 11px 20px;
+    font-size: 13.5px;
+    font-weight: 500;
+    background: #F5C21A;
+    color: #23281C;
+  }
+  .site-header .promo strong { color: #23281C; font-weight: 700; }
+  .site-header .nav-bar {
+    max-width: 1440px; margin: 0 auto; padding: 10px clamp(21px, 3.3vw, 48px);
+    display: flex; align-items: center; justify-content: space-between; gap: clamp(16px, 1.9vw, 28px); z-index: 101; overflow: visible; position: relative; }
+  .site-header .nav-links {
+    display: flex;
+    align-items: center;
+    gap: clamp(18px, 2.2vw, 30px);
+  }
+  .site-header .nav-links > a,
+  .site-header .nav-dropdown-wrap > a {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 15.5px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: rgba(246,241,228,0.9);
+    padding: 6px 2px;
+    border-radius: 0;
+    background: transparent;
+    transition: color 0.25s ease;
+    position: relative;
+  }
+  .site-header .nav-links > a:hover,
+  .site-header .nav-dropdown-wrap > a:hover {
+    color: #F5C21A;
+    background: transparent;
+    transform: none;
+  }
+  .site-header .nav-links > a.is-active {
+    color: #F5C21A;
+    background: transparent;
+    box-shadow: none;
+  }
+  .site-header .nav-links > a.is-active::after,
+  .site-header .nav-dropdown-wrap > a.is-active::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -4px;
+    height: 2px;
+    background: #F5C21A;
+    border-radius: 2px;
+  }
+
+  /* =====================================================================
+     Hero media — organic, not a rectangle
+     Reuses the blob language the Services hero already established
+     (irregular border-radius, ink outline, hard offset shadow, a tilt that
+     straightens on hover) rather than inventing a new shape. Mirrored:
+     Services leans left with the yellow blob right, this leans right with
+     the yellow blob left, so the two pages don't read as the same slide.
+     ===================================================================== */
+  .hero-media-wrap {
+    position: relative;
+    min-height: clamp(360px, 44vw, 520px);
+    display: flex; align-items: center; justify-content: center;
+  }
+  /* yellow blob behind, offset the opposite way to Services */
+  .hero-media-wrap::before {
+    content: "";
+    position: absolute;
+    width: 88%; height: 86%;
+    left: 1%; top: 8%;
+    background: #F5C21A;
+    border-radius: 50%;
+    transform: rotate(-9deg);
+    z-index: 0;
+  }
+  /* rust accent, tucked under the opposite corner */
+  .hero-media-wrap::after {
+    content: "";
+    position: absolute;
+    width: 40%; height: 34%;
+    right: 0; bottom: 6%;
+    background: #C4632F;
+    opacity: 0.2;
+    border-radius: 50%;
+    z-index: 0;
+  }
+  .hero-media {
+    position: relative; z-index: 1;
+    width: min(92%, 500px); aspect-ratio: 1; height: auto;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 3.5px solid #23281C;
+    box-shadow: -10px 12px 0 #23281C;
+    background: #EFE2C8;
+  }
+  .hero-media img {
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: 58% center;
+    display: block;
+  }
+
+  /* ---- hero price sticker ---- */
+  .price-sticker {
+    position: absolute; z-index: 2;
+    right: 4%; bottom: 7%;
+    background: #F5C21A; color: #23281C;
+    font-family: 'Lora', serif; font-weight: 600; font-size: clamp(13px, 1.2vw, 15.5px); letter-spacing: -0.01em;
+    padding: 9px 22px; border-radius: 999px;
+    border: 2.5px solid #23281C;
+    box-shadow: 3px 4px 0 #23281C;
+    transform: rotate(-6deg);
+  }
+
+  /* ---- grooming tiers ---- */
+  .groom-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: clamp(16px, 2.2vw, 28px); align-items: start;
+  }
+  /* Teeth cleaning only: the two tiers are the same service at two price
+     points, so uneven card heights read as one being an afterthought.
+     The grooming tiers above keep `align-items: start` on purpose. */
+  .groom-grid--even { align-items: stretch; }
+  .groom-card {
+    background: #FFFFFF; border: 1px solid rgba(35,40,28,0.1);
+    border-radius: 22px; padding: clamp(22px, 2.6vw, 38px);
+    transition: transform 0.28s cubic-bezier(.22,1,.36,1), box-shadow 0.28s ease;
+  }
+  .groom-card:hover { transform: translateY(-5px); box-shadow: 0 22px 44px -28px rgba(35,40,28,0.6); }
+  /* the Full Groom tier is the one to steer people to */
+  .groom-card--feature { background: #23281C; border-color: #23281C; color: #F6F1E4; }
+  .groom-card--feature .heading { color: #F6F1E4; }
+  .groom-card--feature .groom-price { background: #F5C21A; color: #23281C; }
+  .groom-card--feature .tick-list li { color: rgba(246,241,228,0.88); }
+  .groom-card--feature .tick-list li::before { background: #F5C21A; color: #23281C; }
+
+  .groom-card-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 14px; flex-wrap: wrap; margin-bottom: 20px;
+    padding-bottom: 18px; border-bottom: 1px solid rgba(35,40,28,0.12);
+  }
+  .groom-card--feature .groom-card-head { border-bottom-color: rgba(246,241,228,0.18); }
+  .groom-price {
+    font-family: 'Work Sans', sans-serif; font-weight: 600; font-size: clamp(14px, 1.3vw, 17px);
+    background: #EFE2C8; color: #23281C; padding: 8px 16px; border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .tick-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .tick-list li {
+    position: relative; padding-left: 32px;
+    font-size: 15px; line-height: 1.6; color: #4B4A3E;
+  }
+  .tick-list li::before {
+    content: "✓"; position: absolute; left: 0; top: 1px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #23281C; color: #F5C21A;
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ---- daycare packages ---- */
+  /* =====================================================================
+     Daycare package cards
+     Editorial photo cards, not badge stacks. One accent colour per card,
+     a single hairline instead of pills, and the price carrying the
+     hierarchy on its own. The photo does the decorating, so nothing here
+     needs a watermark, a sticker or a meter.
+     ===================================================================== */
+  .pack-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: clamp(16px, 2vw, 26px);
+    align-items: stretch;
+  }
+  .pack-card {
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column;
+    background: #F6F1E4;
+    border: 1px solid rgba(35,40,28,0.1);
+    border-radius: 18px;
+    transition: transform 0.3s cubic-bezier(.22,1,.36,1), box-shadow 0.3s ease;
+  }
+  .pack-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 24px 46px -30px rgba(35,40,28,0.55);
+  }
+
+  /* photo band across the top — the real photography is the decoration */
+  .pack-shot {
+    position: relative;
+    height: clamp(128px, 13vw, 168px);
+    background: #EFE2C8;
+    flex-shrink: 0;
+  }
+  .pack-shot img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+  }
+  /* keeps the white dogs from bleeding into the cream card below */
+  .pack-shot::after {
+    content: "";
+    position: absolute; left: 0; right: 0; bottom: 0; height: 46%;
+    background: linear-gradient(to bottom, rgba(35,40,28,0) 0%, rgba(35,40,28,0.34) 100%);
+    pointer-events: none;
+  }
+  .pack-flag {
+    position: absolute; right: 12px; bottom: 11px; z-index: 1;
+    font-family: 'Work Sans', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+    line-height: 1; color: #F5C21A;
+  }
+
+  .pack-body {
+    padding: clamp(20px, 2.2vw, 28px) clamp(18px, 2vw, 26px) clamp(20px, 2.2vw, 26px);
+    text-align: center;
+    display: flex; flex-direction: column; flex: 1;
+  }
+
+  /* the pack name recedes; the price is the hero */
+  .pack-name {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 11.5px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.15em;
+    color: #8A8677;
+    margin: 0 0 10px;
+  }
+  .pack-rate {
+    font-family: 'Fraunces', serif; font-weight: 800;
+    font-size: clamp(42px, 4.6vw, 62px); line-height: 0.9;
+    letter-spacing: -0.04em; color: #23281C;
+  }
+  .pack-cur {
+    font-size: 0.55em; font-weight: 700;
+    vertical-align: 0.28em; margin-right: 1px;
+    letter-spacing: 0;
+  }
+  .pack-unit {
+    font-size: 10.5px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.16em;
+    color: #8A8677; margin-top: 10px;
+  }
+
+  /* one hairline does the work four pills were doing */
+  .pack-rule {
+    height: 1px; width: 44px; margin: 18px auto;
+    background: rgba(35,40,28,0.18);
+  }
+
+  .pack-save {
+    font-family: 'Work Sans', sans-serif; font-size: clamp(15px, 1.4vw, 18px);
+    font-weight: 600; color: #C4632F;
+  }
+  .pack-was {
+    font-size: 13px; color: #8A8677; margin-top: 5px;
+  }
+  .pack-was s { text-decoration-thickness: 1px; }
+  .pack-valid {
+    font-size: 11.5px; color: #A8A395;
+    margin-top: auto; padding-top: 14px;
+  }
+
+  /* the best tier inverts rather than inflating */
+  .pack-card--best {
+    background: #23281C; border-color: #23281C; color: #F6F1E4;
+    box-shadow: 0 26px 52px -30px rgba(35,40,28,0.7);
+  }
+  .pack-card--best .pack-shot::after {
+    background: linear-gradient(to bottom, rgba(35,40,28,0) 0%, rgba(35,40,28,0.72) 100%);
+  }
+  .pack-card--best .pack-name { color: rgba(246,241,228,0.55); }
+  .pack-card--best .pack-rate { color: #F5C21A; }
+  .pack-card--best .pack-unit { color: rgba(246,241,228,0.55); }
+  .pack-card--best .pack-rule { background: rgba(245,194,26,0.4); }
+  .pack-card--best .pack-save { color: #F5C21A; }
+  .pack-card--best .pack-was { color: rgba(246,241,228,0.5); }
+  .pack-card--best .pack-valid { color: rgba(246,241,228,0.38); }
+
+  .second-dog {
+    margin: clamp(24px, 3vw, 40px) auto 0; max-width: 760px;
+    background: #23281C; color: #F6F1E4; border-radius: 18px;
+    padding: clamp(18px, 2.2vw, 28px); text-align: center;
+  }
+  .second-dog-head {
+    display: block; font-family: 'Fraunces', serif; font-weight: 700;
+    font-size: clamp(16px, 1.7vw, 22px); letter-spacing: -0.02em; margin-bottom: 6px;
+  }
+  .second-dog-sub { display: block; font-size: 14px; color: rgba(246,241,228,0.7); }
+
+  .note-list {
+    list-style: none; margin: clamp(22px, 2.8vw, 36px) auto 0; padding: 0;
+    max-width: 820px; display: grid; gap: 10px;
+  }
+  .note-list li {
+    position: relative; padding-left: 22px;
+    font-size: 14.5px; line-height: 1.6; color: #4B4A3E;
+  }
+  .note-list li::before {
+    content: ""; position: absolute; left: 4px; top: 9px;
+    width: 6px; height: 6px; border-radius: 50%; background: #C4632F;
+  }
+
+  /* ---- training ---- */
+  .train-card {
+    background: #23281C; color: #F6F1E4; border-radius: 20px;
+    padding: clamp(19px, 2.2vw, 32px) clamp(21px, 2.5vw, 36px);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 20px; flex-wrap: wrap;
+  }
+
+  @media (max-width: 900px) {
+    .groom-grid, .pack-grid { grid-template-columns: 1fr; }
+  }
+
+  .cta-wrap { text-align: center; padding-bottom: 80px; }
+  .cta-wrap .hand { font-size: 26px; margin-bottom: 10px; display: block; }
+  .hand { font-family: 'Fraunces', serif; font-optical-sizing: auto; font-style: italic; font-weight: 500; font-size: inherit; letter-spacing: -0.01em; color: #C4632F; }
+  .heading { font-family: 'Fraunces', serif; font-weight: 700; letter-spacing: -0.02em; color: #23281C; }
+  .page-width { max-width: 1440px; margin: 0 auto; padding-left: clamp(21px, 3.3vw, 48px); padding-right: clamp(21px, 3.3vw, 48px); }
+  .btn-yellow { background: #F5C21A; color: #23281C; box-shadow: 3px 3px 0 #23281C; }
+  .btn-yellow:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 #23281C; }
+
+    /* Header is NOT sticky — keeps page scroll free */
+  .site-header { position: relative; top: auto; z-index: 100; }
+  .site-header.is-stuck { box-shadow: none; }
+
+
+  /* ---- Footer typography + newsletter ---- */
+  .site-footer a.link,
+  .site-footer .fc-row,
+  .site-footer .footer-copy,
+  .site-footer .footer-legal,
+  .site-footer .footer-bottom {
+    font-family: 'Work Sans', sans-serif;
+  }
+  .footer-kicker {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #F5C21A;
+    margin-bottom: 14px;
+  }
+  .footer-heading {
+    font-family: inherit;
+    padding-bottom: 0;
+  }
+  .footer-brand p, .site-footer .footer-tagline {
+    font-family: 'Work Sans', sans-serif;
+  }
+  .footer-news-copy {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 14.5px; line-height: 1.55;
+    color: rgba(246,241,228,0.75); margin: 0 0 14px; max-width: 260px;
+  }
+  .footer-news-form {
+    display: flex; flex-direction: column; gap: 10px; max-width: 280px;
+  }
+  .footer-news-input {
+    width: 100%; box-sizing: border-box;
+    background: rgba(246,241,228,0.08);
+    border: 1px solid rgba(246,241,228,0.18);
+    border-radius: 999px;
+    padding: 12px 16px;
+    color: #F6F1E4;
+    font-family: 'Work Sans', sans-serif; font-size: 14.5px;
+    outline: none;
+  }
+  .footer-news-input::placeholder { color: rgba(246,241,228,0.45); }
+  .footer-news-input:focus { border-color: #F5C21A; background: rgba(246,241,228,0.12); }
+  .footer-news-btn {
+    align-self: flex-start;
+    background: #F5C21A; color: #23281C; border: 0;
+    border-radius: 999px;
+    padding: 11px 20px;
+    font-family: 'Work Sans', sans-serif; font-weight: 600; font-size: 14.5px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 3px 3px 0 #F6F1E4;
+  }
+  .footer-news-btn:hover {
+    background: #F6F1E4;
+    transform: translate(-2px,-2px);
+    box-shadow: 5px 5px 0 #F6F1E4;
+  }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+
+  .footer-social {
+    display: flex; gap: 10px; margin-top: 18px; align-items: center;
+  }
+  .footer-social-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(246,241,228,0.08);
+    color: #F5C21A;
+    border: 1.5px solid rgba(245,194,26,0.35);
+    transition: transform 0.35s cubic-bezier(.34,1.56,.64,1), background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  }
+  .footer-social-btn:hover {
+    background: #F5C21A; color: #23281C; border-color: #F5C21A;
+    transform: translateY(-4px) rotate(-6deg) scale(1.06);
+  }
+
+  @keyframes to-top-float-live {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .to-top {
+    width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+    background: #F5C21A; color: #23281C; border: 0; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    animation: to-top-float-live 2.2s ease-in-out infinite;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 6px 16px -8px rgba(245,194,26,0.7);
+  }
+  .to-top:hover {
+    animation-play-state: paused;
+    background: #F6F1E4;
+    transform: translateY(-3px);
+  }
+  @media (max-width: 900px) {
+    .footer-inner { grid-template-columns: 1fr !important; }
+  }
+
+  /* ---- legal pages (Privacy / Terms) ---- */
+  .legal { max-width: 820px; margin: 0 auto; padding: clamp(28px, 4.4vw, 64px) clamp(21px, 3.3vw, 48px) clamp(42px, 7vw, 100px); }
+  .legal .eyebrow { margin-bottom: 10px; }
+  .legal h1 { font-family: 'Fraunces', serif; font-weight: 800; font-size: clamp(34px, 4.6vw, 60px); line-height: 1.04; letter-spacing: -0.03em; margin: 0 0 14px; color: #23281C; }
+  .legal .legal-date { font-size: 14px; color: #8A8677; margin: 0 0 clamp(24px, 3vw, 40px); }
+  .legal h2 { font-family: 'Fraunces', serif; font-weight: 700; font-size: clamp(19px, 1.9vw, 24px); letter-spacing: -0.02em; line-height: 1.25; margin: clamp(26px, 3vw, 38px) 0 10px; color: #23281C; }
+  .legal p { font-family: 'Work Sans', sans-serif; font-size: 15.5px; line-height: 1.75; color: #4B4A3E; margin: 0 0 14px; }
+  .legal ul { margin: 0 0 14px; padding-left: 22px; }
+  .legal li { font-family: 'Work Sans', sans-serif; font-size: 15.5px; line-height: 1.7; color: #4B4A3E; margin-bottom: 6px; }
+  .legal a { color: #C4632F; text-decoration: underline; text-underline-offset: 3px; }
+</style>
+<link rel="stylesheet" href="./responsive.css">
+<link rel="stylesheet" href="./booking.css">
+<script src="./reveal.js" defer></script>
+</helmet>
+
+<div style="background: #F6F1E4; color: #23281C; font-family: 'Work Sans', sans-serif;">
+
+  <!-- HEADER -->
+  <header class="site-header fade-in">
+    <nav class="nav-bar">
+      <a href="Homepage.dc.html" style="display: flex; align-items: center; flex-shrink: 0;">
+        <img src="assets/logo-official.png" alt="Zoomies" class="site-logo">
+      </a>
+      <input type="checkbox" id="nav-toggle" class="nav-checkbox">
+      <label for="nav-toggle" class="nav-burger" aria-label="Toggle menu">
+        <svg class="nav-burger-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <svg class="nav-burger-close" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </label>
+      <div class="nav-links">
+        <a class="link" href="Grooming.dc.html">Dog Grooming</a>
+        <a class="link" href="Daycare.dc.html">Dog Daycare</a>
+        <a class="link" href="TeethCleaning.dc.html">Teeth Cleaning</a>
+        <a class="link" href="Training.dc.html">Grooming Courses</a>
+        <a class="link" href="Pricing.dc.html">Pricing</a>
+        <a class="link" href="Contact.dc.html">Contact</a>
+      </div>
+      <a href="https://wa.me/353868099535" target="_blank" rel="noopener" class="btn btn-whatsapp" style="padding: 13px 22px; font-size: 14px; flex-shrink: 0;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp Us
+      </a>
+    </nav>
+  </header>
+
+  <!-- PRIVACY — text supplied by the client (Zoomies_Privacy_Policy_Ready_to_Publish.pdf), unchanged -->
+  <main class="legal">
+    <div class="eyebrow">Zoomies Limited</div>
+    <h1>Privacy Policy</h1>
+    <p class="legal-date">Effective 12 October 2026 | Zoomies Limited</p>
+    <p>This Privacy Policy explains how Zoomies Limited handles personal information when you use our website, contact us or use our pet-care and training services.</p>
+    <h2>Who we are</h2>
+    <p>Zoomies Limited, trading as Zoomies, is responsible for personal data collected through our website and our grooming, daycare and related services. You can contact us at 116A Lower Kilmacud Road, Stillorgan, South County Dublin or <a href="mailto:hello@zoomies.ie">hello@zoomies.ie</a>.</p>
+    <h2>Information we collect</h2>
+    <p>We collect information you provide when you contact us, register, book, pay for services or enrol in training. This may include your name, contact details, booking history, communications, payment and transaction information, and information about your dog including breed, age, vaccination, veterinary, medical and behavioural information. We may also record incident reports, emergency contacts, consent choices and photographs or videos of dogs. Some records about a dog can be personal data when linked to an identifiable owner. We may receive technical data from website visits such as IP address, device details and cookie identifiers.</p>
+    <h2>Why we use your information</h2>
+    <p>We use personal data to respond to enquiries, create customer accounts, administer appointments and packages, deliver grooming, daycare and training services, safeguard dogs in our care, contact you about collection or emergencies, take payment, keep business records, handle feedback and complaints, and protect our business and website. Where permitted, we may send you marketing communications and measure the effectiveness of our website and advertising.</p>
+    <h2>Our legal bases</h2>
+    <p>We rely on contractual necessity to administer bookings and services; legal obligations for accounting, tax and compliance; legitimate interests for proportionate customer support, safety administration, fraud prevention and business improvement; and consent where required, including optional promotional use of dog photographs or videos, certain direct marketing and non-essential website tracking. You can withdraw consent at any time without affecting processing already lawfully carried out.</p>
+    <h2>Dog photographs and videos</h2>
+    <p>We may take photos or videos of dogs for care, customer updates or incident records where appropriate. We will use photographs or videos for public promotion on our website, social media or advertising only where the relevant optional permission has been provided or another valid legal basis applies. Permission to promote images is not required to receive our services. We will seek appropriate additional permission before intentionally publishing images of identifiable people, particularly children. To withdraw promotional permission, email <a href="mailto:hello@zoomies.ie">hello@zoomies.ie</a>.</p>
+    <h2>Who receives your information</h2>
+    <p>Relevant personal data may be accessed by authorised Zoomies team members and by service providers assisting with booking and customer management (including Gingr where used), payments, website hosting, business email and messaging, professional advice, accounting and technical support. Analytics and advertising providers may receive website data where enabled and permitted. We share information with veterinary professionals or emergency services where reasonably necessary to protect animal welfare, and with authorities where required by law. We do not sell customer personal data.</p>
+    <h2>International transfers</h2>
+    <p>Some service providers may process personal data outside the European Economic Area. Where required, we rely on an applicable adequacy decision or appropriate safeguards such as the European Commission’s standard contractual clauses. Contact us for information about the safeguards relevant to your data.</p>
+    <h2>How long we keep information</h2>
+    <p>We retain information only as long as needed for the purposes described above, including service history, animal-welfare records, tax and accounting obligations, insurance, legal claims and complaint handling. We periodically review records and delete or anonymise them when no longer needed. Marketing contact information is retained while we have a valid basis to use it and until you unsubscribe or withdraw consent, subject to limited suppression records to respect your choice.</p>
+    <h2>Your rights</h2>
+    <p>Under data protection law, subject to applicable conditions and exemptions, you may request access, correction, erasure, restriction, portability or object to certain processing. Where we rely on consent you can withdraw it. To make a request contact <a href="mailto:hello@zoomies.ie">hello@zoomies.ie</a>. You may also complain to the Data Protection Commission at <a href="https://www.dataprotection.ie" target="_blank" rel="noopener">www.dataprotection.ie</a>.</p>
+    <h2>Cookies and tracking</h2>
+    <p>Our website may use strictly necessary cookies to function. Optional analytics and advertising cookies or pixels, including any Google or Meta technologies deployed on the final site, should not be activated before the legally required consent is obtained. You should be offered meaningful accept/reject options and a way to change your preferences. Cookie choices and the actual technologies used are controlled by the website’s cookie settings tool.</p>
+    <h2>Security and changes</h2>
+    <p>We use reasonable technical and organisational safeguards to protect personal data. We may update this policy as our services or technology change. The current version will be available on our website.</p>
+    <h2>Contact</h2>
+    <p>For any privacy questions, consent withdrawals or data-rights requests, contact Zoomies Limited at 116A Lower Kilmacud Road, Stillorgan, South County Dublin, or <a href="mailto:hello@zoomies.ie">hello@zoomies.ie</a>.</p>
+  </main>
+
+  <a class="sticky-book" href="https://zoomiesireland.portal.gingrapp.com/public/new_customer" target="_blank" rel="noopener">Book Now <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+
+  <!-- FOOTER -->
+  <footer class="reveal site-footer">
+    <div class="footer-dog" aria-hidden="true">
+      <img src="assets/client/grooming-cockapoo-orange.jpg" alt="">
+    </div>
+    <div class="footer-glow" aria-hidden="true"></div>
+
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="assets/logo-footer-transparent.png" alt="Zoomies" class="site-logo" style="height: 120px; width: auto; margin-bottom: 14px;">
+        <p style="font-family: 'Work Sans', sans-serif; font-size: 14px; line-height: 1.6; color: #4B4A3E; margin: 0; max-width: 320px; font-style: italic;">Happier Dogs. Brighter Days.</p>
+        <div class="footer-social" aria-label="Social media">
+          <a class="footer-social-btn" href="https://www.instagram.com/zoomies_ireland/" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          </a>
+          <a class="footer-social-btn" href="https://www.facebook.com/zoomiesireland" target="_blank" rel="noopener" aria-label="Facebook">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M14 9h3V6h-3c-1.7 0-3 1.3-3 3v2H9v3h2v7h3v-7h3l1-3h-4V9c0-.6.4-1 1-1z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <div class="footer-kicker"><span class="footer-heading">Quick Link</span></div>
+        <nav style="display: flex; flex-direction: column; gap: 11px; font-size: 14.5px;">
+          <a class="link" href="Homepage.dc.html">Home</a>
+          <a class="link" href="Services.dc.html">Services</a>
+          <a class="link" href="Pricing.dc.html">Pricing</a>
+          <a class="link" href="Contact.dc.html">Contact Us</a>
+          <a class="link" href="https://zoomiesireland.portal.gingrapp.com/public/new_customer" target="_blank" rel="noopener">Register</a>
+        </nav>
+      </div>
+
+      <div class="footer-col">
+        <div class="footer-kicker"><span class="footer-heading">Contact Info</span></div>
+        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 14.5px;">
+          <a class="fc-row" href="https://wa.me/353868099535" target="_blank" rel="noopener"><span class="fc-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0122 16.92z"/></svg></span><span>+353868099535</span></a>
+          <a class="fc-row" href="mailto:hello@zoomies.ie"><span class="fc-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></span><span>hello@zoomies.ie</span></a>
+          <div class="fc-row is-static"><span class="fc-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span>116A Lower Kilmacud Road, Stillorgan, Co. Dublin, A94 R2C9</span></div>
+        </div>
+      </div>
+
+      <div class="footer-col footer-news">
+        <div class="footer-kicker"><span class="footer-heading">Newsletter</span></div>
+        <p class="footer-news-copy">Paw-some updates, grooming tips &amp; academy news — straight to your inbox.</p>
+        <form class="footer-news-form" action="#" method="post" onsubmit="return false;">
+          <label class="sr-only" for="footer-email-pricing">Email</label>
+          <input id="footer-email-pricing" class="footer-news-input" type="email" name="email" placeholder="Your email" required autocomplete="email">
+          <button class="footer-news-btn" type="submit">Subscribe<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </form>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="footer-copy">
+        <button class="to-top" type="button" id="to-top" aria-label="Back to top">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        </button>
+        <span>© 2026 Zoomies Grooming. All Rights Reserved.</span>
+      </div>
+      <div class="footer-legal">
+        <a class="link" href="Privacy.dc.html">Privacy Policy</a>
+        <span class="footer-dot" aria-hidden="true">·</span>
+        <a class="link" href="Terms.dc.html">Terms &amp; Conditions</a>
+      </div>
+    </div>
+  </footer>
+</div>
+]]>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+class Component extends StreamableLogic {
+  componentDidMount() {
+    if (typeof window === "undefined") return;
+
+    if ("IntersectionObserver" in window) {
+      const els = document.querySelectorAll(".reveal");
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) { entry.target.classList.add("is-visible"); io.unobserve(entry.target); }
+        });
+      }, { threshold: 0.15, rootMargin: "0px 0px -60px 0px" });
+      els.forEach((el) => io.observe(el));
+      this._io = io;
+    } else {
+      document.querySelectorAll(".reveal").forEach((el) => el.classList.add("is-visible"));
+    }
+
+    /* ---------- sticky header ---------- */
+    const header = document.querySelector(".site-header");
+    if (header) {
+      const onScrollStuck = () => {
+        const y = window.scrollY || document.documentElement.scrollTop || 0;
+        header.classList.toggle("is-stuck", y > 8);
+      };
+      window.addEventListener("scroll", onScrollStuck, { passive: true });
+      onScrollStuck();
+    }
+
+
+    const scrollToTopRobust = (el) => {
+      const roots = [window, document.documentElement, document.body];
+      let p = el && el.parentElement;
+      while (p && p !== document.body) {
+        const s = getComputedStyle(p);
+        if ((s.overflowY === "auto" || s.overflowY === "scroll") && p.scrollHeight > p.clientHeight) roots.push(p);
+        p = p.parentElement;
+      }
+      roots.forEach((r) => {
+        try {
+          if (r === window) window.scrollTo({ top: 0, behavior: "smooth" });
+          else if (r.scrollTo) r.scrollTo({ top: 0, behavior: "smooth" });
+          else r.scrollTop = 0;
+        } catch (_) {}
+      });
+    };
+
+    /* ---------- back to top (footer) ---------- */
+    const wireToTop = (el) => {
+      if (!el) return;
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
+        scrollToTopRobust(el);
+      });
+    };
+    wireToTop(document.getElementById("to-top"));
+
+  }
+  componentWillUnmount() { if (this._io) this._io.disconnect(); }
+}
+</script>
+</body>
+</html>

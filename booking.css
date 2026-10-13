@@ -1,0 +1,20 @@
+/* =====================================================================
+   STICKY BOOKING BUTTON — mobile only. Opens the Gingr new-customer
+   registration page. Sits bottom-left so it clears the round WhatsApp
+   button bottom-right. (Teeth Cleaning has its own sticky bar instead.)
+   ===================================================================== */
+.sticky-book { display: none; }
+
+@media (max-width: 700px) {
+  .sticky-book {
+    position: fixed; z-index: 998;
+    left: 16px; bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    display: inline-flex; align-items: center; gap: 8px;
+    min-height: 52px; padding: 0 22px;
+    border-radius: 999px; border: 1.5px solid #23281C;
+    background: #F5C21A; color: #23281C;
+    font-family: 'Work Sans', sans-serif; font-size: 15px; font-weight: 700;
+    text-decoration: none; box-shadow: 0 10px 24px -10px rgba(35, 40, 28, 0.55);
+  }
+  .sticky-book:active { background: #E5B30F; }
+}
